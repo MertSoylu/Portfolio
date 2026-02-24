@@ -1,0 +1,41 @@
+import React from 'react';
+import { motion } from 'framer-motion';
+
+const LoadingSpinner = () => {
+  const containerVariants = {
+    animate: {
+      transition: {
+        staggerChildren: 0.1,
+      },
+    },
+  };
+
+  const dotVariants = {
+    animate: {
+      y: [0, -10, 0],
+      transition: {
+        duration: 0.8,
+        repeat: Infinity,
+      },
+    },
+  };
+
+  return (
+    <motion.div
+      className="flex items-center justify-center gap-2"
+      variants={containerVariants}
+      animate="animate"
+    >
+      {[...Array(3)].map((_, i) => (
+        <motion.div
+          key={i}
+          className="w-3 h-3 bg-warm-500 rounded-full"
+          variants={dotVariants}
+        />
+      ))}
+      <span className="ml-4 text-sand-700 font-medium">Loading...</span>
+    </motion.div>
+  );
+};
+
+export default LoadingSpinner;
