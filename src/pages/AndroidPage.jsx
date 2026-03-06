@@ -46,6 +46,9 @@ const scaleIn = {
 const AndroidPage = () => {
   const { isTurkish } = useLanguage();
   const { isDark } = useDarkMode();
+  const googlePlayBadgeSrc = isTurkish
+    ? 'https://play.google.com/intl/en_us/badges/static/images/badges/tr_badge_web_generic.png'
+    : 'https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png';
 
   const features = isTurkish
     ? [
@@ -140,7 +143,6 @@ const AndroidPage = () => {
                 </p>
                 <div className="flex items-center justify-center md:justify-start gap-3 mt-3">
                   <span className="px-3 py-1 bg-white/20 rounded-full text-sm">Health & Fitness</span>
-                  <span className="px-3 py-1 bg-white/20 rounded-full text-sm">v1.0.5</span>
                 </div>
               </div>
             </div>
@@ -198,23 +200,18 @@ const AndroidPage = () => {
                 rel="noopener noreferrer"
                 whileHover={{ scale: 1.05, y: -2 }}
                 whileTap={{ scale: 0.97 }}
-                className="inline-flex items-center gap-3 px-8 py-4 bg-black dark:bg-white rounded-xl shadow-lg hover:shadow-2xl transition-shadow group"
+                className="inline-flex"
+                aria-label={isTurkish ? "Google Play'den indir" : 'Get it on Google Play'}
               >
-                {/* Google Play icon */}
-                <svg viewBox="0 0 24 24" className="w-8 h-8" fill="none">
-                  <path d="M3.609 1.814L13.792 12 3.61 22.186a.996.996 0 01-.61-.92V2.734c0-.382.218-.72.609-.92z" fill="#4285F4" />
-                  <path d="M17.219 8.691L5.218.753C4.833.525 4.41.461 4.018.554L14.5 12 4.018 23.446c.392.093.815.029 1.2-.199l12.001-7.938" fill="#34A853" />
-                  <path d="M21.015 10.268l-3.796-2.507L13.5 12l3.719 4.239 3.796-2.506c.66-.437.66-1.528 0-1.965z" fill="#FBBC04" />
-                  <path d="M4.018.554L14.5 12 4.018 23.446c-.82-.196-1.518-.88-1.518-1.712V2.266c0-.832.698-1.516 1.518-1.712z" fill="#EA4335" />
-                </svg>
-                <div className="text-left">
-                  <div className="text-[10px] text-gray-400 dark:text-gray-500 uppercase tracking-wider font-medium">
-                    {isTurkish ? "YÜKLE" : "GET IT ON"}
-                  </div>
-                  <div className="text-lg font-semibold text-white dark:text-gray-900 -mt-0.5">
-                    Google Play
-                  </div>
-                </div>
+                <img
+                  src={googlePlayBadgeSrc}
+                  alt={isTurkish ? "Google Play'den al" : 'Get it on Google Play'}
+                  className="h-20 w-auto"
+                  loading="lazy"
+                  onError={(event) => {
+                    event.currentTarget.src = 'https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png';
+                  }}
+                />
               </motion.a>
             </motion.div>
           </div>

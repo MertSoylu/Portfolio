@@ -1,7 +1,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { HiMail } from 'react-icons/hi';
-import { FiGithub } from 'react-icons/fi';
+import { FiGithub, FiLinkedin } from 'react-icons/fi';
 import { useLanguage } from '../context/LanguageContext';
 
 /* ── Animated wave SVG separator ── */
@@ -36,6 +36,11 @@ const Footer = () => {
       name: 'GitHub',
       icon: <FiGithub className="w-6 h-6" />,
       href: 'https://github.com/MertSoylu',
+    },
+    {
+      name: 'LinkedIn',
+      icon: <FiLinkedin className="w-6 h-6" />,
+      href: 'https://www.linkedin.com/in/mert-soylu-b8b6a1341/',
     },
     {
       name: 'Email',

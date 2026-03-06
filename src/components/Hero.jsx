@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, useScroll, useTransform } from 'framer-motion';
-import { HiArrowRight } from 'react-icons/hi';
+import { HiArrowRight, HiSparkles, HiDownload } from 'react-icons/hi';
 import { Link } from 'react-router-dom';
 import { useLanguage } from '../context/LanguageContext';
 
@@ -115,10 +115,18 @@ const Hero = () => {
     >
       <motion.div style={{ y, opacity, scale }} className="text-center max-w-4xl mx-auto">
         <motion.div variants={containerVariants} initial="hidden" animate="visible">
-          {/* Animated greeting */}
-          <motion.div variants={itemVariants} className="mb-6">
-            <span className="inline-block px-4 py-2 bg-sand-200 dark:bg-dark-600 text-sand-700 dark:text-dark-50 rounded-full text-sm font-semibold">
-              {isTurkish ? '👋 Portfolyoma hoş geldin' : '👋 Welcome to my portfolio'}
+          {/* Animated greeting + Open to Work */}
+          <motion.div variants={itemVariants} className="mb-6 flex flex-wrap items-center justify-center gap-3">
+            <span className="inline-flex items-center gap-2 px-4 py-2 bg-sand-200 dark:bg-dark-600 text-sand-700 dark:text-dark-50 rounded-full text-sm font-semibold border border-warm-500/20 dark:border-warm-500/10">
+              <HiSparkles className="w-4 h-4 text-warm-500" />
+              {isTurkish ? 'Portfolyoma hoş geldin' : 'Welcome to my portfolio'}
+            </span>
+            <span className="inline-flex items-center gap-2 px-4 py-2 bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-400 rounded-full text-sm font-semibold border border-green-300 dark:border-green-500/30">
+              <span className="relative flex h-2 w-2">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75" />
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500" />
+              </span>
+              {isTurkish ? 'Fırsatlara Açık' : 'Open to Work'}
             </span>
           </motion.div>
 
@@ -160,13 +168,15 @@ const Hero = () => {
             className="text-xl md:text-2xl text-sand-600 dark:text-dark-200 mb-2 min-h-9"
           >
             <span>{displayedTitle}</span>
-            <motion.span
-              animate={{ opacity: [1, 0] }}
-              transition={{ duration: 0.53, repeat: Infinity, repeatType: 'reverse' }}
-              className="text-warm-500 font-light ml-0.5"
-            >
-              |
-            </motion.span>
+            {!titleComplete && (
+              <motion.span
+                animate={{ opacity: [1, 0] }}
+                transition={{ duration: 0.53, repeat: Infinity, repeatType: 'reverse' }}
+                className="text-warm-500 font-light ml-0.5"
+              >
+                |
+              </motion.span>
+            )}
           </motion.div>
 
           {/* Role cycling */}
@@ -194,10 +204,20 @@ const Hero = () => {
             variants={itemVariants}
             className="text-lg text-sand-600 dark:text-dark-200 mb-4"
           >
-            {isTurkish ? 'öğrencisi, ' : 'at '}
-            <span className="font-semibold text-sand-700 dark:text-dark-100">
-              Kütahya Dumlupınar University
-            </span>
+            {isTurkish ? (
+              <>
+                Kütahya Dumlupınar{' '}
+                <span className="font-semibold text-sand-700 dark:text-dark-100">Üniversitesi</span>
+                {'\'nde'}
+              </>
+            ) : (
+              <>
+                at{' '}
+                <span className="font-semibold text-sand-700 dark:text-dark-100">
+                  Kütahya Dumlupınar University
+                </span>
+              </>
+            )}
           </motion.p>
 
           {/* Description */}
@@ -226,9 +246,10 @@ const Hero = () => {
               <Link
                 key={skill.name}
                 to={skill.path}
-                className="px-4 py-2.5 bg-warm-500/10 text-warm-600 dark:text-warm-400 rounded-full text-sm font-medium border border-warm-500/20 hover:bg-warm-500/20 hover:scale-105 transition-all cursor-pointer"
+                className="inline-flex items-center gap-1.5 px-4 py-2.5 bg-warm-500/10 text-warm-600 dark:text-warm-400 rounded-full text-sm font-medium border border-warm-500/20 hover:bg-warm-500/20 hover:gap-2.5 transition-all duration-200 cursor-pointer group"
               >
                 {skill.name}
+                <HiArrowRight className="w-3.5 h-3.5 opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-200" />
               </Link>
             ))}
           </motion.div>
@@ -251,6 +272,16 @@ const Hero = () => {
               whileTap={{ scale: 0.95 }}
             >
               {isTurkish ? 'İletişime Geç' : 'Get In Touch'}
+            </motion.a>
+            <motion.a
+              href="/cv.pdf"
+              download
+              className="inline-flex items-center gap-2 px-6 py-3 rounded-lg font-semibold border-2 border-warm-500 text-warm-600 dark:text-warm-400 hover:bg-warm-500 hover:text-white transition-all duration-300"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+            >
+              <HiDownload className="w-4 h-4" />
+              {isTurkish ? 'CV İndir' : 'Download CV'}
             </motion.a>
           </motion.div>
 

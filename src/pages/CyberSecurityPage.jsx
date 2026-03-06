@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { HiArrowLeft, HiShieldCheck, HiLightningBolt, HiBookOpen, HiChip } from 'react-icons/hi';
+import { HiArrowLeft, HiShieldCheck, HiLightningBolt, HiBookOpen, HiChip, HiAcademicCap, HiDownload, HiExternalLink } from 'react-icons/hi';
 import { Link } from 'react-router-dom';
 import { useLanguage } from '../context/LanguageContext';
 import { useDarkMode } from '../context/DarkModeContext';
@@ -269,6 +269,77 @@ const CyberSecurityPage = () => {
             </motion.div>
           </div>
         </motion.div>
+
+        {/* Certificates Section */}
+        <motion.div
+          variants={staggerContainer}
+          initial="initial"
+          whileInView="animate"
+          viewport={{ once: true }}
+          className="mt-8"
+        >
+          <motion.div variants={fadeUp} className="flex items-center gap-3 mb-8">
+            <div className="w-10 h-10 rounded-xl bg-red-500/10 flex items-center justify-center text-red-500 dark:text-red-400">
+              <HiAcademicCap className="w-6 h-6" />
+            </div>
+            <h2 className="text-2xl font-bold text-sand-900 dark:text-dark-50">
+              {isTurkish ? 'Sertifikalar' : 'Certificates'}
+            </h2>
+          </motion.div>
+
+          <motion.div variants={scaleIn} className="grid sm:grid-cols-2 gap-5">
+            {/* Introduction to Cybersecurity — Cisco */}
+            <motion.div
+              whileHover={{ y: -4 }}
+              transition={{ duration: 0.3 }}
+              className="bg-white/50 dark:bg-dark-600/50 backdrop-blur-md rounded-2xl border border-sand-200 dark:border-dark-400 overflow-hidden group cursor-pointer"
+            >
+              {/* Card header */}
+              <div className="bg-gradient-to-r from-red-500 via-rose-500 to-orange-500 p-4 flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center">
+                  <HiShieldCheck className="w-6 h-6 text-white" />
+                </div>
+                <div>
+                  <p className="text-white/70 text-xs font-medium">Cisco</p>
+                  <p className="text-white font-semibold text-sm leading-tight">
+                    Introduction to Cybersecurity
+                  </p>
+                </div>
+              </div>
+
+              {/* Card body */}
+              <div className="p-5">
+                <p className="text-sm text-sand-600 dark:text-dark-200 mb-5 leading-relaxed">
+                  {isTurkish
+                    ? 'Cisco NetAcad tarafından verilen, temel siber güvenlik kavramlarını kapsayan sertifika.'
+                    : 'Certificate issued by Cisco NetAcad covering fundamental cybersecurity concepts.'}
+                </p>
+                <div className="flex gap-3">
+                  <a
+                    href="/certificates/Introduction_to_Cybersecurity_certificate.pdf"
+                    download
+                    className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg bg-warm-500/10 text-warm-600 dark:text-warm-400 border border-warm-500/20 hover:bg-warm-500/20 transition-colors text-sm font-medium"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <HiDownload className="w-4 h-4" />
+                    {isTurkish ? 'İndir' : 'Download'}
+                  </a>
+                  <a
+                    href="/certificates/Introduction_to_Cybersecurity_certificate.pdf"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg bg-sand-100 dark:bg-dark-500 text-sand-700 dark:text-dark-200 border border-sand-200 dark:border-dark-400 hover:border-warm-500/40 transition-colors text-sm font-medium"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <HiExternalLink className="w-4 h-4" />
+                    {isTurkish ? 'Görüntüle' : 'View'}
+                  </a>
+                </div>
+              </div>
+            </motion.div>
+          </motion.div>
+        </motion.div>
+
       </div>
     </motion.div>
   );

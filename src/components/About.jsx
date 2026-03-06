@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import TiltCard from './TiltCard';
 import { motion, useInView } from 'framer-motion';
 import { HiAcademicCap, HiCode, HiShieldCheck, HiArrowRight } from 'react-icons/hi';
 import { Link } from 'react-router-dom';
@@ -157,15 +158,15 @@ const About = () => {
               </h3>
               <p className="text-lg text-sand-600 dark:text-dark-200 mb-4">
                 {isTurkish
-                  ? 'Kütahya Dumlupınar Üniversitesi Bilgisayar Programcılığı öğrencisiyim; estetik tasarımı güçlü işlevsellikle birleştiren çözümler üretmeye odaklanıyorum.'
+                  ? 'Kütahya Dumlupınar Üniversitesi\'nde Bilgisayar Programcılığı öğrencisiyim; estetik tasarımı güçlü işlevsellikle birleştiren çözümler üretmeye odaklanıyorum.'
                   : "I'm a computer programming student at Kütahya Dumlupınar University, passionate about creating solutions that combine beautiful design with solid functionality."}
               </p>
-              <p className="text-lg text-sand-600 dark:text-dark-200 mb-4">
+              <p className="text-lg text-sand-600 dark:text-dark-200 mb-4 pl-4 border-l-2 border-warm-500/40">
                 {isTurkish
                   ? 'Teknoloji yolculuğum merakla başladı ve gerçek problemleri çözen uygulamalar geliştirme tutkusuna dönüştü. Her projede temiz, sürdürülebilir ve iyi pratiklere uygun kod yazmayı önceliklendiriyorum.'
                   : 'My journey in tech started with curiosity about how things work, and it has evolved into a passion for building applications that solve real-world problems. I believe in writing clean, maintainable code and following best practices in every project.'}
               </p>
-              <p className="text-lg text-sand-600 dark:text-dark-200">
+              <p className="text-lg text-sand-600 dark:text-dark-200 pl-4 border-l-2 border-warm-500/20">
                 {isTurkish
                   ? 'Kod yazmadığım zamanlarda yeni teknolojileri keşfetmeyi, açık kaynak projelere katkı sunmayı ve web/mobil dünyasındaki güncel trendleri takip etmeyi seviyorum.'
                   : "When I'm not coding, I love exploring new technologies, contributing to open-source projects, and learning about the latest trends in web and mobile development."}
@@ -289,48 +290,50 @@ const About = () => {
               {skills.map((skill, index) => (
                 <motion.div
                   key={index}
-                  className="bg-white/40 dark:bg-dark-600/40 backdrop-blur-md p-5 sm:p-8 rounded-2xl border border-sand-200 dark:border-dark-400 card-hover group"
-                  whileHover={{ y: -8 }}
+                  className="group h-full"
+                  whileHover={{ y: -4 }}
                   transition={{ duration: 0.3 }}
                 >
-                  {/* Icon with whileInView bounce + hover jiggle */}
-                  <motion.div
-                    className="text-warm-600 mb-4 group-hover:text-warm-700 transition-colors inline-block"
-                    initial={{ scale: 0, rotate: -30 }}
-                    whileInView={{ scale: 1, rotate: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ type: 'spring', stiffness: 260, damping: 15, delay: index * 0.15 }}
-                    whileHover={{
-                      rotate: [0, -10, 10, -10, 10, 0],
-                      transition: { duration: 0.5 },
-                    }}
-                  >
-                    {skill.icon}
-                  </motion.div>
-
-                  <h4 className="text-xl font-bold text-sand-900 dark:text-dark-50 mb-3">
-                    {skill.title}
-                  </h4>
-                  <p className="text-sand-600 dark:text-dark-200 mb-6">{skill.description}</p>
-                  <div className="flex flex-wrap gap-2 mb-6">
-                    {skill.technologies.map((tech) => (
-                      <span
-                        key={tech}
-                        className="px-3 py-1 bg-warm-500/10 text-warm-600 dark:text-warm-400 text-xs rounded-full border border-warm-500/20"
-                      >
-                        {tech}
-                      </span>
-                    ))}
-                  </div>
-                  {skill.link && (
-                    <Link
-                      to={skill.link}
-                      className="inline-flex items-center gap-1.5 text-sm font-medium text-warm-600 dark:text-warm-400 hover:text-warm-700 dark:hover:text-warm-300 group/link transition-colors py-2"
+                  <TiltCard className="relative h-full bg-white/40 dark:bg-dark-600/40 backdrop-blur-md p-5 sm:p-8 rounded-2xl border border-sand-200 dark:border-dark-400 card-hover group flex flex-col">
+                    {/* Icon with whileInView bounce + hover jiggle */}
+                    <motion.div
+                      className="w-12 h-12 rounded-xl bg-warm-500/10 border border-warm-500/20 text-warm-600 mb-4 group-hover:bg-warm-500/20 group-hover:text-warm-700 transition-colors flex items-center justify-center relative z-10"
+                      initial={{ scale: 0, rotate: -30 }}
+                      whileInView={{ scale: 1, rotate: 0 }}
+                      viewport={{ once: true }}
+                      transition={{ type: 'spring', stiffness: 260, damping: 15, delay: index * 0.15 }}
+                      whileHover={{
+                        rotate: [0, -10, 10, -10, 10, 0],
+                        transition: { duration: 0.5 },
+                      }}
                     >
-                      {isTurkish ? 'Detayları Gör' : 'View Details'}
-                      <HiArrowRight className="w-4 h-4 group-hover/link:translate-x-1 transition-transform" />
-                    </Link>
-                  )}
+                      {skill.icon}
+                    </motion.div>
+
+                    <h4 className="text-xl font-bold text-sand-900 dark:text-dark-50 mb-3 relative z-10">
+                      {skill.title}
+                    </h4>
+                    <p className="text-sand-600 dark:text-dark-200 mb-6 relative z-10">{skill.description}</p>
+                    <div className="flex flex-wrap gap-2 mb-6 relative z-10">
+                      {skill.technologies.map((tech) => (
+                        <span
+                          key={tech}
+                          className="px-3 py-1 bg-warm-500/10 text-warm-600 dark:text-warm-400 text-xs rounded-full border border-warm-500/20"
+                        >
+                          {tech}
+                        </span>
+                      ))}
+                    </div>
+                    {skill.link && (
+                      <Link
+                        to={skill.link}
+                        className="inline-flex items-center gap-1.5 text-sm font-medium text-warm-600 dark:text-warm-400 hover:text-warm-700 dark:hover:text-warm-300 group/link transition-colors py-2 relative z-10 mt-auto"
+                      >
+                        {isTurkish ? 'Detayları Gör' : 'View Details'}
+                        <HiArrowRight className="w-4 h-4 group-hover/link:translate-x-1 transition-transform" />
+                      </Link>
+                    )}
+                  </TiltCard>
                 </motion.div>
               ))}
             </div>
