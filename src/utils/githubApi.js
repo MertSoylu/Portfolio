@@ -6,7 +6,7 @@ const GITHUB_TOKEN = import.meta.env.VITE_GITHUB_TOKEN;
 
 // Cache configuration
 const CACHE_KEY = 'github_repos_cache';
-const CACHE_TTL = 24 * 60 * 60 * 1000; // 24 hours in ms
+const CACHE_TTL = 60 * 60 * 1000; // 1 hour in ms (session-scoped anyway)
 const RATE_LIMIT_KEY = 'github_api_rate_limit';
 const MAX_REQUESTS_PER_MINUTE = 20;
 const RATE_LIMIT_WINDOW_MS = 60 * 1000;
@@ -16,27 +16,27 @@ const RATE_LIMIT_WINDOW_MS = 60 * 1000;
  */
 const getCachedData = (key) => {
   try {
-    const cached = localStorage.getItem(key);
+    const cached = sessionStorage.getItem(key);
     if (!cached) return null;
 
     const { data, timestamp } = JSON.parse(cached);
     if (Date.now() - timestamp > CACHE_TTL) {
-      localStorage.removeItem(key);
+      sessionStorage.removeItem(key);
       return null;
     }
     return data;
   } catch {
-    localStorage.removeItem(key);
+    sessionStorage.removeItem(key);
     return null;
   }
 };
 
 /**
- * Save data to localStorage cache
+ * Save data to sessionStorage cache
  */
 const setCachedData = (key, data) => {
   try {
-    localStorage.setItem(key, JSON.stringify({ data, timestamp: Date.now() }));
+    sessionStorage.setItem(key, JSON.stringify({ data, timestamp: Date.now() }));
   } catch (e) {
     console.warn('Failed to cache data:', e);
   }

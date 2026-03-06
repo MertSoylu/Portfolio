@@ -61,17 +61,22 @@ const CyberSecurityPage = () => {
         { icon: <HiChip className="w-7 h-7" />, title: 'Secure Coding', desc: 'OWASP standards and secure software development practices' },
       ];
 
-  /* Animated terminal lines */
+  /* Animated terminal lines — msscan simulation */
   const terminalLines = [
-    { prompt: '~$', cmd: 'nmap -sV target.com', delay: 0 },
-    { prompt: '', cmd: 'Starting Nmap 7.94...', delay: 0.3, isOutput: true },
-    { prompt: '', cmd: 'PORT    STATE  SERVICE  VERSION', delay: 0.6, isOutput: true },
-    { prompt: '', cmd: '22/tcp  open   ssh      OpenSSH 8.9', delay: 0.8, isOutput: true },
-    { prompt: '', cmd: '80/tcp  open   http     nginx 1.24', delay: 1.0, isOutput: true },
-    { prompt: '', cmd: '443/tcp open   https    nginx 1.24', delay: 1.2, isOutput: true },
-    { prompt: '~$', cmd: 'python3 exploit_scanner.py', delay: 1.6 },
-    { prompt: '', cmd: '[+] Scanning for vulnerabilities...', delay: 2.0, isOutput: true, isSuccess: true },
-    { prompt: '', cmd: '[✓] Scan complete. 0 critical issues.', delay: 2.4, isOutput: true, isSuccess: true },
+    { prompt: '~$', cmd: 'msscan', delay: 0 },
+    { prompt: 'msscan>', cmd: 'set url https://example.com', delay: 0.5 },
+    { prompt: '', cmd: '[✓] Target set: https://example.com', delay: 0.9, isOutput: true, isSuccess: true },
+    { prompt: 'msscan>', cmd: 'set req 10', delay: 1.2 },
+    { prompt: '', cmd: '[✓] Rate set: 10 req/s', delay: 1.6, isOutput: true, isSuccess: true },
+    { prompt: 'msscan>', cmd: 'run', delay: 2.0 },
+    { prompt: '', cmd: '[*] Starting msscan...', delay: 2.4, isOutput: true },
+    { prompt: '', cmd: '[*] Running XSS module...', delay: 2.8, isOutput: true },
+    { prompt: '', cmd: '[+] XSS: 2 reflected vulnerabilities found', delay: 3.2, isOutput: true, isWarning: true },
+    { prompt: '', cmd: '[*] Running SQLi module...', delay: 3.5, isOutput: true },
+    { prompt: '', cmd: '[✓] SQLi: No issues found.', delay: 3.9, isOutput: true, isSuccess: true },
+    { prompt: '', cmd: '[*] Running Headers module...', delay: 4.2, isOutput: true },
+    { prompt: '', cmd: '[!] Missing: Content-Security-Policy, X-Frame-Options', delay: 4.5, isOutput: true, isWarning: true },
+    { prompt: '', cmd: '[✓] Scan complete. Report saved to report.html', delay: 4.9, isOutput: true, isSuccess: true },
   ];
 
   return (
@@ -156,38 +161,12 @@ const CyberSecurityPage = () => {
           </motion.div>
 
           <div className="p-5 sm:p-8 md:p-10">
-            {/* Message */}
-            <motion.div
-              variants={fadeUp}
-              className="mb-8 sm:mb-10 p-4 sm:p-6 rounded-2xl bg-gradient-to-r from-amber-500/5 to-orange-500/5 border border-amber-500/15 dark:from-amber-500/10 dark:to-orange-500/10 dark:border-amber-500/20"
-            >
-              <div className="flex items-start gap-4">
-                <motion.span
-                  animate={{ scale: [1, 1.15, 1] }}
-                  transition={{ duration: 2, repeat: Infinity }}
-                  className="text-3xl flex-shrink-0"
-                >
-                  🚀
-                </motion.span>
-                <div>
-                  <h3 className="text-lg font-semibold text-sand-900 dark:text-dark-50 mb-2">
-                    {isTurkish ? 'Henüz bir projem yok — ama yolda!' : "No projects yet — but they're on the way!"}
-                  </h3>
-                  <p className="text-sand-600 dark:text-dark-200 leading-relaxed">
-                    {isTurkish
-                      ? 'Siber güvenlik alanında henüz yayınlanmış bir projem bulunmuyor. Ancak ağ güvenliği, kriptografi, güvenli kodlama ve Python ile güvenlik araçları geliştirme konularında aktif olarak kendimi geliştirmeye devam ediyorum. Yakında bu alanda da somut projeler paylaşmayı hedefliyorum!'
-                      : "I don't have any published cybersecurity projects yet. However, I'm actively developing my skills in network security, cryptography, secure coding, and building security tools with Python. I aim to share concrete projects in this field soon!"}
-                  </p>
-                </div>
-              </div>
-            </motion.div>
-
             {/* Learning Areas */}
-            <motion.div variants={fadeUp}>
+            <motion.div variants={fadeUp} className="mb-8 sm:mb-10">
               <h3 className="text-xl font-bold text-sand-900 dark:text-dark-50 mb-6">
                 {isTurkish ? 'Çalıştığım Alanlar' : 'Areas I\'m Studying'}
               </h3>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-10">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {learningAreas.map((area, i) => (
                   <motion.div
                     key={i}
@@ -209,63 +188,117 @@ const CyberSecurityPage = () => {
               </div>
             </motion.div>
 
-            {/* Animated Terminal */}
+            {/* Projects */}
             <motion.div variants={fadeUp}>
-              <h3 className="text-xl font-bold text-sand-900 dark:text-dark-50 mb-4">
-                {isTurkish ? 'Terminal Simülasyonu' : 'Terminal Simulation'}
+              <h3 className="text-xl font-bold text-sand-900 dark:text-dark-50 mb-6">
+                {isTurkish ? 'Projeler' : 'Projects'}
               </h3>
-              <div className="rounded-xl overflow-hidden shadow-2xl border border-gray-700/30">
-                {/* Terminal title bar */}
-                <div className="bg-[#2d333b] px-4 py-2.5 flex items-center gap-1.5">
-                  <div className="w-3 h-3 rounded-full bg-red-400" />
-                  <div className="w-3 h-3 rounded-full bg-yellow-400" />
-                  <div className="w-3 h-3 rounded-full bg-green-400" />
-                  <span className="ml-3 text-xs text-gray-400 font-mono">terminal — bash</span>
+              <motion.div
+                whileHover={{ y: -4 }}
+                transition={{ duration: 0.3 }}
+                className="bg-sand-100/80 dark:bg-dark-500/50 rounded-2xl border border-sand-200/60 dark:border-dark-400/40 overflow-hidden"
+              >
+                {/* Card header */}
+                <div className="bg-gradient-to-r from-red-500 via-rose-500 to-orange-500 p-4 flex items-center justify-between gap-3">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center">
+                      <HiLightningBolt className="w-6 h-6 text-white" />
+                    </div>
+                    <div>
+                      <p className="text-white font-bold text-lg leading-tight">msscan</p>
+                      <p className="text-white/70 text-xs">Python</p>
+                    </div>
+                  </div>
+                  <span className="px-3 py-1 bg-white/20 text-white text-xs font-medium rounded-full">Python</span>
                 </div>
-                {/* Terminal body */}
-                <div className="bg-[#0d1117] p-4 sm:p-5 font-mono text-xs sm:text-sm min-h-[220px] space-y-1 overflow-x-auto">
-                  {terminalLines.map((line, i) => (
-                    <motion.div
-                      key={i}
-                      initial={{ opacity: 0, x: -10 }}
-                      whileInView={{ opacity: 1, x: 0 }}
-                      viewport={{ once: true }}
-                      transition={{ delay: line.delay, duration: 0.3 }}
-                      className="flex items-center gap-2"
-                    >
-                      {line.prompt && (
-                        <span className="text-emerald-400">{line.prompt}</span>
-                      )}
+
+                {/* Card body */}
+                <div className="p-5">
+                  <p className="text-sm text-sand-600 dark:text-dark-200 mb-4 leading-relaxed">
+                    {isTurkish
+                      ? 'Python ile geliştirdiğim terminal tabanlı web uygulama güvenlik tarayıcısı. Hedef siteye yönelik XSS, SQL Injection, CSRF, SSRF, Open Redirect, HTTP güvenlik başlıkları ve subdomain tespiti olmak üzere 7 farklı güvenlik modülü içeriyor. İstek hızı ve zaman aşımı ayarlarıyla özelleştirilebilir; tarama sonunda bulgular önem derecesine göre sıralanmış HTML raporu olarak dışa aktarılıyor.'
+                      : 'A terminal-based web application security scanner I built with Python. It runs 7 security modules against a target — XSS, SQL Injection, CSRF, SSRF, Open Redirect, HTTP security headers, and subdomain enumeration. Configurable request rate and timeout settings keep scans within safe limits, and results are exported as an HTML report sorted by severity.'}
+                  </p>
+                  <div className="flex flex-wrap gap-2 mb-5">
+                    {['XSS', 'SQLi', 'CSRF', 'SSRF', 'Open Redirect', 'Headers', 'Subdomains'].map((tag) => (
                       <span
-                        className={
-                          line.isSuccess
-                            ? 'text-emerald-400'
-                            : line.isOutput
-                            ? 'text-gray-400'
-                            : 'text-gray-200'
-                        }
+                        key={tag}
+                        className="px-2.5 py-1 text-xs font-medium rounded-lg bg-red-500/10 text-red-600 dark:text-red-400 border border-red-500/20"
                       >
-                        {line.cmd}
+                        {tag}
                       </span>
-                    </motion.div>
-                  ))}
-                  {/* Blinking cursor */}
-                  <motion.div
-                    initial={{ opacity: 0 }}
-                    whileInView={{ opacity: 1 }}
-                    viewport={{ once: true }}
-                    transition={{ delay: 2.8 }}
-                    className="flex items-center gap-2"
+                    ))}
+                  </div>
+                  <a
+                    href="https://github.com/MertSoylu/msscan"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-sand-200/80 dark:bg-dark-400/60 text-sand-700 dark:text-dark-200 border border-sand-300 dark:border-dark-300 hover:border-red-500/40 transition-colors text-sm font-medium mb-6"
                   >
-                    <span className="text-emerald-400">~$</span>
-                    <motion.span
-                      animate={{ opacity: [1, 0] }}
-                      transition={{ duration: 0.6, repeat: Infinity, repeatType: 'reverse' }}
-                      className="inline-block w-2 h-4 bg-emerald-400"
-                    />
-                  </motion.div>
+                    <HiExternalLink className="w-4 h-4" />
+                    GitHub
+                  </a>
+
+                  {/* Terminal Simulation */}
+                  <p className="text-xs font-semibold text-sand-500 dark:text-dark-300 uppercase tracking-wider mb-3">
+                    {isTurkish ? 'Simülasyon' : 'Simulation'}
+                  </p>
+                  <div className="rounded-xl overflow-hidden shadow-2xl border border-gray-700/30">
+                    {/* Terminal title bar */}
+                    <div className="bg-[#2d333b] px-4 py-2.5 flex items-center gap-1.5">
+                      <div className="w-3 h-3 rounded-full bg-red-400" />
+                      <div className="w-3 h-3 rounded-full bg-yellow-400" />
+                      <div className="w-3 h-3 rounded-full bg-green-400" />
+                      <span className="ml-3 text-xs text-gray-400 font-mono">terminal — bash</span>
+                    </div>
+                    {/* Terminal body */}
+                    <div className="bg-[#0d1117] p-4 sm:p-5 font-mono text-xs sm:text-sm min-h-[220px] space-y-1 overflow-x-auto">
+                      {terminalLines.map((line, i) => (
+                        <motion.div
+                          key={i}
+                          initial={{ opacity: 0, x: -10 }}
+                          whileInView={{ opacity: 1, x: 0 }}
+                          viewport={{ once: true }}
+                          transition={{ delay: line.delay, duration: 0.3 }}
+                          className="flex items-center gap-2"
+                        >
+                          {line.prompt && (
+                            <span className="text-emerald-400">{line.prompt}</span>
+                          )}
+                          <span
+                            className={
+                              line.isSuccess
+                                ? 'text-emerald-400'
+                                : line.isWarning
+                                ? 'text-yellow-400'
+                                : line.isOutput
+                                ? 'text-gray-400'
+                                : 'text-gray-200'
+                            }
+                          >
+                            {line.cmd}
+                          </span>
+                        </motion.div>
+                      ))}
+                      {/* Blinking cursor */}
+                      <motion.div
+                        initial={{ opacity: 0 }}
+                        whileInView={{ opacity: 1 }}
+                        viewport={{ once: true }}
+                        transition={{ delay: 5.3 }}
+                        className="flex items-center gap-2"
+                      >
+                        <span className="text-emerald-400">~$</span>
+                        <motion.span
+                          animate={{ opacity: [1, 0] }}
+                          transition={{ duration: 0.6, repeat: Infinity, repeatType: 'reverse' }}
+                          className="inline-block w-2 h-4 bg-emerald-400"
+                        />
+                      </motion.div>
+                    </div>
+                  </div>
                 </div>
-              </div>
+              </motion.div>
             </motion.div>
           </div>
         </motion.div>
