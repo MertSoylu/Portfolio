@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
-import { HiStar, HiCode, HiExternalLink } from 'react-icons/hi';
+import React, { useState, useEffect, useCallback } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { HiStar, HiCode, HiExternalLink, HiRefresh, HiX } from 'react-icons/hi';
 import {
   fetchGitHubRepos,
   getGitHubProfileUrl,
@@ -46,30 +46,32 @@ const Projects = () => {
   const [error, setError] = useState(null);
   const [isUsingFallback, setIsUsingFallback] = useState(false);
   const [activeFilter, setActiveFilter] = useState('All');
+  const [expandedProject, setExpandedProject] = useState(null);
 
   const githubProfileUrl = getGitHubProfileUrl();
   const githubUsername = getGitHubUsername();
 
-  useEffect(() => {
-    const getProjects = async () => {
-      try {
-        setLoading(true);
-        const repos = await fetchGitHubRepos();
-        setProjects(repos);
-        setIsUsingFallback(false);
-        setError(repos.length === 0 ? 'empty' : null);
-      } catch (err) {
-        setProjects([]);
-        setIsUsingFallback(false);
-        setError('fetch_error');
-        console.error(err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    getProjects();
+  const getProjects = useCallback(async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const repos = await fetchGitHubRepos();
+      setProjects(repos);
+      setIsUsingFallback(false);
+      setError(repos.length === 0 ? 'empty' : null);
+    } catch (err) {
+      setProjects([]);
+      setIsUsingFallback(false);
+      setError('fetch_error');
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
   }, []);
+
+  useEffect(() => {
+    getProjects();
+  }, [getProjects]);
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -122,27 +124,97 @@ const Projects = () => {
 
   return (
     <section id="projects" className="py-20 px-4 relative">
+      {/* Expanded project overlay */}
+      <AnimatePresence>
+        {expandedProject && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm"
+            onClick={() => setExpandedProject(null)}
+          >
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0, y: 20 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.9, opacity: 0, y: 20 }}
+              transition={{ type: 'spring', stiffness: 300, damping: 25 }}
+              className="bg-sand-50 dark:bg-dark-700 rounded-2xl p-8 max-w-md w-full shadow-2xl border border-sand-200 dark:border-dark-400 relative"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <button
+                onClick={() => setExpandedProject(null)}
+                className="absolute top-4 right-4 p-1.5 rounded-lg text-sand-500 hover:text-sand-700 dark:text-dark-200 dark:hover:text-dark-50 hover:bg-sand-100 dark:hover:bg-dark-600 transition-colors"
+              >
+                <HiX className="w-5 h-5" />
+              </button>
+              {expandedProject.language && (
+                <span className={`inline-block px-3 py-1 text-xs font-semibold rounded-full mb-4 bg-gradient-to-r ${getLanguageColor(expandedProject.language)} text-white`}>
+                  {expandedProject.language}
+                </span>
+              )}
+              <h3 className="text-2xl font-bold text-sand-900 dark:text-dark-50 mb-3">{expandedProject.name}</h3>
+              <p className="text-sand-600 dark:text-dark-200 mb-6">
+                {expandedProject.description || (isTurkish ? 'Açıklama yok' : 'No description available')}
+              </p>
+              <div className="flex items-center gap-4 mb-6 text-sm text-sand-600 dark:text-dark-200">
+                {expandedProject.stargazers_count > 0 && (
+                  <div className="flex items-center gap-1">
+                    <HiStar className="text-warm-500" />
+                    <span>{expandedProject.stargazers_count}</span>
+                  </div>
+                )}
+              </div>
+              <div className="flex gap-3">
+                <motion.a
+                  href={expandedProject.html_url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="btn-primary flex items-center gap-2"
+                  whileHover={{ scale: 1.03 }}
+                  whileTap={{ scale: 0.97 }}
+                >
+                  <HiExternalLink className="w-4 h-4" />
+                  GitHub
+                </motion.a>
+                <motion.button
+                  onClick={() => setExpandedProject(null)}
+                  className="btn-secondary"
+                  whileHover={{ scale: 1.03 }}
+                  whileTap={{ scale: 0.97 }}
+                >
+                  {isTurkish ? 'Kapat' : 'Close'}
+                </motion.button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
       <div className="max-w-6xl mx-auto">
         <motion.div
           variants={containerVariants}
           initial="hidden"
           whileInView="visible"
-          viewport={{ once: true, margin: '-100px' }}
+          viewport={{ once: true, amount: 0.15, margin: '-60px' }}
         >
           {/* Section header */}
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
-            className="text-center mb-10"
-          >
-            <h2 className="section-title">{isTurkish ? 'Projelerim' : 'My Projects'}</h2>
+          <div className="text-center mb-10">
+            <div style={{ overflow: 'hidden' }}>
+              <motion.h2
+                className="section-title"
+                initial={{ y: '100%', opacity: 0 }}
+                whileInView={{ y: 0, opacity: 1 }}
+                viewport={{ once: true, margin: '-60px' }}
+                transition={{ duration: 0.7, ease: [0.76, 0, 0.24, 1] }}
+              >
+                {isTurkish ? 'Projelerim' : 'My Projects'}
+              </motion.h2>
+            </div>
             <AnimatedUnderline />
             <p className="section-subtitle mt-6">
               {isTurkish ? 'GitHub profilimdeki repolar' : 'Repositories from my GitHub profile'}
             </p>
-          </motion.div>
+          </div>
 
           {/* Language filter buttons */}
           {!loading && projects.length > 0 && (
@@ -156,13 +228,22 @@ const Projects = () => {
                 <button
                   key={lang}
                   onClick={() => setActiveFilter(lang)}
-                  className={`px-4 py-1.5 rounded-full text-sm font-medium border transition-all duration-200 cursor-pointer ${
+                  className={`relative px-4 py-1.5 rounded-full text-sm font-medium border transition-colors duration-200 cursor-pointer ${
                     activeFilter === lang
-                      ? 'bg-warm-500 text-white border-warm-500 shadow-md'
+                      ? 'border-warm-500 shadow-md text-white'
                       : 'bg-white/40 dark:bg-dark-600/40 text-sand-700 dark:text-dark-200 border-sand-200 dark:border-dark-400 hover:border-warm-500/50 hover:text-warm-600 dark:hover:text-warm-400'
                   }`}
                 >
-                  {lang === 'All' ? (isTurkish ? 'Tümü' : 'All') : lang}
+                  {activeFilter === lang && (
+                    <motion.div
+                      layoutId="activeFilterPill"
+                      className="absolute inset-0 bg-warm-500 rounded-full -z-10"
+                      transition={{ type: 'spring', stiffness: 380, damping: 30 }}
+                    />
+                  )}
+                  <span className="relative z-10">
+                    {lang === 'All' ? (isTurkish ? 'Tümü' : 'All') : lang}
+                  </span>
                 </button>
               ))}
             </motion.div>
@@ -178,6 +259,17 @@ const Projects = () => {
               {error === 'empty'
                 ? (isTurkish ? 'Herkese açık repo bulunamadı.' : 'No public repositories found.')
                 : (isTurkish ? 'Repolar alınamadı.' : 'Failed to fetch repositories.')}
+              {error === 'fetch_error' && (
+                <motion.button
+                  onClick={getProjects}
+                  className="mt-3 inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-amber-100 dark:bg-amber-800/40 border border-amber-300 dark:border-amber-600 text-amber-800 dark:text-amber-200 text-sm font-medium hover:bg-amber-200 dark:hover:bg-amber-700/40 transition-colors cursor-pointer"
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                >
+                  <HiRefresh className="w-4 h-4" />
+                  {isTurkish ? 'Tekrar Dene' : 'Try Again'}
+                </motion.button>
+              )}
             </motion.div>
           )}
 
@@ -202,7 +294,8 @@ const Projects = () => {
                       initial="hidden"
                       whileInView="visible"
                       viewport={{ once: true, margin: '-40px' }}
-                      className="group h-full"
+                      className="group h-full cursor-pointer"
+                      onClick={() => setExpandedProject(project)}
                     >
                       <TiltCard className="relative h-full bg-white/40 dark:bg-dark-600/40 backdrop-blur-md rounded-xl border border-sand-200 dark:border-dark-400 overflow-hidden flex flex-col transition-shadow duration-300 group-hover:shadow-xl/20">
                         {/* Language badge */}
@@ -250,6 +343,7 @@ const Projects = () => {
                             className="inline-flex items-center gap-2 text-warm-600 dark:text-warm-400 font-semibold hover:text-warm-700 dark:hover:text-warm-300 group/link"
                             whileHover={{ x: 6 }}
                             transition={{ type: 'spring', stiffness: 300, damping: 24 }}
+                            onClick={(e) => e.stopPropagation()}
                           >
                             {isTurkish ? 'GitHub\'da Gör' : 'View on GitHub'}
                             <HiExternalLink className="group-hover/link:translate-x-1 group-hover/link:-translate-y-0.5 transition-transform duration-300" />

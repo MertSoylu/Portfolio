@@ -58,7 +58,7 @@ const About = () => {
   }, []);
 
   const sectionVariants = {
-    hidden: { opacity: 0, x: -60 },
+    hidden: { opacity: 0, x: -30 },
     visible: {
       opacity: 1,
       x: 0,
@@ -78,12 +78,21 @@ const About = () => {
   };
 
   const itemVariants = {
-    hidden: { opacity: 0, x: -60 },
+    hidden: { opacity: 0, x: -30 },
     visible: {
       opacity: 1,
       x: 0,
       transition: { duration: 0.6, ease: 'easeOut' },
     },
+  };
+
+  const slideUpVariants = {
+    hidden: { opacity: 0, y: 40 },
+    visible: (i) => ({
+      opacity: 1,
+      y: 0,
+      transition: { duration: 0.5, ease: 'easeOut', delay: i * 0.12 },
+    }),
   };
 
   const skills = [
@@ -135,16 +144,26 @@ const About = () => {
           variants={containerVariants}
           initial="hidden"
           whileInView="visible"
-          viewport={{ once: true, margin: '-100px' }}
+          viewport={{ once: true, amount: 0.15, margin: '-60px' }}
         >
           {/* Section header */}
-          <motion.div variants={itemVariants} className="text-center mb-16">
-            <h2 className="section-title">{isTurkish ? 'Hakkımda' : 'About Me'}</h2>
+          <div className="text-center mb-16">
+            <div style={{ overflow: 'hidden' }}>
+              <motion.h2
+                className="section-title"
+                initial={{ y: '100%', opacity: 0 }}
+                whileInView={{ y: 0, opacity: 1 }}
+                viewport={{ once: true, margin: '-60px' }}
+                transition={{ duration: 0.7, ease: [0.76, 0, 0.24, 1] }}
+              >
+                {isTurkish ? 'Hakkımda' : 'About Me'}
+              </motion.h2>
+            </div>
             <AnimatedUnderline />
             <p className="section-subtitle mt-6">
               {isTurkish ? 'Tutkulu geliştirici ve ömür boyu öğrenen' : 'Passionate developer and lifelong learner'}
             </p>
-          </motion.div>
+          </div>
 
           {/* Main about content */}
           <motion.div
@@ -290,6 +309,11 @@ const About = () => {
               {skills.map((skill, index) => (
                 <motion.div
                   key={index}
+                  custom={index}
+                  variants={slideUpVariants}
+                  initial="hidden"
+                  whileInView="visible"
+                  viewport={{ once: true, amount: 0.2 }}
                   className="group h-full"
                   whileHover={{ y: -4 }}
                   transition={{ duration: 0.3 }}

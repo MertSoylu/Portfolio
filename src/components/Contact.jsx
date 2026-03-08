@@ -66,19 +66,42 @@ const Contact = () => {
 
   return (
     <section id="contact" className="py-20 px-4 relative">
-      <div className="max-w-4xl mx-auto">
+      {/* Decorative background orb */}
+      <div className="absolute inset-0 flex items-center justify-center pointer-events-none overflow-hidden">
+        <div className="w-96 h-96 rounded-full bg-warm-500/5 dark:bg-warm-500/5 blur-3xl" />
+      </div>
+      <div className="max-w-4xl mx-auto relative">
         <motion.div
           variants={containerVariants}
           initial="hidden"
           whileInView="visible"
-          viewport={{ once: true, margin: '-100px' }}
+          viewport={{ once: true, amount: 0.15, margin: '-60px' }}
         >
           {/* Section header */}
-          <motion.div variants={headerVariants} className="text-center mb-16">
-            <h2 className="section-title">{isTurkish ? 'İletişime Geç' : 'Get In Touch'}</h2>
+          <div className="text-center mb-8">
+            <div style={{ overflow: 'hidden' }}>
+              <motion.h2
+                className="section-title"
+                initial={{ y: '100%', opacity: 0 }}
+                whileInView={{ y: 0, opacity: 1 }}
+                viewport={{ once: true, margin: '-60px' }}
+                transition={{ duration: 0.7, ease: [0.76, 0, 0.24, 1] }}
+              >
+                {isTurkish ? 'İletişime Geç' : 'Get In Touch'}
+              </motion.h2>
+            </div>
             <AnimatedUnderline />
             <p className="section-subtitle mt-6">
               {isTurkish ? 'Bağlantı kuralım ve fikirlerini konuşalım' : "Let's connect and discuss your ideas"}
+            </p>
+          </div>
+
+          {/* Availability blurb */}
+          <motion.div variants={headerVariants} className="text-center mb-12 max-w-xl mx-auto">
+            <p className="text-sand-600 dark:text-dark-200">
+              {isTurkish
+                ? 'Yeni projeler ve iş birlikleri için hazırım. Mesaj atmaktan çekinme.'
+                : "I'm currently available for new projects and collaborations. Don't hesitate to reach out."}
             </p>
           </motion.div>
 

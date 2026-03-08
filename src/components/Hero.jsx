@@ -1,8 +1,26 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { motion, useScroll, useTransform } from 'framer-motion';
+import { motion, useScroll, useTransform, useMotionValue, useSpring } from 'framer-motion';
 import { HiArrowRight, HiSparkles, HiDownload } from 'react-icons/hi';
 import { Link } from 'react-router-dom';
 import { useLanguage } from '../context/LanguageContext';
+
+const useMagneticButton = (strength = 0.35) => {
+  const ref = React.useRef(null);
+  const x = useMotionValue(0);
+  const y = useMotionValue(0);
+  const springX = useSpring(x, { stiffness: 200, damping: 18 });
+  const springY = useSpring(y, { stiffness: 200, damping: 18 });
+
+  const onMouseMove = (e) => {
+    if (!ref.current) return;
+    const rect = ref.current.getBoundingClientRect();
+    x.set((e.clientX - (rect.left + rect.width / 2)) * strength);
+    y.set((e.clientY - (rect.top + rect.height / 2)) * strength);
+  };
+  const onMouseLeave = () => { x.set(0); y.set(0); };
+
+  return { ref, style: { x: springX, y: springY }, onMouseMove, onMouseLeave };
+};
 
 const Hero = () => {
   const { isTurkish } = useLanguage();
@@ -15,7 +33,15 @@ const Hero = () => {
   const y = useTransform(scrollYProgress, [0, 1], [0, -150]);
   const opacity = useTransform(scrollYProgress, [0, 0.8], [1, 0]);
   const scale = useTransform(scrollYProgress, [0, 0.8], [1, 0.92]);
-  const scrollIndicatorOpacity = useTransform(scrollYProgress, [0, 0.08], [1, 0]);
+  const scrollIndicatorOpacity = useTransform(scrollYProgress, [0, 0.18], [1, 0]);
+  const scrollIndicatorY = useTransform(scrollYProgress, [0, 0.18], [0, 10]);
+  const yHeading = useTransform(scrollYProgress, [0, 1], [0, -60]);
+  const yDesc = useTransform(scrollYProgress, [0, 1], [0, 20]);
+  const yBadges = useTransform(scrollYProgress, [0, 1], [0, 30]);
+
+  const magBtn1 = useMagneticButton();
+  const magBtn2 = useMagneticButton();
+  const magBtn3 = useMagneticButton();
 
   // Typing effect state
   const title = isTurkish ? 'Bilgisayar Programcılığı Öğrencisi' : 'Computer Programming Student';
@@ -28,6 +54,7 @@ const Hero = () => {
   const [displayedRole, setDisplayedRole] = useState('');
   const [isDeleting, setIsDeleting] = useState(false);
   const hasHeadingAnimated = useRef(false);
+  const languageChangedRef = useRef(false);
 
   useEffect(() => {
     // Mark heading as animated after initial render
@@ -38,12 +65,17 @@ const Hero = () => {
   }, []);
 
   useEffect(() => {
-    setDisplayedTitle('');
-    setTitleComplete(false);
-    setCurrentRoleIndex(0);
-    setDisplayedRole('');
-    setIsDeleting(false);
-  }, [title, isTurkish]);
+    if (languageChangedRef.current) {
+      // On language toggle: jump directly to completed state, skip re-typing
+      setDisplayedTitle(title);
+      setTitleComplete(true);
+      setCurrentRoleIndex(0);
+      setDisplayedRole('');
+      setIsDeleting(false);
+    } else {
+      languageChangedRef.current = true;
+    }
+  }, [isTurkish]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Typing effect for main title
   useEffect(() => {
@@ -130,39 +162,48 @@ const Hero = () => {
             </span>
           </motion.div>
 
-          {/* Main heading — stagger each letter */}
-          <motion.h1
-            variants={itemVariants}
-            className="text-3xl sm:text-4xl md:text-7xl font-bold text-sand-900 dark:text-dark-50 mb-6 leading-tight"
-          >
-            {headingText.split('').map((char, i) => (
-              <motion.span
-                key={`h-${isTurkish}-${i}`}
-                initial={hasHeadingAnimated.current ? false : { opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={hasHeadingAnimated.current ? { duration: 0 } : { delay: 0.5 + i * 0.04, duration: 0.3 }}
-              >
-                {char === ' ' ? '\u00A0' : char}
-              </motion.span>
-            ))}
-            {nameText.split('').map((char, i) => (
-              <motion.span
-                key={`n-${isTurkish}-${i}`}
-                className="gradient-text"
-                initial={hasHeadingAnimated.current ? false : { opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={
-                  hasHeadingAnimated.current
-                    ? { duration: 0 }
-                    : { delay: 0.5 + (headingText.length + i) * 0.04, duration: 0.3 }
-                }
-              >
-                {char === ' ' ? '\u00A0' : char}
-              </motion.span>
-            ))}
-          </motion.h1>
+          {/* Main heading — word-level mask reveal */}
+          <motion.div style={{ y: yHeading }}>
+            <motion.h1
+              variants={itemVariants}
+              className="text-3xl sm:text-4xl md:text-7xl font-bold text-sand-900 dark:text-dark-50 mb-6 leading-tight"
+            >
+              {headingText.trim().split(/\s+/).map((word, i) => (
+                <React.Fragment key={`h-${isTurkish}-${i}`}>
+                  <span style={{ display: 'inline-block', overflow: 'hidden', verticalAlign: 'bottom' }}>
+                    <motion.span
+                      style={{ display: 'inline-block' }}
+                      initial={hasHeadingAnimated.current ? false : { y: '110%' }}
+                      animate={{ y: 0 }}
+                      transition={hasHeadingAnimated.current ? { duration: 0 } : { delay: 0.3 + i * 0.1, duration: 0.7, ease: [0.76, 0, 0.24, 1] }}
+                    >
+                      {word}
+                    </motion.span>
+                  </span>
+                  {'\u00A0'}
+                </React.Fragment>
+              ))}
+              {nameText.trim().split(/\s+/).map((word, i, arr) => (
+                <React.Fragment key={`n-${isTurkish}-${i}`}>
+                  <span style={{ display: 'inline-block', overflow: 'hidden', verticalAlign: 'bottom' }}>
+                    <motion.span
+                      className="gradient-text"
+                      style={{ display: 'inline-block' }}
+                      initial={hasHeadingAnimated.current ? false : { y: '110%' }}
+                      animate={{ y: 0 }}
+                      transition={hasHeadingAnimated.current ? { duration: 0 } : { delay: 0.3 + (headingText.trim().split(/\s+/).length + i) * 0.1, duration: 0.7, ease: [0.76, 0, 0.24, 1] }}
+                    >
+                      {word}
+                    </motion.span>
+                  </span>
+                  {i < arr.length - 1 ? '\u00A0' : ''}
+                </React.Fragment>
+              ))}
+            </motion.h1>
+          </motion.div>
 
           {/* Typing subheading */}
+          <motion.div style={{ y: yDesc }}>
           <motion.div
             variants={itemVariants}
             className="text-xl md:text-2xl text-sand-600 dark:text-dark-200 mb-2 min-h-9"
@@ -229,8 +270,10 @@ const Hero = () => {
                 ? 'Güzel ve işlevsel web uygulamaları geliştirmeye, aynı zamanda siber güvenlik alanını keşfetmeye tutkuluyum. Web ve Android geliştirme deneyimimle fark yaratan çözümler üretmeye çalışıyorum.'
                 : "I'm passionate about building beautiful, functional web applications and exploring cybersecurity. With expertise in web development and Android development, I strive to create solutions that make a difference."}
           </motion.p>
+          </motion.div>
 
           {/* Skills */}
+          <motion.div style={{ y: yBadges }}>
           <motion.div variants={itemVariants} className="flex flex-wrap gap-3 justify-center mb-10">
             {(isTurkish
               ? [
@@ -257,32 +300,42 @@ const Hero = () => {
           {/* CTA Buttons */}
           <motion.div variants={itemVariants} className="flex flex-wrap gap-4 justify-center">
             <motion.a
+              ref={magBtn1.ref}
+              style={magBtn1.style}
+              onMouseMove={magBtn1.onMouseMove}
+              onMouseLeave={magBtn1.onMouseLeave}
               href="#projects"
               className="btn-primary flex items-center gap-2 group"
-              whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
             >
               {isTurkish ? 'Projelerimi Gör' : 'View My Work'}
               <HiArrowRight className="group-hover:translate-x-1 transition-transform" />
             </motion.a>
             <motion.a
+              ref={magBtn2.ref}
+              style={magBtn2.style}
+              onMouseMove={magBtn2.onMouseMove}
+              onMouseLeave={magBtn2.onMouseLeave}
               href="#contact"
               className="btn-secondary"
-              whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
             >
               {isTurkish ? 'İletişime Geç' : 'Get In Touch'}
             </motion.a>
             <motion.a
+              ref={magBtn3.ref}
+              style={magBtn3.style}
+              onMouseMove={magBtn3.onMouseMove}
+              onMouseLeave={magBtn3.onMouseLeave}
               href="/cv.pdf"
               download
               className="inline-flex items-center gap-2 px-6 py-3 rounded-lg font-semibold border-2 border-warm-500 text-warm-600 dark:text-warm-400 hover:bg-warm-500 hover:text-white transition-all duration-300"
-              whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
             >
               <HiDownload className="w-4 h-4" />
               {isTurkish ? 'CV İndir' : 'Download CV'}
             </motion.a>
+          </motion.div>
           </motion.div>
 
           {/* Scroll indicator — animated mouse icon */}
@@ -290,7 +343,7 @@ const Hero = () => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 2 }}
-            style={{ opacity: scrollIndicatorOpacity }}
+            style={{ opacity: scrollIndicatorOpacity, y: scrollIndicatorY }}
             className="mt-8 sm:mt-16 flex flex-col items-center"
           >
             <div className="text-sand-400 dark:text-dark-300 text-sm mb-3">

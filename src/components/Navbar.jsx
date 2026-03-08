@@ -5,6 +5,37 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { useDarkMode } from '../context/DarkModeContext';
 import { useLanguage } from '../context/LanguageContext';
 
+const NavItem = ({ item, isActive, onClick }) => {
+  const [hovered, setHovered] = useState(false);
+  return (
+    <motion.a
+      href={item.href}
+      onClick={onClick}
+      className="relative text-sand-700 dark:text-dark-100 font-medium hover:text-warm-600 dark:hover:text-warm-400 py-1 px-3 cursor-pointer"
+      whileHover={{ y: -2 }}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+    >
+      {item.name}
+      {isActive && (
+        <motion.div
+          layoutId="activeNavPill"
+          className="absolute inset-0 bg-warm-500/10 dark:bg-warm-500/20 rounded-full -z-10"
+          transition={{ type: 'spring', stiffness: 350, damping: 30 }}
+        />
+      )}
+      {!isActive && (
+        <motion.span
+          className="absolute bottom-0.5 left-3 right-3 h-0.5 bg-warm-500 rounded-full origin-left"
+          animate={{ scaleX: hovered ? 1 : 0 }}
+          transition={{ duration: 0.25, ease: 'easeOut' }}
+          style={{ scaleX: 0 }}
+        />
+      )}
+    </motion.a>
+  );
+};
+
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
@@ -35,17 +66,23 @@ const Navbar = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  /* Track active section via IntersectionObserver */
+  /* Track active section via IntersectionObserver — pick most-visible section */
   useEffect(() => {
+    const visibilityMap = new Map();
+
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            setActiveSection(entry.target.id);
-          }
+          visibilityMap.set(entry.target.id, entry.intersectionRatio);
         });
+        let maxRatio = 0;
+        let mostVisible = '';
+        visibilityMap.forEach((ratio, id) => {
+          if (ratio > maxRatio) { maxRatio = ratio; mostVisible = id; }
+        });
+        if (mostVisible) setActiveSection(mostVisible);
       },
-      { threshold: 0.3, rootMargin: '-80px 0px -40% 0px' }
+      { threshold: [0, 0.1, 0.2, 0.3, 0.4, 0.5], rootMargin: '-80px 0px -30% 0px' }
     );
 
     ['about', 'projects', 'contact'].forEach((id) => {
@@ -93,23 +130,12 @@ const Navbar = () => {
             {navItems.map((item) => {
               const isActive = isHomePage && activeSection === item.href.slice(1);
               return (
-                <motion.a
+                <NavItem
                   key={item.name}
-                  href={item.href}
+                  item={item}
+                  isActive={isActive}
                   onClick={(e) => handleNavClick(e, item.href)}
-                  className="relative text-sand-700 dark:text-dark-100 font-medium hover:text-warm-600 dark:hover:text-warm-400 py-1 px-3 cursor-pointer"
-                  whileHover={{ y: -2 }}
-                >
-                  {item.name}
-                  {/* Sliding pill indicator */}
-                  {isActive && (
-                    <motion.div
-                      layoutId="activeNavPill"
-                      className="absolute inset-0 bg-warm-500/10 dark:bg-warm-500/20 rounded-full -z-10"
-                      transition={{ type: 'spring', stiffness: 350, damping: 30 }}
-                    />
-                  )}
-                </motion.a>
+                />
               );
             })}
 

@@ -3,6 +3,12 @@ import React, { useEffect, useRef } from 'react';
 const SandBackground = ({ isDark }) => {
   const canvasRef = useRef(null);
   const mouseRef = useRef({ x: -1000, y: -1000 });
+  const isDarkRef = useRef(isDark);
+
+  // Update color ref when isDark changes without re-initializing particles
+  useEffect(() => {
+    isDarkRef.current = isDark;
+  }, [isDark]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -12,9 +18,8 @@ const SandBackground = ({ isDark }) => {
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
 
-    const particles = [];
     const isMobile = window.innerWidth < 768;
-    const particleCount = isMobile ? 35 : 90;
+    const particleCount = isMobile ? 25 : 60;
     const connectionDistance = isMobile ? 80 : 120;
     const mouseRadius = 150;
 
@@ -28,20 +33,25 @@ const SandBackground = ({ isDark }) => {
         this.speedX = this.baseSpeedX;
         this.speedY = this.baseSpeedY;
         this.opacity = Math.random() * 0.4 + 0.1;
+        this.updateColor(isDarkRef.current);
+      }
 
-        const hue = isDark ? 220 : 38;
-        const sat = isDark ? 30 + Math.random() * 20 : 60 + Math.random() * 20;
-        const light = isDark ? 45 + Math.random() * 20 : 60 + Math.random() * 20;
+      updateColor(dark) {
+        const hue = dark ? 220 : 38;
+        const sat = dark ? 30 + Math.random() * 20 : 60 + Math.random() * 20;
+        const light = dark ? 45 + Math.random() * 20 : 60 + Math.random() * 20;
         this.color = `hsla(${hue}, ${sat}%, ${light}%, ${this.opacity})`;
       }
 
       update() {
-        // Mouse repel effect
+        // Mouse repel effect — use squared distance to avoid sqrt when far away
         const dx = this.x - mouseRef.current.x;
         const dy = this.y - mouseRef.current.y;
-        const dist = Math.sqrt(dx * dx + dy * dy);
+        const distSq = dx * dx + dy * dy;
+        const mouseRadiusSq = mouseRadius * mouseRadius;
 
-        if (dist < mouseRadius && dist > 0) {
+        if (distSq < mouseRadiusSq && distSq > 0) {
+          const dist = Math.sqrt(distSq);
           const force = (mouseRadius - dist) / mouseRadius;
           const angle = Math.atan2(dy, dx);
           this.speedX += Math.cos(angle) * force * 2;
@@ -72,38 +82,74 @@ const SandBackground = ({ isDark }) => {
       }
     }
 
+    const particles = [];
     for (let i = 0; i < particleCount; i++) {
       particles.push(new Particle());
     }
 
-    const drawConnections = () => {
-      for (let i = 0; i < particles.length; i++) {
-        for (let j = i + 1; j < particles.length; j++) {
-          const dx = particles[i].x - particles[j].x;
-          const dy = particles[i].y - particles[j].y;
-          const dist = Math.sqrt(dx * dx + dy * dy);
+    // Spatial grid partitioning — reduces connection checks from O(n²) to O(n)
+    const buildGrid = () => {
+      const grid = new Map();
+      particles.forEach((p, i) => {
+        const col = Math.floor(p.x / connectionDistance);
+        const row = Math.floor(p.y / connectionDistance);
+        const key = `${col},${row}`;
+        if (!grid.has(key)) grid.set(key, []);
+        grid.get(key).push(i);
+      });
+      return grid;
+    };
 
-          if (dist < connectionDistance) {
-            const opacity = (1 - dist / connectionDistance) * 0.15;
-            ctx.strokeStyle = isDark
-              ? `rgba(100, 140, 200, ${opacity})`
-              : `rgba(196, 168, 144, ${opacity})`;
-            ctx.lineWidth = 1;
-            ctx.beginPath();
-            ctx.moveTo(particles[i].x, particles[i].y);
-            ctx.lineTo(particles[j].x, particles[j].y);
-            ctx.stroke();
+    const drawConnections = () => {
+      const grid = buildGrid();
+      const dark = isDarkRef.current;
+      const maxDistSq = connectionDistance * connectionDistance;
+
+      particles.forEach((p, i) => {
+        const col = Math.floor(p.x / connectionDistance);
+        const row = Math.floor(p.y / connectionDistance);
+
+        for (let dc = -1; dc <= 1; dc++) {
+          for (let dr = -1; dr <= 1; dr++) {
+            const neighbors = grid.get(`${col + dc},${row + dr}`) || [];
+            neighbors.forEach((j) => {
+              if (j <= i) return; // avoid double-checking pairs
+              const dx = p.x - particles[j].x;
+              const dy = p.y - particles[j].y;
+              const distSq = dx * dx + dy * dy;
+
+              if (distSq < maxDistSq) {
+                const dist = Math.sqrt(distSq);
+                const opacity = (1 - dist / connectionDistance) * 0.15;
+                ctx.strokeStyle = dark
+                  ? `rgba(100, 140, 200, ${opacity})`
+                  : `rgba(196, 168, 144, ${opacity})`;
+                ctx.lineWidth = 1;
+                ctx.beginPath();
+                ctx.moveTo(p.x, p.y);
+                ctx.lineTo(particles[j].x, particles[j].y);
+                ctx.stroke();
+              }
+            });
           }
         }
-      }
+      });
     };
 
     let animId;
 
     const animate = () => {
+      // Skip draw calls when tab is not visible — saves CPU/battery
+      if (document.hidden) {
+        animId = requestAnimationFrame(animate);
+        return;
+      }
+
+      const dark = isDarkRef.current;
+
       // Gradient background
       const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
-      if (isDark) {
+      if (dark) {
         gradient.addColorStop(0, '#0f172a');
         gradient.addColorStop(0.5, '#131b30');
         gradient.addColorStop(1, '#1a2236');
@@ -117,7 +163,7 @@ const SandBackground = ({ isDark }) => {
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
       // Wave effect
-      ctx.strokeStyle = isDark
+      ctx.strokeStyle = dark
         ? 'rgba(100, 140, 200, 0.06)'
         : 'rgba(196, 168, 144, 0.1)';
       ctx.lineWidth = 2;
@@ -169,7 +215,7 @@ const SandBackground = ({ isDark }) => {
       window.removeEventListener('mousemove', handleMouseMove);
       window.removeEventListener('mouseleave', handleMouseLeave);
     };
-  }, [isDark]);
+  }, []); // Run only once — isDark changes are handled via isDarkRef
 
   return (
     <canvas
