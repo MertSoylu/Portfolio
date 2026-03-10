@@ -1,9 +1,40 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { HiMenuAlt3, HiX, HiSun, HiMoon } from 'react-icons/hi';
+import { HiMenuAlt3, HiX, HiSun, HiMoon, HiDownload } from 'react-icons/hi';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useDarkMode } from '../context/DarkModeContext';
 import { useLanguage } from '../context/LanguageContext';
+
+const NavItem = ({ item, isActive, onClick }) => {
+  const [hovered, setHovered] = useState(false);
+  return (
+    <motion.a
+      href={item.href}
+      onClick={onClick}
+      className="relative text-sand-700 dark:text-dark-100 font-medium hover:text-warm-600 dark:hover:text-warm-400 py-1 px-3 cursor-pointer"
+      whileHover={{ y: -2 }}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+    >
+      {item.name}
+      {isActive && (
+        <motion.div
+          layoutId="activeNavPill"
+          className="absolute inset-0 bg-warm-500/10 dark:bg-warm-500/20 rounded-full -z-10"
+          transition={{ type: 'spring', stiffness: 350, damping: 30 }}
+        />
+      )}
+      {!isActive && (
+        <motion.span
+          className="absolute bottom-0.5 left-3 right-3 h-0.5 bg-warm-500 rounded-full origin-left"
+          animate={{ scaleX: hovered ? 1 : 0 }}
+          transition={{ duration: 0.25, ease: 'easeOut' }}
+          style={{ scaleX: 0 }}
+        />
+      )}
+    </motion.a>
+  );
+};
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -36,15 +67,21 @@ const Navbar = () => {
   }, []);
 
   useEffect(() => {
+    const visibilityMap = new Map();
+
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            setActiveSection(entry.target.id);
-          }
+          visibilityMap.set(entry.target.id, entry.intersectionRatio);
         });
+        let maxRatio = 0;
+        let mostVisible = '';
+        visibilityMap.forEach((ratio, id) => {
+          if (ratio > maxRatio) { maxRatio = ratio; mostVisible = id; }
+        });
+        if (mostVisible) setActiveSection(mostVisible);
       },
-      { threshold: 0.3, rootMargin: '-80px 0px -40% 0px' }
+      { threshold: [0, 0.1, 0.2, 0.3, 0.4, 0.5], rootMargin: '-80px 0px -30% 0px' }
     );
 
     ['about', 'projects', 'contact'].forEach((id) => {
@@ -80,7 +117,7 @@ const Navbar = () => {
           <motion.a
             href="/"
             onClick={(e) => { e.preventDefault(); navigate('/'); }}
-            className="text-2xl font-bold gradient-text cursor-pointer"
+            className="w-10 h-10 flex items-center justify-center rounded-xl bg-warm-500/10 border border-warm-500/20 text-lg font-bold gradient-text cursor-pointer hover:bg-warm-500/20 transition-colors duration-200"
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
           >
@@ -92,9 +129,10 @@ const Navbar = () => {
             {navItems.map((item) => {
               const isActive = isHomePage && activeSection === item.href.slice(1);
               return (
-                <motion.a
+                <NavItem
                   key={item.name}
-                  href={item.href}
+                  item={item}
+                  isActive={isActive}
                   onClick={(e) => handleNavClick(e, item.href)}
                   className="relative text-sand-700 dark:text-dark-100 font-medium hover:text-warm-600 dark:hover:text-warm-400 py-1 px-3 cursor-pointer"
                   whileHover={{ y: -2 }}
@@ -178,6 +216,17 @@ const Navbar = () => {
               </AnimatePresence>
             </motion.button>
 
+            <motion.a
+              href="/cv.pdf"
+              download
+              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg font-semibold text-sm border border-warm-500 text-warm-600 dark:text-warm-400 hover:bg-warm-500 hover:text-white transition-all duration-200"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              title={isTurkish ? 'CV İndir' : 'Download CV'}
+            >
+              <HiDownload className="w-4 h-4" />
+              CV
+            </motion.a>
             <motion.a
               href="https://github.com/MertSoylu"
               target="_blank"

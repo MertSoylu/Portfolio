@@ -35,7 +35,7 @@ export const LanguageProvider = ({ children }: { children: ReactNode }) => {
     document.body.classList.add('lang-switching');
     const timeout = setTimeout(() => {
       document.body.classList.remove('lang-switching');
-    }, 420);
+    }, 280);
 
     return () => clearTimeout(timeout);
   }, [language]);

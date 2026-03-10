@@ -1,8 +1,26 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { motion, useScroll, useTransform } from 'framer-motion';
-import { HiArrowRight } from 'react-icons/hi';
+import { motion, useScroll, useTransform, useMotionValue, useSpring } from 'framer-motion';
+import { HiArrowRight, HiSparkles, HiDownload } from 'react-icons/hi';
 import { Link } from 'react-router-dom';
 import { useLanguage } from '../context/LanguageContext';
+
+const useMagneticButton = (strength = 0.35) => {
+  const ref = React.useRef(null);
+  const x = useMotionValue(0);
+  const y = useMotionValue(0);
+  const springX = useSpring(x, { stiffness: 200, damping: 18 });
+  const springY = useSpring(y, { stiffness: 200, damping: 18 });
+
+  const onMouseMove = (e) => {
+    if (!ref.current) return;
+    const rect = ref.current.getBoundingClientRect();
+    x.set((e.clientX - (rect.left + rect.width / 2)) * strength);
+    y.set((e.clientY - (rect.top + rect.height / 2)) * strength);
+  };
+  const onMouseLeave = () => { x.set(0); y.set(0); };
+
+  return { ref, style: { x: springX, y: springY }, onMouseMove, onMouseLeave };
+};
 
 const Hero = () => {
   const { isTurkish } = useLanguage();
@@ -15,7 +33,15 @@ const Hero = () => {
   const y = useTransform(scrollYProgress, [0, 1], [0, -150]);
   const opacity = useTransform(scrollYProgress, [0, 0.8], [1, 0]);
   const scale = useTransform(scrollYProgress, [0, 0.8], [1, 0.92]);
-  const scrollIndicatorOpacity = useTransform(scrollYProgress, [0, 0.08], [1, 0]);
+  const scrollIndicatorOpacity = useTransform(scrollYProgress, [0, 0.18], [1, 0]);
+  const scrollIndicatorY = useTransform(scrollYProgress, [0, 0.18], [0, 10]);
+  const yHeading = useTransform(scrollYProgress, [0, 1], [0, -60]);
+  const yDesc = useTransform(scrollYProgress, [0, 1], [0, 20]);
+  const yBadges = useTransform(scrollYProgress, [0, 1], [0, 30]);
+
+  const magBtn1 = useMagneticButton();
+  const magBtn2 = useMagneticButton();
+  const magBtn3 = useMagneticButton();
 
   const title = isTurkish ? 'Bilgisayar Programcılığı Öğrencisi' : 'Computer Programming Student';
   const roles = isTurkish
@@ -27,6 +53,7 @@ const Hero = () => {
   const [displayedRole, setDisplayedRole] = useState('');
   const [isDeleting, setIsDeleting] = useState(false);
   const hasHeadingAnimated = useRef(false);
+  const languageChangedRef = useRef(false);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -36,12 +63,17 @@ const Hero = () => {
   }, []);
 
   useEffect(() => {
-    setDisplayedTitle('');
-    setTitleComplete(false);
-    setCurrentRoleIndex(0);
-    setDisplayedRole('');
-    setIsDeleting(false);
-  }, [title, isTurkish]);
+    if (languageChangedRef.current) {
+      // On language toggle: jump directly to completed state, skip re-typing
+      setDisplayedTitle(title);
+      setTitleComplete(true);
+      setCurrentRoleIndex(0);
+      setDisplayedRole('');
+      setIsDeleting(false);
+    } else {
+      languageChangedRef.current = true;
+    }
+  }, [isTurkish]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     if (displayedTitle.length < title.length) {
@@ -111,10 +143,18 @@ const Hero = () => {
     >
       <motion.div style={{ y, opacity, scale }} className="text-center max-w-4xl mx-auto">
         <motion.div variants={containerVariants} initial="hidden" animate="visible">
-          {/* Animated greeting */}
-          <motion.div variants={itemVariants} className="mb-6">
-            <span className="inline-block px-4 py-2 bg-sand-200 dark:bg-dark-600 text-sand-700 dark:text-dark-50 rounded-full text-sm font-semibold">
-              {isTurkish ? '👋 Portfolyoma hoş geldin' : '👋 Welcome to my portfolio'}
+          {/* Animated greeting + Open to Work */}
+          <motion.div variants={itemVariants} className="mb-6 flex flex-wrap items-center justify-center gap-3">
+            <span className="inline-flex items-center gap-2 px-4 py-2 bg-sand-200 dark:bg-dark-600 text-sand-700 dark:text-dark-50 rounded-full text-sm font-semibold border border-warm-500/20 dark:border-warm-500/10">
+              <HiSparkles className="w-4 h-4 text-warm-500" />
+              {isTurkish ? 'Portfolyoma hoş geldin' : 'Welcome to my portfolio'}
+            </span>
+            <span className="inline-flex items-center gap-2 px-4 py-2 bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-400 rounded-full text-sm font-semibold border border-green-300 dark:border-green-500/30">
+              <span className="relative flex h-2 w-2">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75" />
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500" />
+              </span>
+              {isTurkish ? 'Fırsatlara Açık' : 'Open to Work'}
             </span>
           </motion.div>
 
@@ -151,18 +191,21 @@ const Hero = () => {
           </motion.h1>
 
           {/* Typing subheading */}
+          <motion.div style={{ y: yDesc }}>
           <motion.div
             variants={itemVariants}
             className="text-xl md:text-2xl text-sand-600 dark:text-dark-200 mb-2 min-h-9"
           >
             <span>{displayedTitle}</span>
-            <motion.span
-              animate={{ opacity: [1, 0] }}
-              transition={{ duration: 0.53, repeat: Infinity, repeatType: 'reverse' }}
-              className="text-warm-500 font-light ml-0.5"
-            >
-              |
-            </motion.span>
+            {!titleComplete && (
+              <motion.span
+                animate={{ opacity: [1, 0] }}
+                transition={{ duration: 0.53, repeat: Infinity, repeatType: 'reverse' }}
+                className="text-warm-500 font-light ml-0.5"
+              >
+                |
+              </motion.span>
+            )}
           </motion.div>
 
           {/* Role cycling */}
@@ -190,10 +233,20 @@ const Hero = () => {
             variants={itemVariants}
             className="text-lg text-sand-600 dark:text-dark-200 mb-4"
           >
-            {isTurkish ? 'öğrencisi, ' : 'at '}
-            <span className="font-semibold text-sand-700 dark:text-dark-100">
-              Kütahya Dumlupınar University
-            </span>
+            {isTurkish ? (
+              <>
+                Kütahya Dumlupınar{' '}
+                <span className="font-semibold text-sand-700 dark:text-dark-100">Üniversitesi</span>
+                {'\'nde'}
+              </>
+            ) : (
+              <>
+                at{' '}
+                <span className="font-semibold text-sand-700 dark:text-dark-100">
+                  Kütahya Dumlupınar University
+                </span>
+              </>
+            )}
           </motion.p>
 
           {/* Description */}
@@ -205,8 +258,10 @@ const Hero = () => {
                 ? 'Güzel ve işlevsel web uygulamaları geliştirmeye, aynı zamanda siber güvenlik alanını keşfetmeye tutkuluyum. Web ve Android geliştirme deneyimimle fark yaratan çözümler üretmeye çalışıyorum.'
                 : "I'm passionate about building beautiful, functional web applications and exploring cybersecurity. With expertise in web development and Android development, I strive to create solutions that make a difference."}
           </motion.p>
+          </motion.div>
 
           {/* Skills */}
+          <motion.div style={{ y: yBadges }}>
           <motion.div variants={itemVariants} className="flex flex-wrap gap-3 justify-center mb-10">
             {(isTurkish
               ? [
@@ -222,9 +277,10 @@ const Hero = () => {
               <Link
                 key={skill.name}
                 to={skill.path}
-                className="px-4 py-2.5 bg-warm-500/10 text-warm-600 dark:text-warm-400 rounded-full text-sm font-medium border border-warm-500/20 hover:bg-warm-500/20 hover:scale-105 transition-all cursor-pointer"
+                className="inline-flex items-center gap-1.5 px-4 py-2.5 bg-warm-500/10 text-warm-600 dark:text-warm-400 rounded-full text-sm font-medium border border-warm-500/20 hover:bg-warm-500/20 hover:gap-2.5 transition-all duration-200 cursor-pointer group"
               >
                 {skill.name}
+                <HiArrowRight className="w-3.5 h-3.5 opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-200" />
               </Link>
             ))}
           </motion.div>
@@ -232,22 +288,42 @@ const Hero = () => {
           {/* CTA Buttons */}
           <motion.div variants={itemVariants} className="flex flex-wrap gap-4 justify-center">
             <motion.a
+              ref={magBtn1.ref}
+              style={magBtn1.style}
+              onMouseMove={magBtn1.onMouseMove}
+              onMouseLeave={magBtn1.onMouseLeave}
               href="#projects"
               className="btn-primary flex items-center gap-2 group"
-              whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
             >
               {isTurkish ? 'Projelerimi Gör' : 'View My Work'}
               <HiArrowRight className="group-hover:translate-x-1 transition-transform" />
             </motion.a>
             <motion.a
+              ref={magBtn2.ref}
+              style={magBtn2.style}
+              onMouseMove={magBtn2.onMouseMove}
+              onMouseLeave={magBtn2.onMouseLeave}
               href="#contact"
               className="btn-secondary"
-              whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
             >
               {isTurkish ? 'İletişime Geç' : 'Get In Touch'}
             </motion.a>
+            <motion.a
+              ref={magBtn3.ref}
+              style={magBtn3.style}
+              onMouseMove={magBtn3.onMouseMove}
+              onMouseLeave={magBtn3.onMouseLeave}
+              href="/cv.pdf"
+              download
+              className="inline-flex items-center gap-2 px-6 py-3 rounded-lg font-semibold border-2 border-warm-500 text-warm-600 dark:text-warm-400 hover:bg-warm-500 hover:text-white transition-all duration-300"
+              whileTap={{ scale: 0.95 }}
+            >
+              <HiDownload className="w-4 h-4" />
+              {isTurkish ? 'CV İndir' : 'Download CV'}
+            </motion.a>
+          </motion.div>
           </motion.div>
 
           {/* Scroll indicator */}
@@ -255,7 +331,7 @@ const Hero = () => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 2 }}
-            style={{ opacity: scrollIndicatorOpacity }}
+            style={{ opacity: scrollIndicatorOpacity, y: scrollIndicatorY }}
             className="mt-8 sm:mt-16 flex flex-col items-center"
           >
             <div className="text-sand-400 dark:text-dark-300 text-sm mb-3">

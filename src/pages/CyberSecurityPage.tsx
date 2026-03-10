@@ -1,6 +1,6 @@
 import React, { ReactNode } from 'react';
 import { motion } from 'framer-motion';
-import { HiArrowLeft, HiShieldCheck, HiLightningBolt, HiBookOpen, HiChip } from 'react-icons/hi';
+import { HiArrowLeft, HiShieldCheck, HiLightningBolt, HiBookOpen, HiChip, HiAcademicCap, HiDownload, HiExternalLink } from 'react-icons/hi';
 import { Link } from 'react-router-dom';
 import { useLanguage } from '../context/LanguageContext';
 import { useDarkMode } from '../context/DarkModeContext';
@@ -169,38 +169,12 @@ const CyberSecurityPage = () => {
           </motion.div>
 
           <div className="p-5 sm:p-8 md:p-10">
-            {/* Message */}
-            <motion.div
-              variants={fadeUp}
-              className="mb-8 sm:mb-10 p-4 sm:p-6 rounded-2xl bg-gradient-to-r from-amber-500/5 to-orange-500/5 border border-amber-500/15 dark:from-amber-500/10 dark:to-orange-500/10 dark:border-amber-500/20"
-            >
-              <div className="flex items-start gap-4">
-                <motion.span
-                  animate={{ scale: [1, 1.15, 1] }}
-                  transition={{ duration: 2, repeat: Infinity }}
-                  className="text-3xl flex-shrink-0"
-                >
-                  🚀
-                </motion.span>
-                <div>
-                  <h3 className="text-lg font-semibold text-sand-900 dark:text-dark-50 mb-2">
-                    {isTurkish ? 'Henüz bir projem yok — ama yolda!' : "No projects yet — but they're on the way!"}
-                  </h3>
-                  <p className="text-sand-600 dark:text-dark-200 leading-relaxed">
-                    {isTurkish
-                      ? 'Siber güvenlik alanında henüz yayınlanmış bir projem bulunmuyor. Ancak ağ güvenliği, kriptografi, güvenli kodlama ve Python ile güvenlik araçları geliştirme konularında aktif olarak kendimi geliştirmeye devam ediyorum. Yakında bu alanda da somut projeler paylaşmayı hedefliyorum!'
-                      : "I don't have any published cybersecurity projects yet. However, I'm actively developing my skills in network security, cryptography, secure coding, and building security tools with Python. I aim to share concrete projects in this field soon!"}
-                  </p>
-                </div>
-              </div>
-            </motion.div>
-
             {/* Learning Areas */}
-            <motion.div variants={fadeUp}>
+            <motion.div variants={fadeUp} className="mb-8 sm:mb-10">
               <h3 className="text-xl font-bold text-sand-900 dark:text-dark-50 mb-6">
                 {isTurkish ? 'Çalıştığım Alanlar' : "Areas I'm Studying"}
               </h3>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-10">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {learningAreas.map((area, i) => (
                   <motion.div
                     key={i}
@@ -222,10 +196,10 @@ const CyberSecurityPage = () => {
               </div>
             </motion.div>
 
-            {/* Animated Terminal */}
+            {/* Projects */}
             <motion.div variants={fadeUp}>
-              <h3 className="text-xl font-bold text-sand-900 dark:text-dark-50 mb-4">
-                {isTurkish ? 'Terminal Simülasyonu' : 'Terminal Simulation'}
+              <h3 className="text-xl font-bold text-sand-900 dark:text-dark-50 mb-6">
+                {isTurkish ? 'Projeler' : 'Projects'}
               </h3>
               <div className="rounded-xl overflow-hidden shadow-2xl border border-gray-700/30">
                 <div className="bg-[#2d333b] px-4 py-2.5 flex items-center gap-1.5">
@@ -248,15 +222,10 @@ const CyberSecurityPage = () => {
                         <span className="text-emerald-400">{line.prompt}</span>
                       )}
                       <span
-                        className={
-                          line.isSuccess
-                            ? 'text-emerald-400'
-                            : line.isOutput
-                            ? 'text-gray-400'
-                            : 'text-gray-200'
-                        }
+                        key={tag}
+                        className="px-2.5 py-1 text-xs font-medium rounded-lg bg-red-500/10 text-red-600 dark:text-red-400 border border-red-500/20"
                       >
-                        {line.cmd}
+                        {tag}
                       </span>
                     </motion.div>
                   ))}
@@ -267,18 +236,144 @@ const CyberSecurityPage = () => {
                     transition={{ delay: 2.8 }}
                     className="flex items-center gap-2"
                   >
-                    <span className="text-emerald-400">~$</span>
-                    <motion.span
-                      animate={{ opacity: [1, 0] }}
-                      transition={{ duration: 0.6, repeat: Infinity, repeatType: 'reverse' }}
-                      className="inline-block w-2 h-4 bg-emerald-400"
-                    />
-                  </motion.div>
+                    <HiExternalLink className="w-4 h-4" />
+                    GitHub
+                  </a>
+
+                  {/* Terminal Simulation */}
+                  <p className="text-xs font-semibold text-sand-500 dark:text-dark-300 uppercase tracking-wider mb-3">
+                    {isTurkish ? 'Simülasyon' : 'Simulation'}
+                  </p>
+                  <div className="rounded-xl overflow-hidden shadow-2xl border border-gray-700/30">
+                    {/* Terminal title bar */}
+                    <div className="bg-[#2d333b] px-4 py-2.5 flex items-center gap-1.5">
+                      <div className="w-3 h-3 rounded-full bg-red-400" />
+                      <div className="w-3 h-3 rounded-full bg-yellow-400" />
+                      <div className="w-3 h-3 rounded-full bg-green-400" />
+                      <span className="ml-3 text-xs text-gray-400 font-mono">terminal — bash</span>
+                    </div>
+                    {/* Terminal body */}
+                    <div className="bg-[#0d1117] p-4 sm:p-5 font-mono text-xs sm:text-sm min-h-[220px] space-y-1 overflow-x-auto">
+                      {terminalLines.map((line, i) => (
+                        <motion.div
+                          key={i}
+                          initial={{ opacity: 0, x: -10 }}
+                          whileInView={{ opacity: 1, x: 0 }}
+                          viewport={{ once: true }}
+                          transition={{ delay: line.delay, duration: 0.3 }}
+                          className="flex items-center gap-2"
+                        >
+                          {line.prompt && (
+                            <span className="text-emerald-400">{line.prompt}</span>
+                          )}
+                          <span
+                            className={
+                              line.isSuccess
+                                ? 'text-emerald-400'
+                                : line.isWarning
+                                ? 'text-yellow-400'
+                                : line.isOutput
+                                ? 'text-gray-400'
+                                : 'text-gray-200'
+                            }
+                          >
+                            {line.cmd}
+                          </span>
+                        </motion.div>
+                      ))}
+                      {/* Blinking cursor */}
+                      <motion.div
+                        initial={{ opacity: 0 }}
+                        whileInView={{ opacity: 1 }}
+                        viewport={{ once: true }}
+                        transition={{ delay: 5.3 }}
+                        className="flex items-center gap-2"
+                      >
+                        <span className="text-emerald-400">~$</span>
+                        <motion.span
+                          animate={{ opacity: [1, 0] }}
+                          transition={{ duration: 0.6, repeat: Infinity, repeatType: 'reverse' }}
+                          className="inline-block w-2 h-4 bg-emerald-400"
+                        />
+                      </motion.div>
+                    </div>
+                  </div>
                 </div>
-              </div>
+              </motion.div>
             </motion.div>
           </div>
         </motion.div>
+
+        {/* Certificates Section */}
+        <motion.div
+          variants={staggerContainer}
+          initial="initial"
+          whileInView="animate"
+          viewport={{ once: true }}
+          className="mt-8"
+        >
+          <motion.div variants={fadeUp} className="flex items-center gap-3 mb-8">
+            <div className="w-10 h-10 rounded-xl bg-red-500/10 flex items-center justify-center text-red-500 dark:text-red-400">
+              <HiAcademicCap className="w-6 h-6" />
+            </div>
+            <h2 className="text-2xl font-bold text-sand-900 dark:text-dark-50">
+              {isTurkish ? 'Sertifikalar' : 'Certificates'}
+            </h2>
+          </motion.div>
+
+          <motion.div variants={scaleIn} className="grid sm:grid-cols-2 gap-5">
+            {/* Introduction to Cybersecurity — Cisco */}
+            <motion.div
+              whileHover={{ y: -4 }}
+              transition={{ duration: 0.3 }}
+              className="bg-white/50 dark:bg-dark-600/50 backdrop-blur-md rounded-2xl border border-sand-200 dark:border-dark-400 overflow-hidden group cursor-pointer"
+            >
+              {/* Card header */}
+              <div className="bg-gradient-to-r from-red-500 via-rose-500 to-orange-500 p-4 flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center">
+                  <HiShieldCheck className="w-6 h-6 text-white" />
+                </div>
+                <div>
+                  <p className="text-white/70 text-xs font-medium">Cisco</p>
+                  <p className="text-white font-semibold text-sm leading-tight">
+                    Introduction to Cybersecurity
+                  </p>
+                </div>
+              </div>
+
+              {/* Card body */}
+              <div className="p-5">
+                <p className="text-sm text-sand-600 dark:text-dark-200 mb-5 leading-relaxed">
+                  {isTurkish
+                    ? 'Cisco NetAcad tarafından verilen, temel siber güvenlik kavramlarını kapsayan sertifika.'
+                    : 'Certificate issued by Cisco NetAcad covering fundamental cybersecurity concepts.'}
+                </p>
+                <div className="flex gap-3">
+                  <a
+                    href="/certificates/Introduction_to_Cybersecurity_certificate.pdf"
+                    download
+                    className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg bg-warm-500/10 text-warm-600 dark:text-warm-400 border border-warm-500/20 hover:bg-warm-500/20 transition-colors text-sm font-medium"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <HiDownload className="w-4 h-4" />
+                    {isTurkish ? 'İndir' : 'Download'}
+                  </a>
+                  <a
+                    href="/certificates/Introduction_to_Cybersecurity_certificate.pdf"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg bg-sand-100 dark:bg-dark-500 text-sand-700 dark:text-dark-200 border border-sand-200 dark:border-dark-400 hover:border-warm-500/40 transition-colors text-sm font-medium"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <HiExternalLink className="w-4 h-4" />
+                    {isTurkish ? 'Görüntüle' : 'View'}
+                  </a>
+                </div>
+              </div>
+            </motion.div>
+          </motion.div>
+        </motion.div>
+
       </div>
     </motion.div>
   );

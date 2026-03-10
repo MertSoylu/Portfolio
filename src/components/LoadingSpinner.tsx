@@ -1,5 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
+import { useLanguage } from '../context/LanguageContext';
 
 const containerVariants = {
   animate: {
@@ -33,7 +34,9 @@ const LoadingSpinner = () => {
           variants={dotVariants}
         />
       ))}
-      <span className="ml-4 text-sand-700 font-medium">Loading...</span>
+      <span className="ml-4 text-sand-700 dark:text-dark-200 font-medium">
+        {isTurkish ? 'Yükleniyor...' : 'Loading...'}
+      </span>
     </motion.div>
   );
 };

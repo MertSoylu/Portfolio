@@ -52,6 +52,9 @@ interface Feature {
 const AndroidPage = () => {
   const { isTurkish } = useLanguage();
   const { isDark } = useDarkMode();
+  const googlePlayBadgeSrc = isTurkish
+    ? 'https://play.google.com/intl/en_us/badges/static/images/badges/tr_badge_web_generic.png'
+    : 'https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png';
 
   const features: Feature[] = isTurkish
     ? [
@@ -145,7 +148,6 @@ const AndroidPage = () => {
                 </p>
                 <div className="flex items-center justify-center md:justify-start gap-3 mt-3">
                   <span className="px-3 py-1 bg-white/20 rounded-full text-sm">Health & Fitness</span>
-                  <span className="px-3 py-1 bg-white/20 rounded-full text-sm">v1.0.5</span>
                 </div>
               </div>
             </div>
@@ -203,7 +205,8 @@ const AndroidPage = () => {
                 rel="noopener noreferrer"
                 whileHover={{ scale: 1.05, y: -2 }}
                 whileTap={{ scale: 0.97 }}
-                className="inline-flex items-center gap-3 px-8 py-4 bg-black dark:bg-white rounded-xl shadow-lg hover:shadow-2xl transition-shadow group"
+                className="inline-flex"
+                aria-label={isTurkish ? "Google Play'den indir" : 'Get it on Google Play'}
               >
                 <svg viewBox="0 0 24 24" className="w-8 h-8" fill="none">
                   <path d="M3.609 1.814L13.792 12 3.61 22.186a.996.996 0 01-.61-.92V2.734c0-.382.218-.72.609-.92z" fill="#4285F4" />

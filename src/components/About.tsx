@@ -69,7 +69,7 @@ const About = () => {
   }, []);
 
   const sectionVariants = {
-    hidden: { opacity: 0, x: -60 },
+    hidden: { opacity: 0, x: -30 },
     visible: {
       opacity: 1,
       x: 0,
@@ -89,7 +89,7 @@ const About = () => {
   };
 
   const itemVariants = {
-    hidden: { opacity: 0, x: -60 },
+    hidden: { opacity: 0, x: -30 },
     visible: {
       opacity: 1,
       x: 0,
@@ -157,16 +157,26 @@ const About = () => {
           variants={containerVariants}
           initial="hidden"
           whileInView="visible"
-          viewport={{ once: true, margin: '-100px' }}
+          viewport={{ once: true, amount: 0.15, margin: '-60px' }}
         >
           {/* Section header */}
-          <motion.div variants={itemVariants} className="text-center mb-16">
-            <h2 className="section-title">{isTurkish ? 'Hakkımda' : 'About Me'}</h2>
+          <div className="text-center mb-16">
+            <div style={{ overflow: 'hidden' }}>
+              <motion.h2
+                className="section-title"
+                initial={{ y: '100%', opacity: 0 }}
+                whileInView={{ y: 0, opacity: 1 }}
+                viewport={{ once: true, margin: '-60px' }}
+                transition={{ duration: 0.7, ease: [0.76, 0, 0.24, 1] }}
+              >
+                {isTurkish ? 'Hakkımda' : 'About Me'}
+              </motion.h2>
+            </div>
             <AnimatedUnderline />
             <p className="section-subtitle mt-6">
               {isTurkish ? 'Tutkulu geliştirici ve ömür boyu öğrenen' : 'Passionate developer and lifelong learner'}
             </p>
-          </motion.div>
+          </div>
 
           {/* Main about content */}
           <motion.div
@@ -180,15 +190,15 @@ const About = () => {
               </h3>
               <p className="text-lg text-sand-600 dark:text-dark-200 mb-4">
                 {isTurkish
-                  ? 'Kütahya Dumlupınar Üniversitesi Bilgisayar Programcılığı öğrencisiyim; estetik tasarımı güçlü işlevsellikle birleştiren çözümler üretmeye odaklanıyorum.'
+                  ? 'Kütahya Dumlupınar Üniversitesi\'nde Bilgisayar Programcılığı öğrencisiyim; estetik tasarımı güçlü işlevsellikle birleştiren çözümler üretmeye odaklanıyorum.'
                   : "I'm a computer programming student at Kütahya Dumlupınar University, passionate about creating solutions that combine beautiful design with solid functionality."}
               </p>
-              <p className="text-lg text-sand-600 dark:text-dark-200 mb-4">
+              <p className="text-lg text-sand-600 dark:text-dark-200 mb-4 pl-4 border-l-2 border-warm-500/40">
                 {isTurkish
                   ? 'Teknoloji yolculuğum merakla başladı ve gerçek problemleri çözen uygulamalar geliştirme tutkusuna dönüştü. Her projede temiz, sürdürülebilir ve iyi pratiklere uygun kod yazmayı önceliklendiriyorum.'
                   : 'My journey in tech started with curiosity about how things work, and it has evolved into a passion for building applications that solve real-world problems. I believe in writing clean, maintainable code and following best practices in every project.'}
               </p>
-              <p className="text-lg text-sand-600 dark:text-dark-200">
+              <p className="text-lg text-sand-600 dark:text-dark-200 pl-4 border-l-2 border-warm-500/20">
                 {isTurkish
                   ? 'Kod yazmadığım zamanlarda yeni teknolojileri keşfetmeyi, açık kaynak projelere katkı sunmayı ve web/mobil dünyasındaki güncel trendleri takip etmeyi seviyorum.'
                   : "When I'm not coding, I love exploring new technologies, contributing to open-source projects, and learning about the latest trends in web and mobile development."}
@@ -292,8 +302,13 @@ const About = () => {
               {skills.map((skill, index) => (
                 <motion.div
                   key={index}
-                  className="bg-white/40 dark:bg-dark-600/40 backdrop-blur-md p-5 sm:p-8 rounded-2xl border border-sand-200 dark:border-dark-400 card-hover group"
-                  whileHover={{ y: -8 }}
+                  custom={index}
+                  variants={slideUpVariants}
+                  initial="hidden"
+                  whileInView="visible"
+                  viewport={{ once: true, amount: 0.2 }}
+                  className="group h-full"
+                  whileHover={{ y: -4 }}
                   transition={{ duration: 0.3 }}
                 >
                   <motion.div
@@ -329,10 +344,33 @@ const About = () => {
                       to={skill.link}
                       className="inline-flex items-center gap-1.5 text-sm font-medium text-warm-600 dark:text-warm-400 hover:text-warm-700 dark:hover:text-warm-300 group/link transition-colors py-2"
                     >
-                      {isTurkish ? 'Detayları Gör' : 'View Details'}
-                      <HiArrowRight className="w-4 h-4 group-hover/link:translate-x-1 transition-transform" />
-                    </Link>
-                  )}
+                      {skill.icon}
+                    </motion.div>
+
+                    <h4 className="text-xl font-bold text-sand-900 dark:text-dark-50 mb-3 relative z-10">
+                      {skill.title}
+                    </h4>
+                    <p className="text-sand-600 dark:text-dark-200 mb-6 relative z-10">{skill.description}</p>
+                    <div className="flex flex-wrap gap-2 mb-6 relative z-10">
+                      {skill.technologies.map((tech) => (
+                        <span
+                          key={tech}
+                          className="px-3 py-1 bg-warm-500/10 text-warm-600 dark:text-warm-400 text-xs rounded-full border border-warm-500/20"
+                        >
+                          {tech}
+                        </span>
+                      ))}
+                    </div>
+                    {skill.link && (
+                      <Link
+                        to={skill.link}
+                        className="inline-flex items-center gap-1.5 text-sm font-medium text-warm-600 dark:text-warm-400 hover:text-warm-700 dark:hover:text-warm-300 group/link transition-colors py-2 relative z-10 mt-auto"
+                      >
+                        {isTurkish ? 'Detayları Gör' : 'View Details'}
+                        <HiArrowRight className="w-4 h-4 group-hover/link:translate-x-1 transition-transform" />
+                      </Link>
+                    )}
+                  </TiltCard>
                 </motion.div>
               ))}
             </div>
