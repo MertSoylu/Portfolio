@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { ReactNode } from 'react';
 import { motion } from 'framer-motion';
 import { HiArrowLeft, HiDeviceMobile, HiStar, HiHeart, HiTrendingUp } from 'react-icons/hi';
 import { Link } from 'react-router-dom';
@@ -10,7 +10,7 @@ const pageVariants = {
   animate: {
     opacity: 1,
     y: 0,
-    transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] },
+    transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] as number[] },
   },
   exit: {
     opacity: 0,
@@ -39,15 +39,21 @@ const scaleIn = {
   animate: {
     opacity: 1,
     scale: 1,
-    transition: { duration: 0.5, ease: [0.22, 1, 0.36, 1] },
+    transition: { duration: 0.5, ease: [0.22, 1, 0.36, 1] as number[] },
   },
 };
+
+interface Feature {
+  icon: ReactNode;
+  title: string;
+  desc: string;
+}
 
 const AndroidPage = () => {
   const { isTurkish } = useLanguage();
   const { isDark } = useDarkMode();
 
-  const features = isTurkish
+  const features: Feature[] = isTurkish
     ? [
         { icon: <HiTrendingUp className="w-6 h-6" />, title: 'Adım Sayacı', desc: 'Günlük adımlarını otomatik olarak takip et' },
         { icon: <HiHeart className="w-6 h-6" />, title: 'Sanal Kedi Bakımı', desc: 'Adımlarını mama puanına çevir ve kedini besle' },
@@ -61,7 +67,6 @@ const AndroidPage = () => {
         { icon: <HiDeviceMobile className="w-6 h-6" />, title: 'Water Tracking', desc: 'Monitor daily water intake and reach your goals' },
       ];
 
-  /* Mockup screenshots - using colored placeholder cards */
   return (
     <motion.div
       variants={pageVariants}
@@ -200,7 +205,6 @@ const AndroidPage = () => {
                 whileTap={{ scale: 0.97 }}
                 className="inline-flex items-center gap-3 px-8 py-4 bg-black dark:bg-white rounded-xl shadow-lg hover:shadow-2xl transition-shadow group"
               >
-                {/* Google Play icon */}
                 <svg viewBox="0 0 24 24" className="w-8 h-8" fill="none">
                   <path d="M3.609 1.814L13.792 12 3.61 22.186a.996.996 0 01-.61-.92V2.734c0-.382.218-.72.609-.92z" fill="#4285F4" />
                   <path d="M17.219 8.691L5.218.753C4.833.525 4.41.461 4.018.554L14.5 12 4.018 23.446c.392.093.815.029 1.2-.199l12.001-7.938" fill="#34A853" />

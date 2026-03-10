@@ -10,21 +10,21 @@ export const PERSONAL_INFO = {
   email: 's6ylumert@gmail.com',
   github: 'https://github.com/MertSoylu',
   location: 'İzmir, Turkey',
-};
+} as const;
 
 // Skills and expertise
 export const SKILLS = [
   'Web Development',
   'Android Development',
   'Cybersecurity',
-];
+] as const;
 
 export const TECHNOLOGIES = {
   frontend: ['React', 'JavaScript', 'Tailwind CSS', 'HTML/CSS', 'Vite', 'Framer Motion'],
   backend: ['Node.js', 'Express'],
   mobile: ['Java', 'Android Studio'],
   tools: ['Git', 'GitHub', 'VS Code', 'Linux'],
-};
+} as const;
 
 // Color palette
 export const COLORS = {
@@ -52,30 +52,39 @@ export const COLORS = {
     800: '#a84617',
     900: '#7a3410',
   },
-};
+} as const;
 
 // Animation timings
 export const ANIMATION_TIMINGS = {
   fast: 0.3,
   normal: 0.6,
   slow: 1,
-};
+} as const;
 
 // Navigation links
 export const NAV_LINKS = [
   { name: 'About', href: '#about' },
   { name: 'Projects', href: '#projects' },
   { name: 'Contact', href: '#contact' },
-];
+] as const;
 
 // Sections
 export const SECTIONS = {
   about: 'about',
   projects: 'projects',
   contact: 'contact',
-};
+} as const;
 
-export const FALLBACK_PROJECTS = [
+export interface FallbackProject {
+  id: string;
+  name: string;
+  description: string;
+  html_url: string;
+  language: string;
+  stargazers_count: number;
+}
+
+export const FALLBACK_PROJECTS: FallbackProject[] = [
   {
     id: 'fallback-1',
     name: 'Portfolio Website',

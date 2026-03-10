@@ -1,10 +1,9 @@
-import React from 'react';
+import React, { ReactNode } from 'react';
 import { motion } from 'framer-motion';
 import { HiMail, HiPhone } from 'react-icons/hi';
 import { FiMapPin } from 'react-icons/fi';
 import { useLanguage } from '../context/LanguageContext';
 
-/* ── Animated underline ── */
 const AnimatedUnderline = () => (
   <motion.div
     className="h-1 mx-auto mt-4 rounded-full bg-gradient-to-r from-warm-500 to-sand-400"
@@ -14,6 +13,13 @@ const AnimatedUnderline = () => (
     transition={{ duration: 0.8, ease: 'easeOut', delay: 0.2 }}
   />
 );
+
+interface ContactInfo {
+  icon: ReactNode;
+  label: string;
+  value: string;
+  href: string | null;
+}
 
 const Contact = () => {
   const { isTurkish } = useLanguage();
@@ -28,7 +34,6 @@ const Contact = () => {
     },
   };
 
-  /* Scale-grow entrance (scale: 0.8 → 1 + fade) */
   const cardVariants = {
     hidden: { opacity: 0, scale: 0.8 },
     visible: {
@@ -47,7 +52,7 @@ const Contact = () => {
     },
   };
 
-  const contactInfo = [
+  const contactInfo: ContactInfo[] = [
     {
       icon: <HiMail className="w-6 h-6" />,
       label: isTurkish ? 'E-posta' : 'Email',
@@ -86,7 +91,7 @@ const Contact = () => {
             </p>
           </motion.div>
 
-          {/* Contact info cards — scale grow effect */}
+          {/* Contact info cards */}
           <motion.div className="grid md:grid-cols-3 gap-6">
             {contactInfo.map((info, index) => (
               <motion.div

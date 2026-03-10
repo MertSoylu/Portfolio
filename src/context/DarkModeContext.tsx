@@ -1,18 +1,23 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 
-const DarkModeContext = createContext();
+interface DarkModeContextValue {
+  isDark: boolean;
+  toggleDarkMode: () => void;
+}
 
-export const useDarkMode = () => {
+const DarkModeContext = createContext<DarkModeContextValue | undefined>(undefined);
+
+export const useDarkMode = (): DarkModeContextValue => {
   const context = useContext(DarkModeContext);
   if (!context) throw new Error('useDarkMode must be used within DarkModeProvider');
   return context;
 };
 
-export const DarkModeProvider = ({ children }) => {
+export const DarkModeProvider = ({ children }: { children: ReactNode }) => {
   const [isDark, setIsDark] = useState(() => {
     try {
       const saved = localStorage.getItem('darkMode');
-      if (saved !== null) return JSON.parse(saved);
+      if (saved !== null) return JSON.parse(saved) as boolean;
       return window.matchMedia('(prefers-color-scheme: dark)').matches;
     } catch {
       return false;

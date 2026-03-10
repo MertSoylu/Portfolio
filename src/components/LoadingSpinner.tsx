@@ -1,25 +1,25 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 
+const containerVariants = {
+  animate: {
+    transition: {
+      staggerChildren: 0.1,
+    },
+  },
+};
+
+const dotVariants = {
+  animate: {
+    y: [0, -10, 0],
+    transition: {
+      duration: 0.8,
+      repeat: Infinity,
+    },
+  },
+};
+
 const LoadingSpinner = () => {
-  const containerVariants = {
-    animate: {
-      transition: {
-        staggerChildren: 0.1,
-      },
-    },
-  };
-
-  const dotVariants = {
-    animate: {
-      y: [0, -10, 0],
-      transition: {
-        duration: 0.8,
-        repeat: Infinity,
-      },
-    },
-  };
-
   return (
     <motion.div
       className="flex items-center justify-center gap-2"

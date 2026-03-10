@@ -1,21 +1,26 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, ReactNode } from 'react';
 import { motion, useInView } from 'framer-motion';
 import { HiAcademicCap, HiCode, HiShieldCheck, HiArrowRight } from 'react-icons/hi';
 import { Link } from 'react-router-dom';
 import { fetchGitHubRepos } from '../utils/githubApi';
 import { useLanguage } from '../context/LanguageContext';
 
-/* ── Counter component ── */
-const CountUp = ({ end, suffix = '', label }) => {
+interface CountUpProps {
+  end: number;
+  suffix?: string;
+  label: string;
+}
+
+const CountUp = ({ end, suffix = '', label }: CountUpProps) => {
   const [count, setCount] = useState(0);
-  const ref = useRef(null);
+  const ref = useRef<HTMLDivElement>(null);
   const inView = useInView(ref, { once: true, margin: '-50px' });
 
   useEffect(() => {
     if (!inView) return;
-    let startTime = null;
+    let startTime: number | null = null;
     const duration = 2000;
-    const step = (ts) => {
+    const step = (ts: number) => {
       if (!startTime) startTime = ts;
       const progress = Math.min((ts - startTime) / duration, 1);
       setCount(Math.floor(progress * end));
@@ -35,7 +40,6 @@ const CountUp = ({ end, suffix = '', label }) => {
   );
 };
 
-/* ── Animated underline ── */
 const AnimatedUnderline = () => (
   <motion.div
     className="h-1 mx-auto mt-4 rounded-full bg-gradient-to-r from-warm-500 to-sand-400"
@@ -45,6 +49,14 @@ const AnimatedUnderline = () => (
     transition={{ duration: 0.8, ease: 'easeOut', delay: 0.2 }}
   />
 );
+
+interface Skill {
+  icon: ReactNode;
+  title: string;
+  description: string;
+  technologies: string[];
+  link: string;
+}
 
 const About = () => {
   const { isTurkish } = useLanguage();
@@ -85,7 +97,7 @@ const About = () => {
     },
   };
 
-  const skills = [
+  const skills: Skill[] = [
     {
       icon: <HiCode className="w-8 h-8" />,
       title: isTurkish ? 'Web Geliştirme' : 'Web Development',
@@ -118,7 +130,6 @@ const About = () => {
     },
   ];
 
-  /* Avatar clip-path reveal */
   const avatarVariants = {
     hidden: { clipPath: 'circle(0% at 50% 50%)' },
     visible: {
@@ -126,6 +137,18 @@ const About = () => {
       transition: { duration: 1, ease: 'easeOut', delay: 0.3 },
     },
   };
+
+  const codeLines = [
+    { num: 1, indent: 0, tokens: [{ text: 'import', color: 'text-purple-400' }, { text: ' React', color: 'text-sky-300' }, { text: ' from', color: 'text-purple-400' }, { text: " 'react'", color: 'text-emerald-400' }] },
+    { num: 2, indent: 0, tokens: [] as { text: string; color: string }[] },
+    { num: 3, indent: 0, tokens: [{ text: 'const', color: 'text-purple-400' }, { text: ' App', color: 'text-yellow-300' }, { text: ' = () => {', color: 'text-gray-300' }] },
+    { num: 4, indent: 1, tokens: [{ text: 'return', color: 'text-purple-400' }, { text: ' (', color: 'text-gray-300' }] },
+    { num: 5, indent: 2, tokens: [{ text: '<', color: 'text-gray-400' }, { text: 'div', color: 'text-red-400' }, { text: ' className=', color: 'text-sky-300' }, { text: '"app"', color: 'text-emerald-400' }, { text: '>', color: 'text-gray-400' }] },
+    { num: 6, indent: 3, tokens: [{ text: '<', color: 'text-gray-400' }, { text: 'h1', color: 'text-red-400' }, { text: '>', color: 'text-gray-400' }, { text: 'Hello!', color: 'text-white' }, { text: '</', color: 'text-gray-400' }, { text: 'h1', color: 'text-red-400' }, { text: '>', color: 'text-gray-400' }] },
+    { num: 7, indent: 2, tokens: [{ text: '</', color: 'text-gray-400' }, { text: 'div', color: 'text-red-400' }, { text: '>', color: 'text-gray-400' }] },
+    { num: 8, indent: 1, tokens: [{ text: ')', color: 'text-gray-300' }] },
+    { num: 9, indent: 0, tokens: [{ text: '}', color: 'text-gray-300' }] },
+  ];
 
   return (
     <section id="about" className="py-20 px-4 relative">
@@ -150,7 +173,7 @@ const About = () => {
             variants={itemVariants}
             className="grid md:grid-cols-2 gap-12 mb-16 items-center"
           >
-            {/* Left side — Text (slides from left) */}
+            {/* Left side */}
             <motion.div variants={sectionVariants}>
               <h3 className="text-3xl font-bold text-sand-900 dark:text-dark-50 mb-6">
                 {isTurkish ? 'Bilgisayar Programcılığı Öğrencisi' : 'Computer Programming Student'}
@@ -172,7 +195,7 @@ const About = () => {
               </p>
             </motion.div>
 
-            {/* Right side — Code editor illustration with clip-path reveal */}
+            {/* Right side — Code editor illustration */}
             <motion.div className="flex justify-center">
               <motion.div
                 variants={avatarVariants}
@@ -188,33 +211,16 @@ const About = () => {
                   className="absolute inset-0 flex items-center justify-center bg-gradient-sand dark:bg-gradient-to-br dark:from-dark-600 dark:to-dark-700 rounded-2xl shadow-xl border border-sand-300 dark:border-dark-400 overflow-hidden"
                 >
                   <div className="relative w-full h-full flex items-center justify-center p-6">
-                    {/* Ambient glow */}
                     <div className="absolute w-32 h-32 bg-warm-500/15 dark:bg-warm-500/10 rounded-full blur-3xl" />
-
-                    {/* Code editor window */}
                     <div className="w-full max-w-[240px] rounded-xl overflow-hidden shadow-2xl border border-sand-300/30 dark:border-dark-300/20">
-                      {/* Title bar */}
                       <div className="bg-[#2d333b] dark:bg-[#161b22] px-3 py-2 flex items-center gap-1.5">
                         <div className="w-2.5 h-2.5 rounded-full bg-red-400" />
                         <div className="w-2.5 h-2.5 rounded-full bg-yellow-400" />
                         <div className="w-2.5 h-2.5 rounded-full bg-green-400" />
-                        <span className="ml-2 text-[9px] text-gray-400 font-mono">App.jsx</span>
+                        <span className="ml-2 text-[9px] text-gray-400 font-mono">App.tsx</span>
                       </div>
-
-                      {/* Code area */}
                       <div className="bg-[#1e293b] dark:bg-[#0d1117] px-3 py-3 font-mono text-[10px] md:text-[11px] leading-relaxed space-y-0.5 min-h-[140px]">
-                        {/* Line numbers + code */}
-                        {[
-                          { num: 1, indent: 0, tokens: [{ text: 'import', color: 'text-purple-400' }, { text: ' React', color: 'text-sky-300' }, { text: ' from', color: 'text-purple-400' }, { text: " 'react'", color: 'text-emerald-400' }] },
-                          { num: 2, indent: 0, tokens: [] },
-                          { num: 3, indent: 0, tokens: [{ text: 'const', color: 'text-purple-400' }, { text: ' App', color: 'text-yellow-300' }, { text: ' = () => {', color: 'text-gray-300' }] },
-                          { num: 4, indent: 1, tokens: [{ text: 'return', color: 'text-purple-400' }, { text: ' (', color: 'text-gray-300' }] },
-                          { num: 5, indent: 2, tokens: [{ text: '<', color: 'text-gray-400' }, { text: 'div', color: 'text-red-400' }, { text: ' className=', color: 'text-sky-300' }, { text: '"app"', color: 'text-emerald-400' }, { text: '>', color: 'text-gray-400' }] },
-                          { num: 6, indent: 3, tokens: [{ text: '<', color: 'text-gray-400' }, { text: 'h1', color: 'text-red-400' }, { text: '>', color: 'text-gray-400' }, { text: 'Hello!', color: 'text-white' }, { text: '</', color: 'text-gray-400' }, { text: 'h1', color: 'text-red-400' }, { text: '>', color: 'text-gray-400' }] },
-                          { num: 7, indent: 2, tokens: [{ text: '</', color: 'text-gray-400' }, { text: 'div', color: 'text-red-400' }, { text: '>', color: 'text-gray-400' }] },
-                          { num: 8, indent: 1, tokens: [{ text: ')', color: 'text-gray-300' }] },
-                          { num: 9, indent: 0, tokens: [{ text: '}', color: 'text-gray-300' }] },
-                        ].map((line, i) => (
+                        {codeLines.map((line, i) => (
                           <motion.div
                             key={line.num}
                             className="flex items-center"
@@ -231,7 +237,6 @@ const About = () => {
                             </span>
                           </motion.div>
                         ))}
-                        {/* Blinking cursor */}
                         <div className="flex items-center">
                           <span className="w-5 text-right text-gray-600 mr-3 select-none text-[9px]">10</span>
                           <motion.span
@@ -242,8 +247,6 @@ const About = () => {
                         </div>
                       </div>
                     </div>
-
-                    {/* Floating symbols */}
                     <motion.div
                       animate={{ y: [0, -6, 0], opacity: [0.5, 1, 0.5] }}
                       transition={{ duration: 3, repeat: Infinity }}
@@ -271,7 +274,7 @@ const About = () => {
             </motion.div>
           </motion.div>
 
-          {/* ── Counters ── */}
+          {/* Counters */}
           <motion.div
             variants={itemVariants}
             className="grid grid-cols-2 gap-6 md:gap-8 mb-16 max-w-md mx-auto"
@@ -293,7 +296,6 @@ const About = () => {
                   whileHover={{ y: -8 }}
                   transition={{ duration: 0.3 }}
                 >
-                  {/* Icon with whileInView bounce + hover jiggle */}
                   <motion.div
                     className="text-warm-600 mb-4 group-hover:text-warm-700 transition-colors inline-block"
                     initial={{ scale: 0, rotate: -30 }}

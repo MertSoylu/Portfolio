@@ -1,8 +1,13 @@
 import React, { useEffect, useRef, useState } from 'react';
 
+interface Trail {
+  el: HTMLDivElement;
+  x: number;
+  y: number;
+}
+
 const CustomCursor = () => {
-  const cursorRef = useRef(null);
-  const trailsRef = useRef([]);
+  const trailsRef = useRef<Trail[]>([]);
   const posRef = useRef({ x: -100, y: -100 });
   const [isDesktop, setIsDesktop] = useState(false);
 
@@ -19,9 +24,8 @@ const CustomCursor = () => {
     if (!isDesktop) return;
 
     const trailCount = 8;
-    const trails = [];
+    const trails: Trail[] = [];
 
-    // Create trail elements
     for (let i = 0; i < trailCount; i++) {
       const el = document.createElement('div');
       el.className = 'cursor-trail';
@@ -41,11 +45,11 @@ const CustomCursor = () => {
     }
     trailsRef.current = trails;
 
-    const handleMouseMove = (e) => {
+    const handleMouseMove = (e: MouseEvent) => {
       posRef.current = { x: e.clientX, y: e.clientY };
     };
 
-    let animId;
+    let animId: number;
     const animate = () => {
       let prevX = posRef.current.x;
       let prevY = posRef.current.y;

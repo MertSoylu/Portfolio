@@ -1,15 +1,23 @@
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import React, { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 
-const LanguageContext = createContext();
+type Language = 'tr' | 'en';
 
-export const useLanguage = () => {
+interface LanguageContextValue {
+  language: Language;
+  isTurkish: boolean;
+  toggleLanguage: () => void;
+}
+
+const LanguageContext = createContext<LanguageContextValue | undefined>(undefined);
+
+export const useLanguage = (): LanguageContextValue => {
   const context = useContext(LanguageContext);
   if (!context) throw new Error('useLanguage must be used within LanguageProvider');
   return context;
 };
 
-export const LanguageProvider = ({ children }) => {
-  const [language, setLanguage] = useState(() => {
+export const LanguageProvider = ({ children }: { children: ReactNode }) => {
+  const [language, setLanguage] = useState<Language>(() => {
     try {
       const saved = localStorage.getItem('language');
       if (saved === 'tr' || saved === 'en') return saved;

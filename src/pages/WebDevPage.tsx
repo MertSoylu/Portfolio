@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { HiArrowLeft, HiExternalLink, HiGlobe, HiCode, HiTemplate } from 'react-icons/hi';
+import { HiArrowLeft, HiExternalLink } from 'react-icons/hi';
 import { Link } from 'react-router-dom';
 import { useLanguage } from '../context/LanguageContext';
 import { useDarkMode } from '../context/DarkModeContext';
@@ -10,7 +10,7 @@ const pageVariants = {
   animate: {
     opacity: 1,
     y: 0,
-    transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] },
+    transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] as number[] },
   },
   exit: {
     opacity: 0,
@@ -52,11 +52,25 @@ const slideInRight = {
   },
 };
 
+interface Project {
+  id: string;
+  title: string;
+  url: string;
+  gradient: string;
+  accentLight: string;
+  accentDark: string;
+  icon: string;
+  description: string;
+  longDesc: string;
+  tags: string[];
+  features: string[];
+}
+
 const WebDevPage = () => {
   const { isTurkish } = useLanguage();
   const { isDark } = useDarkMode();
 
-  const projects = [
+  const projects: Project[] = [
     {
       id: 'typesprint',
       title: 'TypeSprint',
@@ -67,7 +81,7 @@ const WebDevPage = () => {
       icon: '⌨️',
       description: isTurkish
         ? 'TypeSprint, gerçek zamanlı harf doğrulaması, akıcı arayüzü ve çok dilli kelime setleriyle modern bir yazma hızı (WPM) testidir. Yanlış harfe bastığında ilerleyemezsin — bu sayede sonuçlar net ve tekrar edilebilir olur.'
-        : 'TypeSprint is a modern typing speed (WPM) test with real-time letter validation, smooth UI, and multilingual word sets. You can\'t proceed when hitting wrong keys — making results clean and repeatable.',
+        : "TypeSprint is a modern typing speed (WPM) test with real-time letter validation, smooth UI, and multilingual word sets. You can't proceed when hitting wrong keys — making results clean and repeatable.",
       longDesc: isTurkish
         ? 'Türkçe ve Avrupa dillerinde kelime havuzları, gün/hafta/ay/genel skor tabloları, mobil uyumlu tasarım ve hile önleme sistemiyle donatılmış kapsamlı bir platform. Kullanıcılar yazma hızlarını ölçebilir, geliştirebilir ve arkadaşlarıyla kıyaslayabilir.'
         : 'A comprehensive platform equipped with word pools in Turkish and European languages, daily/weekly/monthly/all-time leaderboards, mobile-friendly design, and anti-cheat system. Users can measure their typing speed, improve it, and compare with friends.',

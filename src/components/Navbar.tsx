@@ -15,7 +15,7 @@ const Navbar = () => {
   const navigate = useNavigate();
   const isHomePage = location.pathname === '/';
 
-  const handleNavClick = (e, href) => {
+  const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
     e.preventDefault();
     if (isHomePage) {
       const el = document.querySelector(href);
@@ -35,7 +35,6 @@ const Navbar = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  /* Track active section via IntersectionObserver */
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
@@ -101,7 +100,6 @@ const Navbar = () => {
                   whileHover={{ y: -2 }}
                 >
                   {item.name}
-                  {/* Sliding pill indicator */}
                   {isActive && (
                     <motion.div
                       layoutId="activeNavPill"
@@ -194,7 +192,6 @@ const Navbar = () => {
 
           {/* Mobile buttons */}
           <div className="flex md:hidden items-center gap-2">
-            {/* Mobile dark mode toggle */}
             <motion.button
               onClick={toggleDarkMode}
               className="p-2.5 rounded-lg hover:bg-sand-200 dark:hover:bg-dark-500 transition-colors text-sand-700 dark:text-dark-100"

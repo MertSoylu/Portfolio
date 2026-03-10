@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, lazy, Suspense } from 'react';
 import { Routes, Route, useLocation } from 'react-router-dom';
 import { AnimatePresence } from 'framer-motion';
 import { DarkModeProvider, useDarkMode } from './context/DarkModeContext';
@@ -12,9 +12,11 @@ import Contact from './components/Contact';
 import Footer from './components/Footer';
 import ScrollProgress from './components/ScrollProgress';
 import CustomCursor from './components/CustomCursor';
-import AndroidPage from './pages/AndroidPage';
-import WebDevPage from './pages/WebDevPage';
-import CyberSecurityPage from './pages/CyberSecurityPage';
+import LoadingSpinner from './components/LoadingSpinner';
+
+const AndroidPage = lazy(() => import('./pages/AndroidPage'));
+const WebDevPage = lazy(() => import('./pages/WebDevPage'));
+const CyberSecurityPage = lazy(() => import('./pages/CyberSecurityPage'));
 
 const HomePage = () => (
   <>
@@ -25,7 +27,12 @@ const HomePage = () => (
   </>
 );
 
-/* Scroll to top or hash on route change */
+const PageFallback = () => (
+  <div className="min-h-screen flex items-center justify-center">
+    <LoadingSpinner />
+  </div>
+);
+
 const ScrollToTop = () => {
   const { pathname, hash } = useLocation();
   useEffect(() => {
@@ -56,9 +63,30 @@ const AppContent = () => {
         <AnimatePresence mode="wait">
           <Routes location={location} key={location.pathname}>
             <Route path="/" element={<HomePage />} />
-            <Route path="/android" element={<AndroidPage />} />
-            <Route path="/web" element={<WebDevPage />} />
-            <Route path="/cybersecurity" element={<CyberSecurityPage />} />
+            <Route
+              path="/android"
+              element={
+                <Suspense fallback={<PageFallback />}>
+                  <AndroidPage />
+                </Suspense>
+              }
+            />
+            <Route
+              path="/web"
+              element={
+                <Suspense fallback={<PageFallback />}>
+                  <WebDevPage />
+                </Suspense>
+              }
+            />
+            <Route
+              path="/cybersecurity"
+              element={
+                <Suspense fallback={<PageFallback />}>
+                  <CyberSecurityPage />
+                </Suspense>
+              }
+            />
           </Routes>
         </AnimatePresence>
       </main>

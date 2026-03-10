@@ -5,10 +5,11 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## Commands
 
 ```bash
-npm run dev      # Start dev server on port 3000
-npm run build    # Production build (outputs to dist/)
-npm run preview  # Preview production build
-npm run lint     # ESLint on .js/.jsx files
+npm run dev       # Start dev server on port 3000
+npm run build     # Production build (outputs to dist/)
+npm run preview   # Preview production build
+npm run lint      # ESLint on .js/.jsx/.ts/.tsx files
+npm run typecheck # Run TypeScript compiler (no emit) for type checking
 ```
 
 No test framework is configured.
@@ -23,7 +24,7 @@ Copy `.env.example` to `.env` and set:
 
 ## Architecture
 
-**Stack:** React 18 + Vite, Tailwind CSS (class-based dark mode), Framer Motion, React Router v6, Axios.
+**Stack:** React 18 + Vite + TypeScript, Tailwind CSS (class-based dark mode), Framer Motion, React Router v6, Axios.
 
 ### Context System
 
@@ -37,7 +38,7 @@ All bilingual text is inlined inside components as conditional objects/strings �
 
 `/` renders a single-page scroll layout (Hero → About → Projects → Contact) with scroll-based active section tracking in Navbar. Sub-pages `/web`, `/android`, `/cybersecurity` are full-page detail views rendered via React Router.
 
-### GitHub API Integration (`src/utils/githubApi.js`)
+### GitHub API Integration (`src/utils/githubApi.ts`)
 
 Fetches public repos for the configured username. Implements:
 - 24-hour localStorage cache (key: `github_repos_cache`)

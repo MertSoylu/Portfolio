@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { ReactNode } from 'react';
 import { motion } from 'framer-motion';
 import { HiArrowLeft, HiShieldCheck, HiLightningBolt, HiBookOpen, HiChip } from 'react-icons/hi';
 import { Link } from 'react-router-dom';
@@ -10,7 +10,7 @@ const pageVariants = {
   animate: {
     opacity: 1,
     y: 0,
-    transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] },
+    transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] as number[] },
   },
   exit: {
     opacity: 0,
@@ -39,15 +39,29 @@ const scaleIn = {
   animate: {
     opacity: 1,
     scale: 1,
-    transition: { duration: 0.5, ease: [0.22, 1, 0.36, 1] },
+    transition: { duration: 0.5, ease: [0.22, 1, 0.36, 1] as number[] },
   },
 };
+
+interface LearningArea {
+  icon: ReactNode;
+  title: string;
+  desc: string;
+}
+
+interface TerminalLine {
+  prompt: string;
+  cmd: string;
+  delay: number;
+  isOutput?: boolean;
+  isSuccess?: boolean;
+}
 
 const CyberSecurityPage = () => {
   const { isTurkish } = useLanguage();
   const { isDark } = useDarkMode();
 
-  const learningAreas = isTurkish
+  const learningAreas: LearningArea[] = isTurkish
     ? [
         { icon: <HiShieldCheck className="w-7 h-7" />, title: 'Ağ Güvenliği', desc: 'Ağ protokolleri, güvenlik duvarları ve sızma testi temelleri' },
         { icon: <HiLightningBolt className="w-7 h-7" />, title: 'Python ile Güvenlik', desc: 'Güvenlik araçları ve otomasyon scriptleri geliştirme' },
@@ -61,8 +75,7 @@ const CyberSecurityPage = () => {
         { icon: <HiChip className="w-7 h-7" />, title: 'Secure Coding', desc: 'OWASP standards and secure software development practices' },
       ];
 
-  /* Animated terminal lines */
-  const terminalLines = [
+  const terminalLines: TerminalLine[] = [
     { prompt: '~$', cmd: 'nmap -sV target.com', delay: 0 },
     { prompt: '', cmd: 'Starting Nmap 7.94...', delay: 0.3, isOutput: true },
     { prompt: '', cmd: 'PORT    STATE  SERVICE  VERSION', delay: 0.6, isOutput: true },
@@ -185,7 +198,7 @@ const CyberSecurityPage = () => {
             {/* Learning Areas */}
             <motion.div variants={fadeUp}>
               <h3 className="text-xl font-bold text-sand-900 dark:text-dark-50 mb-6">
-                {isTurkish ? 'Çalıştığım Alanlar' : 'Areas I\'m Studying'}
+                {isTurkish ? 'Çalıştığım Alanlar' : "Areas I'm Studying"}
               </h3>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-10">
                 {learningAreas.map((area, i) => (
@@ -215,14 +228,12 @@ const CyberSecurityPage = () => {
                 {isTurkish ? 'Terminal Simülasyonu' : 'Terminal Simulation'}
               </h3>
               <div className="rounded-xl overflow-hidden shadow-2xl border border-gray-700/30">
-                {/* Terminal title bar */}
                 <div className="bg-[#2d333b] px-4 py-2.5 flex items-center gap-1.5">
                   <div className="w-3 h-3 rounded-full bg-red-400" />
                   <div className="w-3 h-3 rounded-full bg-yellow-400" />
                   <div className="w-3 h-3 rounded-full bg-green-400" />
                   <span className="ml-3 text-xs text-gray-400 font-mono">terminal — bash</span>
                 </div>
-                {/* Terminal body */}
                 <div className="bg-[#0d1117] p-4 sm:p-5 font-mono text-xs sm:text-sm min-h-[220px] space-y-1 overflow-x-auto">
                   {terminalLines.map((line, i) => (
                     <motion.div
@@ -249,7 +260,6 @@ const CyberSecurityPage = () => {
                       </span>
                     </motion.div>
                   ))}
-                  {/* Blinking cursor */}
                   <motion.div
                     initial={{ opacity: 0 }}
                     whileInView={{ opacity: 1 }}

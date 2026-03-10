@@ -1,10 +1,9 @@
-import React from 'react';
+import React, { ReactNode } from 'react';
 import { motion } from 'framer-motion';
 import { HiMail } from 'react-icons/hi';
 import { FiGithub } from 'react-icons/fi';
 import { useLanguage } from '../context/LanguageContext';
 
-/* ── Animated wave SVG separator ── */
 const WaveSeparator = () => (
   <div className="relative w-full overflow-hidden leading-[0] -mb-1">
     <div className="wave-separator w-[200%]">
@@ -27,11 +26,17 @@ const WaveSeparator = () => (
   </div>
 );
 
+interface SocialLink {
+  name: string;
+  icon: ReactNode;
+  href: string;
+}
+
 const Footer = () => {
   const { isTurkish } = useLanguage();
   const currentYear = new Date().getFullYear();
 
-  const socialLinks = [
+  const socialLinks: SocialLink[] = [
     {
       name: 'GitHub',
       icon: <FiGithub className="w-6 h-6" />,
@@ -46,7 +51,6 @@ const Footer = () => {
 
   return (
     <div className="mt-20">
-      {/* Wave separator */}
       <WaveSeparator />
 
       <footer className="bg-sand-100/50 dark:bg-dark-700/50 backdrop-blur-md border-t border-sand-200 dark:border-dark-500 py-12 px-4">
@@ -118,10 +122,8 @@ const Footer = () => {
             </motion.div>
           </div>
 
-          {/* Divider */}
           <div className="border-t border-sand-200 dark:border-dark-500 my-8" />
 
-          {/* Bottom */}
           <motion.div
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 1 }}

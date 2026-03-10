@@ -6,7 +6,7 @@ import { useLanguage } from '../context/LanguageContext';
 
 const Hero = () => {
   const { isTurkish } = useLanguage();
-  const sectionRef = useRef(null);
+  const sectionRef = useRef<HTMLElement>(null);
   const { scrollYProgress } = useScroll({
     target: sectionRef,
     offset: ['start start', 'end start'],
@@ -17,7 +17,6 @@ const Hero = () => {
   const scale = useTransform(scrollYProgress, [0, 0.8], [1, 0.92]);
   const scrollIndicatorOpacity = useTransform(scrollYProgress, [0, 0.08], [1, 0]);
 
-  // Typing effect state
   const title = isTurkish ? 'Bilgisayar Programcılığı Öğrencisi' : 'Computer Programming Student';
   const roles = isTurkish
     ? ['Web Geliştirici', 'Android Geliştirici', 'Siber Güvenlik Meraklısı']
@@ -30,7 +29,6 @@ const Hero = () => {
   const hasHeadingAnimated = useRef(false);
 
   useEffect(() => {
-    // Mark heading as animated after initial render
     const timer = setTimeout(() => {
       hasHeadingAnimated.current = true;
     }, 1500);
@@ -45,7 +43,6 @@ const Hero = () => {
     setIsDeleting(false);
   }, [title, isTurkish]);
 
-  // Typing effect for main title
   useEffect(() => {
     if (displayedTitle.length < title.length) {
       const timeout = setTimeout(() => {
@@ -57,7 +54,6 @@ const Hero = () => {
     }
   }, [displayedTitle, title]);
 
-  // Role cycling effect
   useEffect(() => {
     if (!titleComplete) return;
     const currentRole = roles[currentRoleIndex];
@@ -83,7 +79,7 @@ const Hero = () => {
     );
 
     return () => clearTimeout(timeout);
-  }, [displayedRole, isDeleting, currentRoleIndex, titleComplete]);
+  }, [displayedRole, isDeleting, currentRoleIndex, titleComplete, roles]);
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -122,7 +118,7 @@ const Hero = () => {
             </span>
           </motion.div>
 
-          {/* Main heading — stagger each letter */}
+          {/* Main heading */}
           <motion.h1
             variants={itemVariants}
             className="text-3xl sm:text-4xl md:text-7xl font-bold text-sand-900 dark:text-dark-50 mb-6 leading-tight"
@@ -254,7 +250,7 @@ const Hero = () => {
             </motion.a>
           </motion.div>
 
-          {/* Scroll indicator — animated mouse icon */}
+          {/* Scroll indicator */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}

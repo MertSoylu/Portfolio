@@ -1,16 +1,16 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef, useCallback, ReactNode } from 'react';
 import { motion } from 'framer-motion';
 import { HiStar, HiCode, HiExternalLink } from 'react-icons/hi';
 import {
   fetchGitHubRepos,
   getGitHubProfileUrl,
   getGitHubUsername,
+  GitHubRepo,
 } from '../utils/githubApi';
 import { FALLBACK_PROJECTS } from '../utils/constants';
 import LoadingSpinner from './LoadingSpinner';
 import { useLanguage } from '../context/LanguageContext';
 
-/* ── Animated section underline ── */
 const AnimatedUnderline = () => (
   <motion.div
     className="h-1 mx-auto mt-4 rounded-full bg-gradient-to-r from-warm-500 to-sand-400"
@@ -21,13 +21,17 @@ const AnimatedUnderline = () => (
   />
 );
 
-/* ── 3D tilt + light-follow card wrapper ── */
-const TiltCard = ({ children, className }) => {
-  const cardRef = useRef(null);
-  const [style, setStyle] = useState({});
+interface TiltCardProps {
+  children: ReactNode;
+  className?: string;
+}
+
+const TiltCard = ({ children, className }: TiltCardProps) => {
+  const cardRef = useRef<HTMLDivElement>(null);
+  const [style, setStyle] = useState<React.CSSProperties>({});
   const [glowPos, setGlowPos] = useState({ x: 50, y: 50 });
 
-  const handleMouseMove = useCallback((e) => {
+  const handleMouseMove = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
     const card = cardRef.current;
     if (!card) return;
     const rect = card.getBoundingClientRect();
@@ -61,7 +65,6 @@ const TiltCard = ({ children, className }) => {
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
     >
-      {/* Light-follow glow layer */}
       <div
         className="pointer-events-none absolute inset-0 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-0"
         style={{
@@ -73,11 +76,13 @@ const TiltCard = ({ children, className }) => {
   );
 };
 
+type DisplayProject = GitHubRepo | typeof FALLBACK_PROJECTS[number];
+
 const Projects = () => {
   const { isTurkish } = useLanguage();
-  const [projects, setProjects] = useState([]);
+  const [projects, setProjects] = useState<DisplayProject[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [error, setError] = useState<string | null>(null);
   const [isUsingFallback, setIsUsingFallback] = useState(false);
 
   const githubProfileUrl = getGitHubProfileUrl();
@@ -94,7 +99,7 @@ const Projects = () => {
       } catch (err) {
         setProjects([]);
         setIsUsingFallback(false);
-        setError(err.message || (isTurkish ? 'Repolar alınamadı' : 'Failed to fetch repositories'));
+        setError(err instanceof Error ? err.message : (isTurkish ? 'Repolar alınamadı' : 'Failed to fetch repositories'));
         console.error(err);
       } finally {
         setLoading(false);
@@ -115,8 +120,7 @@ const Projects = () => {
     },
   };
 
-  /* Fan-open animation: each card comes from below with a slight rotation */
-  const fanVariants = (index) => ({
+  const fanVariants = (index: number) => ({
     hidden: {
       opacity: 0,
       y: 80,
@@ -136,8 +140,8 @@ const Projects = () => {
     },
   });
 
-  const getLanguageColor = (language) => {
-    const colors = {
+  const getLanguageColor = (language: string | null): string => {
+    const colors: Record<string, string> = {
       JavaScript: 'from-yellow-400 to-yellow-600',
       TypeScript: 'from-blue-400 to-blue-600',
       Python: 'from-cyan-400 to-cyan-600',
@@ -145,9 +149,8 @@ const Projects = () => {
       HTML: 'from-red-400 to-red-600',
       CSS: 'from-pink-400 to-pink-600',
       React: 'from-cyan-400 to-blue-600',
-      null: 'from-gray-400 to-gray-600',
     };
-    return colors[language] || colors.null;
+    return (language && colors[language]) || 'from-gray-400 to-gray-600';
   };
 
   return (
@@ -207,7 +210,6 @@ const Projects = () => {
                       className="group h-full"
                     >
                       <TiltCard className="relative h-full bg-white/40 dark:bg-dark-600/40 backdrop-blur-md rounded-xl border border-sand-200 dark:border-dark-400 overflow-hidden flex flex-col transition-shadow duration-300 group-hover:shadow-xl/20">
-                        {/* Language badge with pulse */}
                         {project.language && (
                           <motion.div
                             className={`bg-gradient-to-r ${getLanguageColor(project.language)} p-px`}
@@ -225,7 +227,6 @@ const Projects = () => {
                           </motion.div>
                         )}
 
-                        {/* Content */}
                         <div className="p-6 flex flex-col flex-grow relative z-10">
                           <h3 className="text-xl font-bold text-sand-900 dark:text-dark-50 mb-2 group-hover:text-warm-600 dark:group-hover:text-warm-400 transition-colors duration-300">
                             {project.name}
@@ -235,7 +236,6 @@ const Projects = () => {
                             {project.description || (isTurkish ? 'Açıklama yok' : 'No description available')}
                           </p>
 
-                          {/* Stats */}
                           <div className="flex items-center gap-4 mb-6 text-sm text-sand-600 dark:text-dark-200">
                             {project.stargazers_count > 0 && (
                               <div className="flex items-center gap-1">
@@ -251,7 +251,6 @@ const Projects = () => {
                             )}
                           </div>
 
-                          {/* CTA Button */}
                           <motion.a
                             href={project.html_url}
                             target="_blank"
@@ -260,7 +259,7 @@ const Projects = () => {
                             whileHover={{ x: 6 }}
                             transition={{ type: 'spring', stiffness: 300, damping: 24 }}
                           >
-                            {isTurkish ? 'GitHub\'da Gör' : 'View on GitHub'}
+                            {isTurkish ? "GitHub'da Gör" : 'View on GitHub'}
                             <HiExternalLink className="group-hover/link:translate-x-1 group-hover/link:-translate-y-0.5 transition-transform duration-300" />
                           </motion.a>
                         </div>

@@ -1,7 +1,11 @@
 import React, { useEffect, useRef } from 'react';
 
-const SandBackground = ({ isDark }) => {
-  const canvasRef = useRef(null);
+interface SandBackgroundProps {
+  isDark: boolean;
+}
+
+const SandBackground = ({ isDark }: SandBackgroundProps) => {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
   const mouseRef = useRef({ x: -1000, y: -1000 });
 
   useEffect(() => {
@@ -9,19 +13,31 @@ const SandBackground = ({ isDark }) => {
     if (!canvas) return;
 
     const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
 
-    const particles = [];
+    const particles: Particle[] = [];
     const isMobile = window.innerWidth < 768;
     const particleCount = isMobile ? 35 : 90;
     const connectionDistance = isMobile ? 80 : 120;
     const mouseRadius = 150;
 
     class Particle {
+      x: number;
+      y: number;
+      size: number;
+      baseSpeedX: number;
+      baseSpeedY: number;
+      speedX: number;
+      speedY: number;
+      opacity: number;
+      color: string;
+
       constructor() {
-        this.x = Math.random() * canvas.width;
-        this.y = Math.random() * canvas.height;
+        this.x = Math.random() * canvas!.width;
+        this.y = Math.random() * canvas!.height;
         this.size = Math.random() * 4 + 1;
         this.baseSpeedX = Math.random() * 0.5 - 0.25;
         this.baseSpeedY = Math.random() * 0.5 - 0.25;
@@ -36,7 +52,6 @@ const SandBackground = ({ isDark }) => {
       }
 
       update() {
-        // Mouse repel effect
         const dx = this.x - mouseRef.current.x;
         const dy = this.y - mouseRef.current.y;
         const dist = Math.sqrt(dx * dx + dy * dy);
@@ -48,27 +63,25 @@ const SandBackground = ({ isDark }) => {
           this.speedY += Math.sin(angle) * force * 2;
         }
 
-        // Damping — return to base speed
         this.speedX += (this.baseSpeedX - this.speedX) * 0.05;
         this.speedY += (this.baseSpeedY - this.speedY) * 0.05;
 
         this.x += this.speedX;
         this.y += this.speedY;
 
-        // Subtle wave movement
         this.speedY += Math.sin(Date.now() * 0.0001) * 0.005;
 
-        if (this.x > canvas.width) this.x = 0;
-        if (this.x < 0) this.x = canvas.width;
-        if (this.y > canvas.height) this.y = 0;
-        if (this.y < 0) this.y = canvas.height;
+        if (this.x > canvas!.width) this.x = 0;
+        if (this.x < 0) this.x = canvas!.width;
+        if (this.y > canvas!.height) this.y = 0;
+        if (this.y < 0) this.y = canvas!.height;
       }
 
       draw() {
-        ctx.fillStyle = this.color;
-        ctx.beginPath();
-        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-        ctx.fill();
+        ctx!.fillStyle = this.color;
+        ctx!.beginPath();
+        ctx!.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+        ctx!.fill();
       }
     }
 
@@ -98,10 +111,9 @@ const SandBackground = ({ isDark }) => {
       }
     };
 
-    let animId;
+    let animId: number;
 
     const animate = () => {
-      // Gradient background
       const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
       if (isDark) {
         gradient.addColorStop(0, '#0f172a');
@@ -116,7 +128,6 @@ const SandBackground = ({ isDark }) => {
       ctx.fillStyle = gradient;
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-      // Wave effect
       ctx.strokeStyle = isDark
         ? 'rgba(100, 140, 200, 0.06)'
         : 'rgba(196, 168, 144, 0.1)';
@@ -132,10 +143,8 @@ const SandBackground = ({ isDark }) => {
       }
       ctx.stroke();
 
-      // Constellation connections
       drawConnections();
 
-      // Particles
       particles.forEach((particle) => {
         particle.update();
         particle.draw();
@@ -151,7 +160,7 @@ const SandBackground = ({ isDark }) => {
       canvas.height = window.innerHeight;
     };
 
-    const handleMouseMove = (e) => {
+    const handleMouseMove = (e: MouseEvent) => {
       mouseRef.current = { x: e.clientX, y: e.clientY };
     };
 
