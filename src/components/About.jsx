@@ -4,6 +4,7 @@ import { motion, useInView } from 'framer-motion';
 import { HiAcademicCap, HiCode, HiShieldCheck, HiArrowRight } from 'react-icons/hi';
 import { Link } from 'react-router-dom';
 import { fetchGitHubRepos } from '../utils/githubApi';
+import { TECHNOLOGIES } from '../utils/constants';
 import { useLanguage } from '../context/LanguageContext';
 
 /* ── Counter component ── */
@@ -175,21 +176,39 @@ const About = () => {
               <h3 className="text-3xl font-bold text-sand-900 dark:text-dark-50 mb-6">
                 {isTurkish ? 'Bilgisayar Programcılığı Öğrencisi' : 'Computer Programming Student'}
               </h3>
-              <p className="text-lg text-sand-600 dark:text-dark-200 mb-4">
+              <motion.p
+                className="text-lg text-sand-600 dark:text-dark-200 mb-4"
+                initial={{ clipPath: 'inset(0 0 100% 0)', opacity: 0 }}
+                whileInView={{ clipPath: 'inset(0 0 0% 0)', opacity: 1 }}
+                viewport={{ once: true, margin: '-40px' }}
+                transition={{ duration: 0.7, ease: [0.76, 0, 0.24, 1], delay: 0.15 }}
+              >
                 {isTurkish
                   ? 'Kütahya Dumlupınar Üniversitesi\'nde Bilgisayar Programcılığı öğrencisiyim; estetik tasarımı güçlü işlevsellikle birleştiren çözümler üretmeye odaklanıyorum.'
                   : "I'm a computer programming student at Kütahya Dumlupınar University, passionate about creating solutions that combine beautiful design with solid functionality."}
-              </p>
-              <p className="text-lg text-sand-600 dark:text-dark-200 mb-4 pl-4 border-l-2 border-warm-500/40">
+              </motion.p>
+              <motion.p
+                className="text-lg text-sand-600 dark:text-dark-200 mb-4 pl-4 border-l-2 border-warm-500/40"
+                initial={{ clipPath: 'inset(0 0 100% 0)', opacity: 0 }}
+                whileInView={{ clipPath: 'inset(0 0 0% 0)', opacity: 1 }}
+                viewport={{ once: true, margin: '-40px' }}
+                transition={{ duration: 0.7, ease: [0.76, 0, 0.24, 1], delay: 0.30 }}
+              >
                 {isTurkish
                   ? 'Teknoloji yolculuğum merakla başladı ve gerçek problemleri çözen uygulamalar geliştirme tutkusuna dönüştü. Her projede temiz, sürdürülebilir ve iyi pratiklere uygun kod yazmayı önceliklendiriyorum.'
                   : 'My journey in tech started with curiosity about how things work, and it has evolved into a passion for building applications that solve real-world problems. I believe in writing clean, maintainable code and following best practices in every project.'}
-              </p>
-              <p className="text-lg text-sand-600 dark:text-dark-200 pl-4 border-l-2 border-warm-500/20">
+              </motion.p>
+              <motion.p
+                className="text-lg text-sand-600 dark:text-dark-200 pl-4 border-l-2 border-warm-500/20"
+                initial={{ clipPath: 'inset(0 0 100% 0)', opacity: 0 }}
+                whileInView={{ clipPath: 'inset(0 0 0% 0)', opacity: 1 }}
+                viewport={{ once: true, margin: '-40px' }}
+                transition={{ duration: 0.7, ease: [0.76, 0, 0.24, 1], delay: 0.45 }}
+              >
                 {isTurkish
                   ? 'Kod yazmadığım zamanlarda yeni teknolojileri keşfetmeyi, açık kaynak projelere katkı sunmayı ve web/mobil dünyasındaki güncel trendleri takip etmeyi seviyorum.'
                   : "When I'm not coding, I love exploring new technologies, contributing to open-source projects, and learning about the latest trends in web and mobile development."}
-              </p>
+              </motion.p>
             </motion.div>
 
             {/* Right side — Code editor illustration with clip-path reveal */}
@@ -201,7 +220,7 @@ const About = () => {
                 viewport={{ once: true }}
                 className="relative w-64 h-64 md:w-80 md:h-80"
               >
-                <div className="absolute inset-0 bg-gradient-to-br from-warm-500 to-sand-400 rounded-2xl shadow-2xl opacity-20" />
+                <div className="absolute inset-0 bg-gradient-to-br from-warm-500 via-warm-600 to-transparent rounded-2xl shadow-2xl opacity-40" />
                 <motion.div
                   animate={{ y: [0, -8, 0] }}
                   transition={{ duration: 5, repeat: Infinity, ease: 'easeInOut' }}
@@ -265,23 +284,23 @@ const About = () => {
 
                     {/* Floating symbols */}
                     <motion.div
-                      animate={{ y: [0, -6, 0], opacity: [0.5, 1, 0.5] }}
+                      animate={{ y: [0, -6, 0], opacity: [0.75, 1, 0.75] }}
                       transition={{ duration: 3, repeat: Infinity }}
-                      className="absolute top-6 right-4 text-warm-500/70 dark:text-warm-400/60 font-mono font-bold text-sm"
+                      className="absolute top-6 right-4 text-warm-500/90 dark:text-warm-400/80 font-mono font-bold text-sm"
                     >
                       {'</>'}
                     </motion.div>
                     <motion.div
-                      animate={{ y: [0, -5, 0], opacity: [0.4, 0.8, 0.4] }}
+                      animate={{ y: [0, -5, 0], opacity: [0.65, 0.9, 0.65] }}
                       transition={{ duration: 3.5, repeat: Infinity, delay: 0.8 }}
-                      className="absolute bottom-10 left-3 text-sky-500/60 dark:text-sky-400/50 font-mono font-bold text-xs"
+                      className="absolute bottom-10 left-3 text-sky-500/80 dark:text-sky-400/70 font-mono font-bold text-xs"
                     >
                       {'{ }'}
                     </motion.div>
                     <motion.div
-                      animate={{ y: [0, -4, 0], opacity: [0.3, 0.7, 0.3] }}
+                      animate={{ y: [0, -4, 0], opacity: [0.55, 0.85, 0.55] }}
                       transition={{ duration: 2.8, repeat: Infinity, delay: 1.2 }}
-                      className="absolute bottom-6 right-6 text-emerald-500/60 dark:text-emerald-400/50 font-mono font-bold text-[10px]"
+                      className="absolute bottom-6 right-6 text-emerald-500/80 dark:text-emerald-400/70 font-mono font-bold text-[10px]"
                     >
                       fn()
                     </motion.div>
@@ -298,6 +317,31 @@ const About = () => {
           >
             <CountUp end={repoCount} suffix="+" label={isTurkish ? 'Projeler' : 'Projects'} />
             <CountUp end={3} label={isTurkish ? 'Odak Alanı' : 'Focus Areas'} />
+          </motion.div>
+
+          {/* Tech stack row */}
+          <motion.div
+            variants={itemVariants}
+            className="mb-16"
+          >
+            <h4 className="text-center text-sm font-semibold text-sand-500 dark:text-dark-300 uppercase tracking-widest mb-6">
+              {isTurkish ? 'Teknolojiler' : 'Technologies'}
+            </h4>
+            <motion.div
+              className="flex flex-wrap gap-2 justify-center"
+              variants={{ visible: { transition: { staggerChildren: 0.05, delayChildren: 0.1 } } }}
+            >
+              {[...TECHNOLOGIES.frontend, ...TECHNOLOGIES.mobile, ...TECHNOLOGIES.tools].map((tech, i) => (
+                <motion.span
+                  key={tech}
+                  custom={i}
+                  variants={slideUpVariants}
+                  className="inline-flex items-center px-3 py-1.5 text-xs font-medium rounded-lg bg-white/50 dark:bg-dark-500/50 border border-sand-200 dark:border-dark-400 text-sand-700 dark:text-dark-200 hover:bg-warm-500/10 hover:border-warm-500/30 hover:text-warm-600 dark:hover:text-warm-400 transition-all duration-150 cursor-default"
+                >
+                  {tech}
+                </motion.span>
+              ))}
+            </motion.div>
           </motion.div>
 
           {/* Skills grid */}
@@ -342,7 +386,7 @@ const About = () => {
                       {skill.technologies.map((tech) => (
                         <span
                           key={tech}
-                          className="px-3 py-1 bg-warm-500/10 text-warm-600 dark:text-warm-400 text-xs rounded-full border border-warm-500/20"
+                          className="px-3 py-1 bg-warm-500/10 text-warm-600 dark:text-warm-400 text-xs rounded-full border border-warm-500/20 hover:bg-warm-500/25 hover:scale-105 transition-all duration-150 cursor-default inline-block"
                         >
                           {tech}
                         </span>

@@ -127,6 +127,10 @@ const apiClient = axios.create({
 });
 
 const getGitHubErrorMessage = (error, username = GITHUB_USERNAME) => {
+  if (!error?.response) {
+    return error?.message || 'Failed to fetch repositories from GitHub.';
+  }
+
   const status = error?.response?.status;
 
   if (status === 403) {
@@ -154,6 +158,7 @@ const getGitHubErrorMessage = (error, username = GITHUB_USERNAME) => {
 
 export const getGitHubUsername = () => GITHUB_USERNAME;
 export const getGitHubProfileUrl = () => `https://github.com/${GITHUB_USERNAME}`;
+export const clearRateLimitState = () => localStorage.removeItem(RATE_LIMIT_KEY);
 
 /**
  * Fetch all public repositories for a GitHub user
@@ -166,9 +171,9 @@ export const fetchGitHubRepos = async () => {
     return cached;
   }
 
-  try {
-    reserveRateLimitSlot();
+  reserveRateLimitSlot();
 
+  try {
     const response = await apiClient.get(
       `/users/${GITHUB_USERNAME}/repos?sort=updated&direction=desc&per_page=100&type=public`
     );
@@ -210,9 +215,9 @@ export const fetchGitHubRepos = async () => {
  * @returns {Promise<Object>} Repository object
  */
 export const fetchGitHubRepo = async (repoName) => {
-  try {
-    reserveRateLimitSlot();
+  reserveRateLimitSlot();
 
+  try {
     const response = await apiClient.get(
       `/repos/${GITHUB_USERNAME}/${repoName}`
     );
@@ -243,9 +248,9 @@ export const fetchGitHubRepo = async (repoName) => {
  * @returns {Promise<Object>} User profile object
  */
 export const fetchGitHubUser = async () => {
-  try {
-    reserveRateLimitSlot();
+  reserveRateLimitSlot();
 
+  try {
     const response = await apiClient.get(`/users/${GITHUB_USERNAME}`);
 
     return {

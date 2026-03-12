@@ -65,11 +65,14 @@ const Contact = () => {
   ];
 
   return (
-    <section id="contact" className="py-20 px-4 relative">
-      {/* Decorative background orb */}
-      <div className="absolute inset-0 flex items-center justify-center pointer-events-none overflow-hidden">
-        <div className="w-96 h-96 rounded-full bg-warm-500/5 dark:bg-warm-500/5 blur-3xl" />
+    <section id="contact" className="py-20 px-4 relative overflow-hidden">
+      {/* Dual ambient orbs */}
+      <div className="absolute inset-0 pointer-events-none overflow-hidden">
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 -translate-x-16 w-[32rem] h-[32rem] rounded-full bg-warm-500/10 dark:bg-warm-500/12 blur-[80px]" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 translate-x-24 translate-y-16 w-64 h-64 rounded-full bg-sand-400/15 dark:bg-warm-400/8 blur-[60px]" />
       </div>
+      {/* Diagonal light streak */}
+      <div className="absolute inset-x-0 top-1/3 h-px rotate-[-6deg] bg-gradient-to-r from-transparent via-warm-500/20 to-transparent pointer-events-none" />
       <div className="max-w-4xl mx-auto relative">
         <motion.div
           variants={containerVariants}
@@ -122,6 +125,7 @@ const Contact = () => {
                     whileInView={{ scale: 1, rotate: 0 }}
                     viewport={{ once: true }}
                     transition={{ type: 'spring', stiffness: 260, damping: 15, delay: 0.2 + index * 0.1 }}
+                    whileHover={{ scale: [1, 1.2, 1.05], transition: { duration: 0.4 } }}
                   >
                     {info.icon}
                   </motion.div>

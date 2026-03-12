@@ -18,6 +18,14 @@ const SandBackground = ({ isDark }) => {
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
 
+    // Respect prefers-reduced-motion — draw static background and bail out
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      const bg = isDarkRef.current ? '#0f172a' : '#faf8f3';
+      ctx.fillStyle = bg;
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      return;
+    }
+
     const isMobile = window.innerWidth < 768;
     const particleCount = isMobile ? 25 : 60;
     const connectionDistance = isMobile ? 80 : 120;
@@ -160,6 +168,16 @@ const SandBackground = ({ isDark }) => {
       }
 
       ctx.fillStyle = gradient;
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      // Radial ambient light source (top-center warm glow)
+      const ambient = ctx.createRadialGradient(
+        canvas.width / 2, 0, 0,
+        canvas.width / 2, 0, canvas.width * 0.6
+      );
+      ambient.addColorStop(0, dark ? 'rgba(255,154,92,0.08)' : 'rgba(240,125,45,0.06)');
+      ambient.addColorStop(1, 'transparent');
+      ctx.fillStyle = ambient;
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
       // Wave effect

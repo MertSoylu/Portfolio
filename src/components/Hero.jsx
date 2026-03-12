@@ -57,7 +57,6 @@ const Hero = () => {
   const languageChangedRef = useRef(false);
 
   useEffect(() => {
-    // Mark heading as animated after initial render
     const timer = setTimeout(() => {
       hasHeadingAnimated.current = true;
     }, 1500);
@@ -66,7 +65,6 @@ const Hero = () => {
 
   useEffect(() => {
     if (languageChangedRef.current) {
-      // On language toggle: jump directly to completed state, skip re-typing
       setDisplayedTitle(title);
       setTitleComplete(true);
       setCurrentRoleIndex(0);
@@ -143,11 +141,61 @@ const Hero = () => {
   return (
     <section
       ref={sectionRef}
-      className="min-h-screen flex items-center justify-center pt-20 pb-10 px-4 relative"
+      className="h-screen flex flex-col items-center justify-center px-4 relative overflow-hidden"
     >
-      <motion.div style={{ y, opacity, scale }} className="text-center max-w-4xl mx-auto">
-        <motion.div variants={containerVariants} initial="hidden" animate="visible">
-          {/* Animated greeting + Open to Work */}
+      {/* Mesh gradient glow blobs */}
+      <div className="pointer-events-none absolute inset-0 overflow-hidden">
+        {/* Blob 1 — turuncu, sol-üst */}
+        <motion.div
+          animate={{ x: [0, 50, -30, 0], y: [0, -40, 25, 0] }}
+          transition={{ duration: 12, repeat: Infinity, ease: 'easeInOut' }}
+          className="absolute top-[5%] left-[5%] w-[500px] h-[500px] rounded-full bg-warm-500/15 dark:bg-warm-500/20 blur-[120px]"
+        />
+        {/* Blob 2 — mor, sağ-üst */}
+        <motion.div
+          animate={{ x: [0, -40, 30, 0], y: [0, 35, -25, 0] }}
+          transition={{ duration: 15, repeat: Infinity, ease: 'easeInOut' }}
+          className="absolute top-[0%] right-[5%] w-[450px] h-[450px] rounded-full bg-purple-500/8 dark:bg-purple-500/12 blur-[120px]"
+        />
+        {/* Blob 3 — mavi, sol-alt */}
+        <motion.div
+          animate={{ x: [0, 35, -20, 0], y: [0, -30, 40, 0] }}
+          transition={{ duration: 18, repeat: Infinity, ease: 'easeInOut' }}
+          className="absolute bottom-[10%] left-[10%] w-[400px] h-[400px] rounded-full bg-blue-500/6 dark:bg-blue-500/10 blur-[100px]"
+        />
+        {/* Blob 4 — amber, sağ-alt */}
+        <motion.div
+          animate={{ x: [0, -50, 20, 0], y: [0, 40, -30, 0] }}
+          transition={{ duration: 10, repeat: Infinity, ease: 'easeInOut' }}
+          className="absolute bottom-[5%] right-[8%] w-[480px] h-[480px] rounded-full bg-amber-400/8 dark:bg-amber-400/12 blur-[110px]"
+        />
+      </div>
+
+      {/* Depth rings — centered, all breakpoints */}
+      <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
+        <div
+          className="absolute w-[500px] h-[500px] rounded-full border border-warm-500/[0.07]"
+          style={{ animation: 'pulse 8s ease-in-out infinite' }}
+        />
+        <div
+          className="absolute w-[800px] h-[800px] rounded-full border border-warm-500/[0.04]"
+          style={{ animation: 'pulse 8s ease-in-out infinite', animationDelay: '2s' }}
+        />
+        <div
+          className="absolute w-[1100px] h-[1100px] rounded-full border border-warm-500/[0.02]"
+          style={{ animation: 'pulse 8s ease-in-out infinite', animationDelay: '4s' }}
+        />
+      </div>
+
+      {/* Parallax content wrapper */}
+      <motion.div style={{ y, opacity, scale }} className="w-full flex flex-col items-center z-10 relative">
+        <motion.div
+          variants={containerVariants}
+          initial="hidden"
+          animate="visible"
+          className="text-center max-w-2xl mx-auto w-full"
+        >
+          {/* Badges row */}
           <motion.div variants={itemVariants} className="mb-6 flex flex-wrap items-center justify-center gap-3">
             <span className="inline-flex items-center gap-2 px-4 py-2 bg-sand-200 dark:bg-dark-600 text-sand-700 dark:text-dark-50 rounded-full text-sm font-semibold border border-warm-500/20 dark:border-warm-500/10">
               <HiSparkles className="w-4 h-4 text-warm-500" />
@@ -166,7 +214,7 @@ const Hero = () => {
           <motion.div style={{ y: yHeading }}>
             <motion.h1
               variants={itemVariants}
-              className="text-3xl sm:text-4xl md:text-7xl font-bold text-sand-900 dark:text-dark-50 mb-6 leading-tight"
+              className="text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-bold text-sand-900 dark:text-dark-50 mb-6 leading-tight"
             >
               {headingText.trim().split(/\s+/).map((word, i) => (
                 <React.Fragment key={`h-${isTurkish}-${i}`}>
@@ -187,7 +235,7 @@ const Hero = () => {
                 <React.Fragment key={`n-${isTurkish}-${i}`}>
                   <span style={{ display: 'inline-block', overflow: 'hidden', verticalAlign: 'bottom' }}>
                     <motion.span
-                      className="gradient-text"
+                      className="hero-name"
                       style={{ display: 'inline-block' }}
                       initial={hasHeadingAnimated.current ? false : { y: '110%' }}
                       animate={{ y: 0 }}
@@ -202,162 +250,162 @@ const Hero = () => {
             </motion.h1>
           </motion.div>
 
-          {/* Typing subheading */}
+          {/* Typing subheading + role cycling + university + description */}
           <motion.div style={{ y: yDesc }}>
-          <motion.div
-            variants={itemVariants}
-            className="text-xl md:text-2xl text-sand-600 dark:text-dark-200 mb-2 min-h-9"
-          >
-            <span>{displayedTitle}</span>
-            {!titleComplete && (
-              <motion.span
-                animate={{ opacity: [1, 0] }}
-                transition={{ duration: 0.53, repeat: Infinity, repeatType: 'reverse' }}
-                className="text-warm-500 font-light ml-0.5"
-              >
-                |
-              </motion.span>
-            )}
-          </motion.div>
-
-          {/* Role cycling */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: titleComplete ? 1 : 0 }}
-            className="text-lg md:text-xl text-warm-600 dark:text-warm-400 mb-4 min-h-9 font-semibold"
-          >
-            {titleComplete && (
-              <>
-                <span>{displayedRole}</span>
+            <motion.div
+              variants={itemVariants}
+              className="text-xl md:text-2xl text-sand-600 dark:text-dark-200 mb-2 min-h-9"
+            >
+              <span>{displayedTitle}</span>
+              {!titleComplete && (
                 <motion.span
-                  animate={{ opacity: [1, 0] }}
+                  animate={{ opacity: [1, 0], textShadow: ['0 0 8px rgba(240,125,45,0.8)', '0 0 0px rgba(240,125,45,0)'] }}
                   transition={{ duration: 0.53, repeat: Infinity, repeatType: 'reverse' }}
                   className="text-warm-500 font-light ml-0.5"
                 >
                   |
                 </motion.span>
-              </>
-            )}
-          </motion.div>
+              )}
+            </motion.div>
 
-          {/* University */}
-          <motion.p
-            variants={itemVariants}
-            className="text-lg text-sand-600 dark:text-dark-200 mb-4"
-          >
-            {isTurkish ? (
-              <>
-                Kütahya Dumlupınar{' '}
-                <span className="font-semibold text-sand-700 dark:text-dark-100">Üniversitesi</span>
-                {'\'nde'}
-              </>
-            ) : (
-              <>
-                at{' '}
-                <span className="font-semibold text-sand-700 dark:text-dark-100">
-                  Kütahya Dumlupınar University
-                </span>
-              </>
-            )}
-          </motion.p>
+            {/* Role cycling */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: titleComplete ? 1 : 0 }}
+              className="text-lg md:text-xl text-warm-600 dark:text-warm-400 mb-4 min-h-9 font-semibold"
+            >
+              {titleComplete && (
+                <>
+                  <span>{displayedRole}</span>
+                  <motion.span
+                    animate={{ opacity: [1, 0], textShadow: ['0 0 8px rgba(240,125,45,0.8)', '0 0 0px rgba(240,125,45,0)'] }}
+                    transition={{ duration: 0.53, repeat: Infinity, repeatType: 'reverse' }}
+                    className="text-warm-500 font-light ml-0.5"
+                  >
+                    |
+                  </motion.span>
+                </>
+              )}
+            </motion.div>
 
-          {/* Description */}
-          <motion.p
-            variants={itemVariants}
-            className="text-lg text-sand-600 dark:text-dark-200 max-w-2xl mx-auto mb-8"
-          >
-            {isTurkish
+            {/* University */}
+            <motion.p
+              variants={itemVariants}
+              className="text-lg text-sand-600 dark:text-dark-200 mb-4"
+            >
+              {isTurkish ? (
+                <>
+                  Kütahya Dumlupınar{' '}
+                  <span className="font-semibold text-sand-700 dark:text-dark-100">Üniversitesi</span>
+                  {'\'nde'}
+                </>
+              ) : (
+                <>
+                  at{' '}
+                  <span className="font-semibold text-sand-700 dark:text-dark-100">
+                    Kütahya Dumlupınar University
+                  </span>
+                </>
+              )}
+            </motion.p>
+
+            {/* Description */}
+            <motion.p
+              variants={itemVariants}
+              className="text-lg text-sand-600 dark:text-dark-200 max-w-lg mx-auto mb-8"
+            >
+              {isTurkish
                 ? 'Güzel ve işlevsel web uygulamaları geliştirmeye, aynı zamanda siber güvenlik alanını keşfetmeye tutkuluyum. Web ve Android geliştirme deneyimimle fark yaratan çözümler üretmeye çalışıyorum.'
                 : "I'm passionate about building beautiful, functional web applications and exploring cybersecurity. With expertise in web development and Android development, I strive to create solutions that make a difference."}
-          </motion.p>
+            </motion.p>
           </motion.div>
 
-          {/* Skills */}
+          {/* Skill badges */}
           <motion.div style={{ y: yBadges }}>
-          <motion.div variants={itemVariants} className="flex flex-wrap gap-3 justify-center mb-10">
-            {(isTurkish
-              ? [
-                  { name: 'Web Geliştirme', path: '/web' },
-                  { name: 'Android Geliştirme', path: '/android' },
-                  { name: 'Siber Güvenlik', path: '/cybersecurity' },
-                ]
-              : [
-                  { name: 'Web Development', path: '/web' },
-                  { name: 'Android Development', path: '/android' },
-                  { name: 'Cybersecurity', path: '/cybersecurity' },
-                ]).map((skill) => (
-              <Link
-                key={skill.name}
-                to={skill.path}
-                className="inline-flex items-center gap-1.5 px-4 py-2.5 bg-warm-500/10 text-warm-600 dark:text-warm-400 rounded-full text-sm font-medium border border-warm-500/20 hover:bg-warm-500/20 hover:gap-2.5 transition-all duration-200 cursor-pointer group"
+            <motion.div variants={itemVariants} className="flex flex-wrap gap-3 justify-center mb-10">
+              {(isTurkish
+                ? [
+                    { name: 'Web Geliştirme', path: '/web' },
+                    { name: 'Android Geliştirme', path: '/android' },
+                    { name: 'Siber Güvenlik', path: '/cybersecurity' },
+                  ]
+                : [
+                    { name: 'Web Development', path: '/web' },
+                    { name: 'Android Development', path: '/android' },
+                    { name: 'Cybersecurity', path: '/cybersecurity' },
+                  ]).map((skill) => (
+                <Link
+                  key={skill.name}
+                  to={skill.path}
+                  className="inline-flex items-center gap-1.5 px-4 py-2.5 bg-warm-500/10 text-warm-600 dark:text-warm-400 rounded-full text-sm font-medium border border-warm-500/20 hover:bg-warm-500/20 hover:gap-2.5 transition-all duration-200 cursor-pointer group"
+                >
+                  {skill.name}
+                  <HiArrowRight className="w-3.5 h-3.5 opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-200" />
+                </Link>
+              ))}
+            </motion.div>
+
+            {/* CTA Buttons */}
+            <motion.div variants={itemVariants} className="flex flex-wrap gap-4 justify-center">
+              <motion.a
+                ref={magBtn1.ref}
+                style={magBtn1.style}
+                onMouseMove={magBtn1.onMouseMove}
+                onMouseLeave={magBtn1.onMouseLeave}
+                href="#projects"
+                className="btn-primary flex items-center gap-2 group"
+                whileTap={{ scale: 0.95 }}
               >
-                {skill.name}
-                <HiArrowRight className="w-3.5 h-3.5 opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-200" />
-              </Link>
-            ))}
-          </motion.div>
-
-          {/* CTA Buttons */}
-          <motion.div variants={itemVariants} className="flex flex-wrap gap-4 justify-center">
-            <motion.a
-              ref={magBtn1.ref}
-              style={magBtn1.style}
-              onMouseMove={magBtn1.onMouseMove}
-              onMouseLeave={magBtn1.onMouseLeave}
-              href="#projects"
-              className="btn-primary flex items-center gap-2 group"
-              whileTap={{ scale: 0.95 }}
-            >
-              {isTurkish ? 'Projelerimi Gör' : 'View My Work'}
-              <HiArrowRight className="group-hover:translate-x-1 transition-transform" />
-            </motion.a>
-            <motion.a
-              ref={magBtn2.ref}
-              style={magBtn2.style}
-              onMouseMove={magBtn2.onMouseMove}
-              onMouseLeave={magBtn2.onMouseLeave}
-              href="#contact"
-              className="btn-secondary"
-              whileTap={{ scale: 0.95 }}
-            >
-              {isTurkish ? 'İletişime Geç' : 'Get In Touch'}
-            </motion.a>
-            <motion.a
-              ref={magBtn3.ref}
-              style={magBtn3.style}
-              onMouseMove={magBtn3.onMouseMove}
-              onMouseLeave={magBtn3.onMouseLeave}
-              href="/cv.pdf"
-              download
-              className="inline-flex items-center gap-2 px-6 py-3 rounded-lg font-semibold border-2 border-warm-500 text-warm-600 dark:text-warm-400 hover:bg-warm-500 hover:text-white transition-all duration-300"
-              whileTap={{ scale: 0.95 }}
-            >
-              <HiDownload className="w-4 h-4" />
-              {isTurkish ? 'CV İndir' : 'Download CV'}
-            </motion.a>
-          </motion.div>
-          </motion.div>
-
-          {/* Scroll indicator — animated mouse icon */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 2 }}
-            style={{ opacity: scrollIndicatorOpacity, y: scrollIndicatorY }}
-            className="mt-8 sm:mt-16 flex flex-col items-center"
-          >
-            <div className="text-sand-400 dark:text-dark-300 text-sm mb-3">
-              {isTurkish ? 'Keşfetmek için kaydır' : 'Scroll to explore'}
-            </div>
-            <div className="w-6 h-10 border-2 border-sand-400 dark:border-dark-300 rounded-full relative flex justify-center">
-              <motion.div
-                animate={{ y: [2, 14, 2] }}
-                transition={{ duration: 1.5, repeat: Infinity, ease: 'easeInOut' }}
-                className="w-1.5 h-1.5 bg-warm-500 rounded-full mt-1.5"
-              />
-            </div>
+                {isTurkish ? 'Projelerimi Gör' : 'View My Work'}
+                <HiArrowRight className="group-hover:translate-x-1 transition-transform" />
+              </motion.a>
+              <motion.a
+                ref={magBtn2.ref}
+                style={magBtn2.style}
+                onMouseMove={magBtn2.onMouseMove}
+                onMouseLeave={magBtn2.onMouseLeave}
+                href="#contact"
+                className="btn-secondary"
+                whileTap={{ scale: 0.95 }}
+              >
+                {isTurkish ? 'İletişime Geç' : 'Get In Touch'}
+              </motion.a>
+              <motion.a
+                ref={magBtn3.ref}
+                style={magBtn3.style}
+                onMouseMove={magBtn3.onMouseMove}
+                onMouseLeave={magBtn3.onMouseLeave}
+                href="/cv.pdf"
+                download
+                className="inline-flex items-center gap-2 px-6 py-3 rounded-lg font-semibold border-2 border-warm-500 text-warm-600 dark:text-warm-400 hover:bg-warm-500 hover:text-white transition-all duration-300"
+                whileTap={{ scale: 0.95 }}
+              >
+                <HiDownload className="w-4 h-4" />
+                {isTurkish ? 'CV İndir' : 'Download CV'}
+              </motion.a>
+            </motion.div>
           </motion.div>
         </motion.div>
+      </motion.div>
+
+      {/* Scroll indicator — pinned to section bottom */}
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 2 }}
+        style={{ opacity: scrollIndicatorOpacity, y: scrollIndicatorY }}
+        className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center"
+      >
+        <div className="text-sand-400 dark:text-dark-300 text-sm mb-3">
+          {isTurkish ? 'Keşfetmek için kaydır' : 'Scroll to explore'}
+        </div>
+        <div className="w-6 h-10 border-2 border-sand-400 dark:border-dark-300 rounded-full relative flex justify-center">
+          <motion.div
+            animate={{ y: [2, 14, 2] }}
+            transition={{ duration: 1.5, repeat: Infinity, ease: 'easeInOut' }}
+            className="w-1.5 h-1.5 bg-warm-500 rounded-full mt-1.5"
+          />
+        </div>
       </motion.div>
     </section>
   );

@@ -62,11 +62,25 @@ const CustomCursor = () => {
       animId = requestAnimationFrame(animate);
     };
 
+    const handleMouseDown = () => {
+      trails.forEach((trail) => {
+        trail.el.style.transition = 'transform 0.15s ease, opacity 0.15s ease';
+        trail.el.style.transform = `translate(${trail.x - 6}px, ${trail.y - 6}px) scale(1.6)`;
+        trail.el.style.opacity = '0.9';
+        setTimeout(() => {
+          trail.el.style.transition = 'none';
+          trail.el.style.opacity = '';
+        }, 150);
+      });
+    };
+
     window.addEventListener('mousemove', handleMouseMove);
+    window.addEventListener('mousedown', handleMouseDown);
     animId = requestAnimationFrame(animate);
 
     return () => {
       window.removeEventListener('mousemove', handleMouseMove);
+      window.removeEventListener('mousedown', handleMouseDown);
       cancelAnimationFrame(animId);
       trails.forEach((t) => {
         if (t.el.parentNode) t.el.parentNode.removeChild(t.el);

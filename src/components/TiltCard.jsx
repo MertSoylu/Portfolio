@@ -45,15 +45,19 @@ const TiltCard = ({ children, className }) => {
   return (
     <div
       ref={cardRef}
-      className={className}
-      style={style}
+      className={`card-border-glow ${className}`}
+      style={{
+        ...style,
+        transition: style.transition,
+      }}
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
     >
       <div
-        className="pointer-events-none absolute inset-0 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-0"
+        className="pointer-events-none absolute inset-0 rounded-xl opacity-0 group-hover:opacity-100 z-0"
         style={{
-          background: `radial-gradient(circle at ${glowPos.x}% ${glowPos.y}%, rgba(240,125,45,0.12) 0%, transparent 60%)`,
+          background: `radial-gradient(circle at ${glowPos.x}% ${glowPos.y}%, rgba(240,125,45,0.22) 0%, rgba(240,125,45,0.06) 40%, transparent 65%)`,
+          transition: 'background 0.15s ease, opacity 0.3s ease',
         }}
       />
       {children}

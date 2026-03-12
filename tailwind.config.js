@@ -105,9 +105,16 @@ export default {
           '50%': { transform: 'scale(1.08)', opacity: 0.85 },
         },
       },
+      boxShadow: {
+        'glow-sm': '0 0 8px 0px rgba(240,125,45,0.25)',
+        'glow': '0 0 20px 0px rgba(240,125,45,0.30)',
+        'glow-lg': '0 0 40px 4px rgba(240,125,45,0.25)',
+        'inner-glow': 'inset 0 1px 0 0 rgba(240,125,45,0.15), inset 0 0 20px 0 rgba(240,125,45,0.05)',
+      },
       backgroundImage: {
         'gradient-sand': 'linear-gradient(135deg, #faf8f3 0%, #ede6db 100%)',
         'gradient-warm': 'linear-gradient(135deg, #fff8f0 0%, #ffe8d6 100%)',
+        'radial-warm': 'radial-gradient(ellipse at center, rgba(240,125,45,0.08) 0%, transparent 70%)',
       }
     },
   },

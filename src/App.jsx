@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, lazy, Suspense } from 'react';
 import { Routes, Route, useLocation } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
 import { DarkModeProvider, useDarkMode } from './context/DarkModeContext';
@@ -12,9 +12,11 @@ import Contact from './components/Contact';
 import Footer from './components/Footer';
 import ScrollProgress from './components/ScrollProgress';
 import CustomCursor from './components/CustomCursor';
-import AndroidPage from './pages/AndroidPage';
-import WebDevPage from './pages/WebDevPage';
-import CyberSecurityPage from './pages/CyberSecurityPage';
+import LoadingSpinner from './components/LoadingSpinner';
+
+const AndroidPage = lazy(() => import('./pages/AndroidPage'));
+const WebDevPage = lazy(() => import('./pages/WebDevPage'));
+const CyberSecurityPage = lazy(() => import('./pages/CyberSecurityPage'));
 
 const HomePage = () => (
   <>
@@ -26,16 +28,20 @@ const HomePage = () => (
 );
 
 const pageVariants = {
-  initial: { x: 50, opacity: 0 },
+  initial: { opacity: 0, y: 24, filter: 'blur(4px)', scale: 0.98 },
   animate: {
-    x: 0,
     opacity: 1,
-    transition: { duration: 0.45, ease: [0.25, 0.46, 0.45, 0.94] },
+    y: 0,
+    filter: 'blur(0px)',
+    scale: 1,
+    transition: { duration: 0.55, ease: [0.22, 1, 0.36, 1] },
   },
   exit: {
-    x: -50,
     opacity: 0,
-    transition: { duration: 0.2, ease: [0.55, 0, 1, 0.45] },
+    y: -16,
+    filter: 'blur(2px)',
+    scale: 1.01,
+    transition: { duration: 0.22, ease: [0.55, 0, 1, 0.45] },
   },
 };
 
@@ -48,7 +54,14 @@ const PageTransition = ({ children }) => (
 /* Scroll to top or hash on route change */
 const ScrollToTop = () => {
   const { pathname, hash } = useLocation();
+  const isInitialMount = React.useRef(true);
+
   useEffect(() => {
+    if (isInitialMount.current) {
+      isInitialMount.current = false;
+      window.scrollTo({ top: 0, behavior: 'instant' });
+      return;
+    }
     if (hash) {
       setTimeout(() => {
         const el = document.querySelector(hash);
@@ -76,9 +89,9 @@ const AppContent = () => {
         <AnimatePresence mode="wait">
           <Routes location={location} key={location.pathname}>
             <Route path="/" element={<PageTransition><HomePage /></PageTransition>} />
-            <Route path="/android" element={<PageTransition><AndroidPage /></PageTransition>} />
-            <Route path="/web" element={<PageTransition><WebDevPage /></PageTransition>} />
-            <Route path="/cybersecurity" element={<PageTransition><CyberSecurityPage /></PageTransition>} />
+            <Route path="/android" element={<Suspense fallback={<LoadingSpinner />}><PageTransition><AndroidPage /></PageTransition></Suspense>} />
+            <Route path="/web" element={<Suspense fallback={<LoadingSpinner />}><PageTransition><WebDevPage /></PageTransition></Suspense>} />
+            <Route path="/cybersecurity" element={<Suspense fallback={<LoadingSpinner />}><PageTransition><CyberSecurityPage /></PageTransition></Suspense>} />
           </Routes>
         </AnimatePresence>
       </main>

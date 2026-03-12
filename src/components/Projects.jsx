@@ -5,6 +5,7 @@ import {
   fetchGitHubRepos,
   getGitHubProfileUrl,
   getGitHubUsername,
+  clearRateLimitState,
 } from '../utils/githubApi';
 import { FALLBACK_PROJECTS } from '../utils/constants';
 import { useLanguage } from '../context/LanguageContext';
@@ -62,7 +63,7 @@ const Projects = () => {
     } catch (err) {
       setProjects([]);
       setIsUsingFallback(false);
-      setError('fetch_error');
+      setError(err instanceof Error ? err.message : 'fetch_error');
       console.error(err);
     } finally {
       setLoading(false);
@@ -258,10 +259,10 @@ const Projects = () => {
             >
               {error === 'empty'
                 ? (isTurkish ? 'Herkese açık repo bulunamadı.' : 'No public repositories found.')
-                : (isTurkish ? 'Repolar alınamadı.' : 'Failed to fetch repositories.')}
-              {error === 'fetch_error' && (
+                : error}
+              {error !== 'empty' && (
                 <motion.button
-                  onClick={getProjects}
+                  onClick={() => { clearRateLimitState(); getProjects(); }}
                   className="mt-3 inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-amber-100 dark:bg-amber-800/40 border border-amber-300 dark:border-amber-600 text-amber-800 dark:text-amber-200 text-sm font-medium hover:bg-amber-200 dark:hover:bg-amber-700/40 transition-colors cursor-pointer"
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
@@ -297,21 +298,15 @@ const Projects = () => {
                       className="group h-full cursor-pointer"
                       onClick={() => setExpandedProject(project)}
                     >
-                      <TiltCard className="relative h-full bg-white/40 dark:bg-dark-600/40 backdrop-blur-md rounded-xl border border-sand-200 dark:border-dark-400 overflow-hidden flex flex-col transition-shadow duration-300 group-hover:shadow-xl/20">
-                        {/* Language badge */}
+                      <TiltCard className="relative h-full bg-white/40 dark:bg-dark-600/40 backdrop-blur-md rounded-xl border border-sand-200 dark:border-dark-400 overflow-hidden flex flex-col transition-all duration-300 group-hover:shadow-glow-sm">
+                        {/* Language badge — solid color top bar */}
                         {project.language && (
-                          <div className={`bg-gradient-to-r ${getLanguageColor(project.language)} p-px`}>
-                            <div className="bg-white/95 dark:bg-dark-700/95 px-3 py-1">
-                              <span className={`text-xs font-semibold bg-gradient-to-r ${getLanguageColor(project.language)} bg-clip-text text-transparent`}>
-                                {project.language}
-                              </span>
-                            </div>
-                          </div>
+                          <div className={`h-1 w-full bg-gradient-to-r ${getLanguageColor(project.language)}`} />
                         )}
 
                         {/* Content */}
                         <div className="p-6 flex flex-col flex-grow relative z-10">
-                          <h3 className="text-xl font-bold text-sand-900 dark:text-dark-50 mb-2 group-hover:text-warm-600 dark:group-hover:text-warm-400 transition-colors duration-300">
+                          <h3 className="text-xl font-bold text-sand-900 dark:text-dark-50 mb-2 group-hover:text-warm-600 dark:group-hover:text-warm-400 group-hover:pl-1 transition-all duration-200">
                             {project.name}
                           </h3>
 
