@@ -133,6 +133,10 @@ const getGitHubErrorMessage = (error, username = GITHUB_USERNAME) => {
 
   const status = error?.response?.status;
 
+  if (status === 401) {
+    return 'GitHub API token is invalid or expired. Remove VITE_GITHUB_TOKEN to use unauthenticated access.';
+  }
+
   if (status === 403) {
     return 'GitHub API rate limit reached. Please try again later.';
   }
