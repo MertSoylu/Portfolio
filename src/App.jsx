@@ -1,5 +1,6 @@
 import React, { useEffect, lazy, Suspense } from 'react';
 import { Routes, Route, useLocation } from 'react-router-dom';
+import { Analytics } from '@vercel/analytics/react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { DarkModeProvider, useDarkMode } from './context/DarkModeContext';
 import { LanguageProvider } from './context/LanguageContext';
@@ -105,6 +106,7 @@ function App() {
     <DarkModeProvider>
       <LanguageProvider>
         <AppContent />
+        <Analytics />
       </LanguageProvider>
     </DarkModeProvider>
   );
