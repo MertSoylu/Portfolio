@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, useScroll, useTransform, useMotionValue, useSpring } from 'framer-motion';
-import { HiArrowRight, HiSparkles, HiDownload } from 'react-icons/hi';
-import { Link } from 'react-router-dom';
+import { HiArrowRight, HiSparkles, HiCode } from 'react-icons/hi';
+import { fetchGitHubRepos } from '../utils/githubApi';
 import { useLanguage } from '../context/LanguageContext';
 
 const useMagneticButton = (strength = 0.35) => {
@@ -37,24 +37,29 @@ const Hero = () => {
   const scrollIndicatorY = useTransform(scrollYProgress, [0, 0.18], [0, 10]);
   const yHeading = useTransform(scrollYProgress, [0, 1], [0, -60]);
   const yDesc = useTransform(scrollYProgress, [0, 1], [0, 20]);
-  const yBadges = useTransform(scrollYProgress, [0, 1], [0, 30]);
+  const yActions = useTransform(scrollYProgress, [0, 1], [0, 30]);
 
   const magBtn1 = useMagneticButton();
   const magBtn2 = useMagneticButton();
-  const magBtn3 = useMagneticButton();
 
-  // Typing effect state
-  const title = isTurkish ? 'Bilgisayar Programcılığı Öğrencisi' : 'Computer Programming Student';
+  // Role cycling state
   const roles = isTurkish
     ? ['Web Geliştirici', 'Android Geliştirici', 'Siber Güvenlik Meraklısı']
     : ['Web Developer', 'Android Developer', 'Cybersecurity Enthusiast'];
-  const [displayedTitle, setDisplayedTitle] = useState('');
-  const [titleComplete, setTitleComplete] = useState(false);
   const [currentRoleIndex, setCurrentRoleIndex] = useState(0);
   const [displayedRole, setDisplayedRole] = useState('');
   const [isDeleting, setIsDeleting] = useState(false);
   const hasHeadingAnimated = useRef(false);
   const languageChangedRef = useRef(false);
+
+  // GitHub repo count for stats strip
+  const [repoCount, setRepoCount] = useState(null);
+
+  useEffect(() => {
+    fetchGitHubRepos()
+      .then((repos) => setRepoCount(repos.length))
+      .catch(() => setRepoCount(null));
+  }, []);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -65,31 +70,16 @@ const Hero = () => {
 
   useEffect(() => {
     if (languageChangedRef.current) {
-      setDisplayedTitle(title);
-      setTitleComplete(true);
       setCurrentRoleIndex(0);
       setDisplayedRole('');
       setIsDeleting(false);
     } else {
       languageChangedRef.current = true;
     }
-  }, [isTurkish]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [isTurkish]);
 
-  // Typing effect for main title
+  // Role cycling effect — starts immediately on mount
   useEffect(() => {
-    if (displayedTitle.length < title.length) {
-      const timeout = setTimeout(() => {
-        setDisplayedTitle(title.slice(0, displayedTitle.length + 1));
-      }, 60);
-      return () => clearTimeout(timeout);
-    } else {
-      setTitleComplete(true);
-    }
-  }, [displayedTitle, title]);
-
-  // Role cycling effect
-  useEffect(() => {
-    if (!titleComplete) return;
     const currentRole = roles[currentRoleIndex];
 
     const timeout = setTimeout(
@@ -113,7 +103,7 @@ const Hero = () => {
     );
 
     return () => clearTimeout(timeout);
-  }, [displayedRole, isDeleting, currentRoleIndex, titleComplete]);
+  }, [displayedRole, isDeleting, currentRoleIndex]);
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -143,50 +133,6 @@ const Hero = () => {
       ref={sectionRef}
       className="h-screen flex flex-col items-center justify-center px-4 relative overflow-hidden"
     >
-      {/* Mesh gradient glow blobs */}
-      <div className="pointer-events-none absolute inset-0 overflow-hidden">
-        {/* Blob 1 — turuncu, sol-üst */}
-        <motion.div
-          animate={{ x: [0, 50, -30, 0], y: [0, -40, 25, 0] }}
-          transition={{ duration: 12, repeat: Infinity, ease: 'easeInOut' }}
-          className="absolute top-[5%] left-[5%] w-[500px] h-[500px] rounded-full bg-warm-500/15 dark:bg-warm-500/20 blur-[120px]"
-        />
-        {/* Blob 2 — mor, sağ-üst */}
-        <motion.div
-          animate={{ x: [0, -40, 30, 0], y: [0, 35, -25, 0] }}
-          transition={{ duration: 15, repeat: Infinity, ease: 'easeInOut' }}
-          className="absolute top-[0%] right-[5%] w-[450px] h-[450px] rounded-full bg-purple-500/8 dark:bg-purple-500/12 blur-[120px]"
-        />
-        {/* Blob 3 — mavi, sol-alt */}
-        <motion.div
-          animate={{ x: [0, 35, -20, 0], y: [0, -30, 40, 0] }}
-          transition={{ duration: 18, repeat: Infinity, ease: 'easeInOut' }}
-          className="absolute bottom-[10%] left-[10%] w-[400px] h-[400px] rounded-full bg-blue-500/6 dark:bg-blue-500/10 blur-[100px]"
-        />
-        {/* Blob 4 — amber, sağ-alt */}
-        <motion.div
-          animate={{ x: [0, -50, 20, 0], y: [0, 40, -30, 0] }}
-          transition={{ duration: 10, repeat: Infinity, ease: 'easeInOut' }}
-          className="absolute bottom-[5%] right-[8%] w-[480px] h-[480px] rounded-full bg-amber-400/8 dark:bg-amber-400/12 blur-[110px]"
-        />
-      </div>
-
-      {/* Depth rings — centered, all breakpoints */}
-      <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
-        <div
-          className="absolute w-[500px] h-[500px] rounded-full border border-warm-500/[0.07]"
-          style={{ animation: 'pulse 8s ease-in-out infinite' }}
-        />
-        <div
-          className="absolute w-[800px] h-[800px] rounded-full border border-warm-500/[0.04]"
-          style={{ animation: 'pulse 8s ease-in-out infinite', animationDelay: '2s' }}
-        />
-        <div
-          className="absolute w-[1100px] h-[1100px] rounded-full border border-warm-500/[0.02]"
-          style={{ animation: 'pulse 8s ease-in-out infinite', animationDelay: '4s' }}
-        />
-      </div>
-
       {/* Parallax content wrapper */}
       <motion.div style={{ y, opacity, scale }} className="w-full flex flex-col items-center z-10 relative">
         <motion.div
@@ -195,18 +141,11 @@ const Hero = () => {
           animate="visible"
           className="text-center max-w-2xl mx-auto w-full"
         >
-          {/* Badges row */}
-          <motion.div variants={itemVariants} className="mb-6 flex flex-wrap items-center justify-center gap-3">
+          {/* Welcome badge */}
+          <motion.div variants={itemVariants} className="mb-6 flex items-center justify-center">
             <span className="inline-flex items-center gap-2 px-4 py-2 bg-sand-200 dark:bg-dark-600 text-sand-700 dark:text-dark-50 rounded-full text-sm font-semibold border border-warm-500/20 dark:border-warm-500/10">
               <HiSparkles className="w-4 h-4 text-warm-500" />
               {isTurkish ? 'Portfolyoma hoş geldin' : 'Welcome to my portfolio'}
-            </span>
-            <span className="inline-flex items-center gap-2 px-4 py-2 bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-400 rounded-full text-sm font-semibold border border-green-300 dark:border-green-500/30">
-              <span className="relative flex h-2 w-2">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75" />
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500" />
-              </span>
-              {isTurkish ? 'Fırsatlara Açık' : 'Open to Work'}
             </span>
           </motion.div>
 
@@ -250,103 +189,48 @@ const Hero = () => {
             </motion.h1>
           </motion.div>
 
-          {/* Typing subheading + role cycling + university + description */}
+          {/* Subtitle + Role cycling */}
           <motion.div style={{ y: yDesc }}>
+            {/* Static subtitle with university */}
             <motion.div
               variants={itemVariants}
-              className="text-xl md:text-2xl text-sand-600 dark:text-dark-200 mb-2 min-h-9"
+              className="text-xl md:text-2xl text-sand-600 dark:text-dark-200 mb-2"
             >
-              <span>{displayedTitle}</span>
-              {!titleComplete && (
-                <motion.span
-                  animate={{ opacity: [1, 0], textShadow: ['0 0 8px rgba(240,125,45,0.8)', '0 0 0px rgba(240,125,45,0)'] }}
-                  transition={{ duration: 0.53, repeat: Infinity, repeatType: 'reverse' }}
-                  className="text-warm-500 font-light ml-0.5"
-                >
-                  |
-                </motion.span>
-              )}
+              {isTurkish ? 'Bilgisayar Programcılığı Öğrencisi' : 'Computer Programming Student'}
+              <span className="text-sand-400 dark:text-dark-400 mx-2">·</span>
+              <span className="font-semibold text-sand-700 dark:text-dark-100">DPU</span>
             </motion.div>
 
-            {/* Role cycling */}
+            {/* Role cycling — starts immediately */}
             <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: titleComplete ? 1 : 0 }}
+              variants={itemVariants}
               className="text-lg md:text-xl text-warm-600 dark:text-warm-400 mb-4 min-h-9 font-semibold"
             >
-              {titleComplete && (
-                <>
-                  <span>{displayedRole}</span>
-                  <motion.span
-                    animate={{ opacity: [1, 0], textShadow: ['0 0 8px rgba(240,125,45,0.8)', '0 0 0px rgba(240,125,45,0)'] }}
-                    transition={{ duration: 0.53, repeat: Infinity, repeatType: 'reverse' }}
-                    className="text-warm-500 font-light ml-0.5"
-                  >
-                    |
-                  </motion.span>
-                </>
-              )}
+              <span>{displayedRole}</span>
+              <motion.span
+                animate={{ opacity: [1, 0], textShadow: ['0 0 8px rgba(240,125,45,0.8)', '0 0 0px rgba(240,125,45,0)'] }}
+                transition={{ duration: 0.53, repeat: Infinity, repeatType: 'reverse' }}
+                className="text-warm-500 font-light ml-0.5"
+              >
+                |
+              </motion.span>
             </motion.div>
 
-            {/* University */}
-            <motion.p
-              variants={itemVariants}
-              className="text-lg text-sand-600 dark:text-dark-200 mb-4"
-            >
-              {isTurkish ? (
-                <>
-                  Kütahya Dumlupınar{' '}
-                  <span className="font-semibold text-sand-700 dark:text-dark-100">Üniversitesi</span>
-                  {'\'nde'}
-                </>
-              ) : (
-                <>
-                  at{' '}
-                  <span className="font-semibold text-sand-700 dark:text-dark-100">
-                    Kütahya Dumlupınar University
-                  </span>
-                </>
-              )}
-            </motion.p>
-
-            {/* Description */}
+            {/* Micro-description */}
             <motion.p
               variants={itemVariants}
               className="text-lg text-sand-600 dark:text-dark-200 max-w-lg mx-auto mb-8"
             >
               {isTurkish
-                ? 'Güzel ve işlevsel web uygulamaları geliştirmeye, aynı zamanda siber güvenlik alanını keşfetmeye tutkuluyum. Web ve Android geliştirme deneyimimle fark yaratan çözümler üretmeye çalışıyorum.'
-                : "I'm passionate about building beautiful, functional web applications and exploring cybersecurity. With expertise in web development and Android development, I strive to create solutions that make a difference."}
+                ? 'Web ve mobil uygulamalar geliştiriyor, siber güvenliği keşfediyorum.'
+                : 'I build web & mobile apps and explore cybersecurity.'}
             </motion.p>
           </motion.div>
 
-          {/* Skill badges */}
-          <motion.div style={{ y: yBadges }}>
-            <motion.div variants={itemVariants} className="flex flex-wrap gap-3 justify-center mb-10">
-              {(isTurkish
-                ? [
-                    { name: 'Web Geliştirme', path: '/web' },
-                    { name: 'Android Geliştirme', path: '/android' },
-                    { name: 'Siber Güvenlik', path: '/cybersecurity' },
-                  ]
-                : [
-                    { name: 'Web Development', path: '/web' },
-                    { name: 'Android Development', path: '/android' },
-                    { name: 'Cybersecurity', path: '/cybersecurity' },
-                  ]).map((skill) => (
-                <Link
-                  key={skill.name}
-                  to={skill.path}
-                  className="inline-flex items-center gap-1.5 px-4 py-2.5 bg-warm-500/10 text-warm-600 dark:text-warm-400 rounded-full text-sm font-medium border border-warm-500/20 hover:bg-warm-500/20 hover:gap-2.5 transition-all duration-200 cursor-pointer group"
-                >
-                  {skill.name}
-                  <HiArrowRight className="w-3.5 h-3.5 opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-200" />
-                </Link>
-              ))}
-            </motion.div>
-
+          {/* CTAs + Stats */}
+          <motion.div style={{ y: yActions }}>
             {/* CTA Buttons */}
-            <motion.div variants={itemVariants} className="flex flex-wrap gap-4 justify-center">
+            <motion.div variants={itemVariants} className="flex flex-wrap gap-4 justify-center mb-8">
               <motion.a
                 ref={magBtn1.ref}
                 style={magBtn1.style}
@@ -370,19 +254,18 @@ const Hero = () => {
               >
                 {isTurkish ? 'İletişime Geç' : 'Get In Touch'}
               </motion.a>
-              <motion.a
-                ref={magBtn3.ref}
-                style={magBtn3.style}
-                onMouseMove={magBtn3.onMouseMove}
-                onMouseLeave={magBtn3.onMouseLeave}
-                href="/cv.pdf"
-                download
-                className="inline-flex items-center gap-2 px-6 py-3 rounded-lg font-semibold border-2 border-warm-500 text-warm-600 dark:text-warm-400 hover:bg-warm-500 hover:text-white transition-all duration-300"
-                whileTap={{ scale: 0.95 }}
-              >
-                <HiDownload className="w-4 h-4" />
-                {isTurkish ? 'CV İndir' : 'Download CV'}
-              </motion.a>
+            </motion.div>
+
+            {/* TODO(human): Stats strip */}
+            <motion.div variants={itemVariants}>
+              {/* Stats strip - display repoCount, focus areas, and open to work status */}
+              <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-sm text-sand-500 dark:text-dark-300">
+                {/* Implement: 3 metrics separated by dot dividers */}
+                {/* Available data: repoCount (number|null), isTurkish (boolean) */}
+                {/* Metric 1: Project count from repoCount (show nothing if null) */}
+                {/* Metric 2: "3 Odak Alanı" / "3 Focus Areas" */}
+                {/* Metric 3: Open to Work with green ping dot */}
+              </div>
             </motion.div>
           </motion.div>
         </motion.div>
