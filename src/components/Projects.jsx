@@ -61,8 +61,8 @@ const Projects = () => {
       setIsUsingFallback(false);
       setError(repos.length === 0 ? 'empty' : null);
     } catch (err) {
-      setProjects([]);
-      setIsUsingFallback(false);
+      setProjects(FALLBACK_PROJECTS);
+      setIsUsingFallback(true);
       setError(err instanceof Error ? err.message : 'fetch_error');
       console.error(err);
     } finally {
