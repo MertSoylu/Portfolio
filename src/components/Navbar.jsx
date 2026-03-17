@@ -1,323 +1,103 @@
-import React, { useState, useEffect } from 'react';
+import React, { useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { HiMenuAlt3, HiX, HiSun, HiMoon, HiDownload } from 'react-icons/hi';
+import { HiSun, HiMoon } from 'react-icons/hi';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useDarkMode } from '../context/DarkModeContext';
 import { useLanguage } from '../context/LanguageContext';
+import { StaggeredMenu } from './StaggeredMenu';
 
-const NavItem = ({ item, isActive, onClick }) => {
-  const [hovered, setHovered] = useState(false);
-  return (
-    <motion.a
-      href={item.href}
-      onClick={onClick}
-      className="relative text-sand-700 dark:text-dark-100 font-medium hover:text-warm-600 dark:hover:text-warm-400 py-1 px-3 cursor-pointer"
-      whileHover={{ y: -2 }}
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
-    >
-      {item.name}
-      {isActive && (
-        <motion.div
-          layoutId="activeNavPill"
-          className="absolute inset-0 bg-warm-500/10 dark:bg-warm-500/20 rounded-full -z-10"
-          transition={{ type: 'spring', stiffness: 350, damping: 30 }}
-        />
-      )}
-      {!isActive && (
-        <motion.span
-          className="absolute bottom-0.5 left-3 right-3 h-0.5 bg-warm-500 rounded-full origin-left"
-          animate={{ scaleX: hovered ? 1 : 0 }}
-          transition={{ duration: 0.25, ease: 'easeOut' }}
-          style={{ scaleX: 0 }}
-        />
-      )}
-    </motion.a>
-  );
-};
+const SECTION_IDS = ['about', 'projects', 'contact'];
 
 const Navbar = () => {
-  const [isOpen, setIsOpen] = useState(false);
-  const [scrolled, setScrolled] = useState(false);
-  const [activeSection, setActiveSection] = useState('');
   const { isDark, toggleDarkMode } = useDarkMode();
   const { isTurkish, toggleLanguage } = useLanguage();
   const location = useLocation();
   const navigate = useNavigate();
   const isHomePage = location.pathname === '/';
 
-  const handleNavClick = (e, href) => {
-    e.preventDefault();
-    if (isHomePage) {
-      const el = document.querySelector(href);
-      if (el) el.scrollIntoView({ behavior: 'smooth' });
-    } else {
-      navigate('/' + href);
-    }
-    setIsOpen(false);
-  };
-
-  useEffect(() => {
-    const handleScroll = () => {
-      setScrolled(window.scrollY > 50);
-    };
-
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
-
-  /* Track active section via IntersectionObserver — pick most-visible section */
-  useEffect(() => {
-    const visibilityMap = new Map();
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          visibilityMap.set(entry.target.id, entry.intersectionRatio);
-        });
-        let maxRatio = 0;
-        let mostVisible = '';
-        visibilityMap.forEach((ratio, id) => {
-          if (ratio > maxRatio) { maxRatio = ratio; mostVisible = id; }
-        });
-        if (mostVisible) setActiveSection(mostVisible);
-      },
-      { threshold: [0, 0.1, 0.2, 0.3, 0.4, 0.5], rootMargin: '-80px 0px -30% 0px' }
-    );
-
-    ['about', 'projects', 'contact'].forEach((id) => {
-      const el = document.getElementById(id);
-      if (el) observer.observe(el);
-    });
-
-    return () => observer.disconnect();
-  }, []);
-
-  const navItems = [
-    { name: isTurkish ? 'Hakkımda' : 'About', href: '#about' },
-    { name: isTurkish ? 'Projeler' : 'Projects', href: '#projects' },
-    { name: isTurkish ? 'İletişim' : 'Contact', href: '#contact' },
+  const menuItems = [
+    { label: isTurkish ? 'Hakkımda' : 'About', link: '#about' },
+    { label: isTurkish ? 'Projeler' : 'Projects', link: '#projects' },
+    { label: isTurkish ? 'İletişim' : 'Contact', link: '#contact' },
   ];
 
-  const toggleMenu = () => setIsOpen(!isOpen);
+  const socialItems = [
+    { label: 'GitHub', link: 'https://github.com/MertSoylu' },
+    { label: 'LinkedIn', link: 'https://www.linkedin.com/in/mert-soylu-b8b6a1341/' },
+  ];
+
+  const handleItemClick = useCallback((index) => {
+    const sectionId = SECTION_IDS[index];
+    if (!isHomePage) {
+      navigate(`/#${sectionId}`);
+    } else {
+      const el = document.getElementById(sectionId);
+      if (el) el.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, [isHomePage, navigate]);
+
+  const headerControls = (
+    <>
+      {/* Dark mode toggle */}
+      <motion.button
+        onClick={toggleDarkMode}
+        className="w-11 h-11 sm:w-9 sm:h-9 rounded-full flex items-center justify-center bg-white/10 hover:bg-white/20 text-current transition-colors"
+        whileHover={{ scale: 1.1 }}
+        whileTap={{ scale: 0.92 }}
+        aria-label={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
+      >
+        <AnimatePresence mode="wait" initial={false}>
+          {isDark ? (
+            <motion.span key="sun" initial={{ rotate: -90, opacity: 0, scale: 0 }} animate={{ rotate: 0, opacity: 1, scale: 1 }} exit={{ rotate: 90, opacity: 0, scale: 0 }} transition={{ duration: 0.25 }}>
+              <HiSun className="w-4 h-4" />
+            </motion.span>
+          ) : (
+            <motion.span key="moon" initial={{ rotate: 90, opacity: 0, scale: 0 }} animate={{ rotate: 0, opacity: 1, scale: 1 }} exit={{ rotate: -90, opacity: 0, scale: 0 }} transition={{ duration: 0.25 }}>
+              <HiMoon className="w-4 h-4" />
+            </motion.span>
+          )}
+        </AnimatePresence>
+      </motion.button>
+
+      {/* Language toggle */}
+      <motion.button
+        onClick={toggleLanguage}
+        className="w-11 h-11 sm:w-9 sm:h-9 rounded-full flex items-center justify-center bg-white/10 hover:bg-white/20 text-current transition-colors"
+        whileHover={{ scale: 1.1 }}
+        whileTap={{ scale: 0.92 }}
+        aria-label={isTurkish ? 'Switch to English' : 'Türkçeye geç'}
+      >
+        <AnimatePresence mode="wait" initial={false}>
+          {isTurkish ? (
+            <motion.span key="tr" initial={{ rotate: -90, opacity: 0, scale: 0 }} animate={{ rotate: 0, opacity: 1, scale: 1 }} exit={{ rotate: 90, opacity: 0, scale: 0 }} transition={{ duration: 0.25 }} className="text-[10px] font-bold">TR</motion.span>
+          ) : (
+            <motion.span key="en" initial={{ rotate: 90, opacity: 0, scale: 0 }} animate={{ rotate: 0, opacity: 1, scale: 1 }} exit={{ rotate: -90, opacity: 0, scale: 0 }} transition={{ duration: 0.25 }} className="text-[10px] font-bold">EN</motion.span>
+          )}
+        </AnimatePresence>
+      </motion.button>
+
+    </>
+  );
 
   return (
-    <motion.nav
-      initial={{ y: -100 }}
-      animate={{ y: 0 }}
-      transition={{ duration: 0.5 }}
-      className={`fixed top-0 w-full z-50 transition-all duration-300 ${
-        scrolled
-          ? 'bg-sand-50/95 dark:bg-dark-800/95 backdrop-blur-md shadow-lg'
-          : 'bg-transparent'
-      }`}
-    >
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center py-4">
-          {/* Logo */}
-          <motion.a
-            href="/"
-            onClick={(e) => { e.preventDefault(); navigate('/'); }}
-            className="w-10 h-10 flex items-center justify-center rounded-xl bg-warm-500/10 border border-warm-500/20 text-lg font-bold gradient-text cursor-pointer hover:bg-warm-500/20 transition-colors duration-200"
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-          >
-            MS
-          </motion.a>
-
-          {/* Desktop Menu */}
-          <div className="hidden md:flex items-center gap-8">
-            {navItems.map((item) => {
-              const isActive = isHomePage && activeSection === item.href.slice(1);
-              return (
-                <NavItem
-                  key={item.name}
-                  item={item}
-                  isActive={isActive}
-                  onClick={(e) => handleNavClick(e, item.href)}
-                />
-              );
-            })}
-
-            {/* Dark mode toggle */}
-            <motion.button
-              onClick={toggleDarkMode}
-              className="relative w-10 h-10 rounded-full flex items-center justify-center bg-sand-200 dark:bg-dark-500 text-sand-700 dark:text-dark-100 hover:bg-sand-300 dark:hover:bg-dark-400 transition-colors"
-              whileHover={{ scale: 1.1, rotate: 15 }}
-              whileTap={{ scale: 0.9 }}
-              aria-label="Toggle dark mode"
-            >
-              <AnimatePresence mode="wait" initial={false}>
-                {isDark ? (
-                  <motion.span
-                    key="sun"
-                    initial={{ rotate: -90, opacity: 0, scale: 0 }}
-                    animate={{ rotate: 0, opacity: 1, scale: 1 }}
-                    exit={{ rotate: 90, opacity: 0, scale: 0 }}
-                    transition={{ duration: 0.25 }}
-                  >
-                    <HiSun className="w-5 h-5" />
-                  </motion.span>
-                ) : (
-                  <motion.span
-                    key="moon"
-                    initial={{ rotate: 90, opacity: 0, scale: 0 }}
-                    animate={{ rotate: 0, opacity: 1, scale: 1 }}
-                    exit={{ rotate: -90, opacity: 0, scale: 0 }}
-                    transition={{ duration: 0.25 }}
-                  >
-                    <HiMoon className="w-5 h-5" />
-                  </motion.span>
-                )}
-              </AnimatePresence>
-            </motion.button>
-
-            <motion.button
-              onClick={toggleLanguage}
-              className="relative w-10 h-10 rounded-full flex items-center justify-center bg-sand-200 dark:bg-dark-500 text-sand-700 dark:text-dark-100 hover:bg-sand-300 dark:hover:bg-dark-400 transition-colors"
-              whileHover={{ scale: 1.1, rotate: 15 }}
-              whileTap={{ scale: 0.9 }}
-              aria-label={isTurkish ? 'Dil değiştir' : 'Switch language'}
-            >
-              <AnimatePresence mode="wait" initial={false}>
-                {isTurkish ? (
-                  <motion.span
-                    key="tr"
-                    initial={{ rotate: -90, opacity: 0, scale: 0 }}
-                    animate={{ rotate: 0, opacity: 1, scale: 1 }}
-                    exit={{ rotate: 90, opacity: 0, scale: 0 }}
-                    transition={{ duration: 0.25 }}
-                    className="text-xs font-bold"
-                  >
-                    TR
-                  </motion.span>
-                ) : (
-                  <motion.span
-                    key="en"
-                    initial={{ rotate: 90, opacity: 0, scale: 0 }}
-                    animate={{ rotate: 0, opacity: 1, scale: 1 }}
-                    exit={{ rotate: -90, opacity: 0, scale: 0 }}
-                    transition={{ duration: 0.25 }}
-                    className="text-xs font-bold"
-                  >
-                    EN
-                  </motion.span>
-                )}
-              </AnimatePresence>
-            </motion.button>
-
-            <motion.a
-              href="/cv.pdf"
-              download
-              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg font-semibold text-sm border border-warm-500 text-warm-600 dark:text-warm-400 hover:bg-warm-500 hover:text-white transition-all duration-200"
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              title={isTurkish ? 'CV İndir' : 'Download CV'}
-            >
-              <HiDownload className="w-4 h-4" />
-              CV
-            </motion.a>
-            <motion.a
-              href="https://github.com/MertSoylu"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="btn-primary text-sm"
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-            >
-              GitHub
-            </motion.a>
-          </div>
-
-          {/* Mobile buttons */}
-          <div className="flex md:hidden items-center gap-2">
-            {/* Mobile dark mode toggle */}
-            <motion.button
-              onClick={toggleDarkMode}
-              className="p-2.5 rounded-lg hover:bg-sand-200 dark:hover:bg-dark-500 transition-colors text-sand-700 dark:text-dark-100"
-              whileTap={{ scale: 0.9 }}
-              aria-label="Toggle dark mode"
-            >
-              {isDark ? <HiSun size={20} /> : <HiMoon size={20} />}
-            </motion.button>
-
-            <motion.button
-              onClick={toggleLanguage}
-              className="p-2.5 rounded-lg hover:bg-sand-200 dark:hover:bg-dark-500 transition-colors text-sand-700 dark:text-dark-100 text-xs font-bold"
-              whileTap={{ scale: 0.9 }}
-              aria-label={isTurkish ? 'Dil değiştir' : 'Switch language'}
-            >
-              <AnimatePresence mode="wait" initial={false}>
-                {isTurkish ? (
-                  <motion.span
-                    key="tr-mobile"
-                    initial={{ rotate: -90, opacity: 0, scale: 0 }}
-                    animate={{ rotate: 0, opacity: 1, scale: 1 }}
-                    exit={{ rotate: 90, opacity: 0, scale: 0 }}
-                    transition={{ duration: 0.25 }}
-                    className="inline-block"
-                  >
-                    TR
-                  </motion.span>
-                ) : (
-                  <motion.span
-                    key="en-mobile"
-                    initial={{ rotate: 90, opacity: 0, scale: 0 }}
-                    animate={{ rotate: 0, opacity: 1, scale: 1 }}
-                    exit={{ rotate: -90, opacity: 0, scale: 0 }}
-                    transition={{ duration: 0.25 }}
-                    className="inline-block"
-                  >
-                    EN
-                  </motion.span>
-                )}
-              </AnimatePresence>
-            </motion.button>
-
-            <button
-              className="p-2.5 rounded-lg hover:bg-sand-200 dark:hover:bg-dark-500 transition-colors text-sand-900 dark:text-dark-50"
-              onClick={toggleMenu}
-            >
-              {isOpen ? <HiX size={24} /> : <HiMenuAlt3 size={24} />}
-            </button>
-          </div>
-        </div>
-
-        {/* Mobile Menu */}
-        <motion.div
-          initial={false}
-          animate={isOpen ? { height: 'auto', opacity: 1 } : { height: 0, opacity: 0 }}
-          transition={{ duration: 0.3 }}
-          className="md:hidden overflow-hidden"
-        >
-          <div className="flex flex-col gap-2 pb-4 pt-2">
-            {navItems.map((item) => (
-              <a
-                key={item.name}
-                href={item.href}
-                className={`py-3 px-4 rounded-lg text-sand-700 dark:text-dark-100 font-medium hover:text-warm-600 dark:hover:text-warm-400 hover:bg-sand-100 dark:hover:bg-dark-600 transition-colors ${
-                  isHomePage && activeSection === item.href.slice(1)
-                    ? 'text-warm-600 dark:text-warm-400 font-bold'
-                    : ''
-                }`}
-                onClick={(e) => handleNavClick(e, item.href)}
-              >
-                {item.name}
-              </a>
-            ))}
-            <a
-              href="https://github.com/MertSoylu"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="btn-primary text-sm inline-block w-fit mt-1"
-              onClick={() => setIsOpen(false)}
-            >
-              GitHub
-            </a>
-          </div>
-        </motion.div>
-      </div>
-    </motion.nav>
+    <StaggeredMenu
+      isFixed={true}
+      position="right"
+      items={menuItems}
+      socialItems={socialItems}
+      displaySocials={true}
+      displayItemNumbering={true}
+      logoUrl="/favicon.svg"
+      headerContent={headerControls}
+      onItemClick={handleItemClick}
+      colors={isDark ? ['rgba(30,41,59,0.58)', 'rgba(15,23,42,0.64)'] : ['rgba(245,240,232,0.58)', 'rgba(250,248,243,0.64)']}
+      panelBg={isDark ? 'rgba(15,23,42,0.68)' : 'rgba(250,248,243,0.68)'}
+      panelTextColor={isDark ? '#e2e8f0' : '#5a4a42'}
+      accentColor={isDark ? '#ff9a5c' : '#f07d2d'}
+      menuButtonColor={isDark ? '#e2e8f0' : '#5a4a42'}
+      openMenuButtonColor={isDark ? '#e2e8f0' : '#5a4a42'}
+      changeMenuColorOnOpen={false}
+    />
   );
 };
 

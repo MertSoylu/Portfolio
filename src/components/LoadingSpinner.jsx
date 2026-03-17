@@ -5,41 +5,41 @@ import { useLanguage } from '../context/LanguageContext';
 const LoadingSpinner = () => {
   const { isTurkish } = useLanguage();
 
-  const containerVariants = {
-    animate: {
-      transition: {
-        staggerChildren: 0.1,
-      },
-    },
-  };
-
-  const dotVariants = {
-    animate: {
-      y: [0, -10, 0],
-      transition: {
-        duration: 0.8,
-        repeat: Infinity,
-      },
-    },
-  };
-
   return (
-    <motion.div
-      className="flex items-center justify-center gap-2"
-      variants={containerVariants}
-      animate="animate"
-    >
-      {[...Array(3)].map((_, i) => (
+    <div className="flex flex-col items-center justify-center min-h-[60vh] gap-6">
+      {/* Spinner ring */}
+      <div className="relative w-16 h-16">
+        {/* Outer ring - rotating */}
         <motion.div
-          key={i}
-          className="w-3 h-3 bg-warm-500 rounded-full"
-          variants={dotVariants}
+          className="absolute inset-0 rounded-full border-2 border-sand-200 dark:border-dark-500"
+          style={{ borderTopColor: '#f07d2d', borderRightColor: '#ff9a5c' }}
+          animate={{ rotate: 360 }}
+          transition={{ duration: 1.2, repeat: Infinity, ease: 'linear' }}
         />
-      ))}
-      <span className="ml-4 text-sand-700 dark:text-dark-200 font-medium">
+        {/* Inner pulsing glow */}
+        <motion.div
+          className="absolute inset-2 rounded-full bg-warm-500/10 dark:bg-warm-500/5"
+          animate={{ scale: [1, 1.15, 1], opacity: [0.5, 0.8, 0.5] }}
+          transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
+        />
+        {/* Center monogram */}
+        <motion.span
+          className="absolute inset-0 flex items-center justify-center text-sm font-bold gradient-text"
+          animate={{ opacity: [0.5, 1, 0.5] }}
+          transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
+        >
+          MS
+        </motion.span>
+      </div>
+      {/* Loading text */}
+      <motion.p
+        className="text-sand-500 dark:text-dark-300 text-sm"
+        animate={{ opacity: [0.5, 1, 0.5] }}
+        transition={{ duration: 1.5, repeat: Infinity }}
+      >
         {isTurkish ? 'Yükleniyor...' : 'Loading...'}
-      </span>
-    </motion.div>
+      </motion.p>
+    </div>
   );
 };
 

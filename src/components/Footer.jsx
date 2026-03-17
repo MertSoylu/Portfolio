@@ -4,9 +4,41 @@ import { HiMail } from 'react-icons/hi';
 import { FiGithub, FiLinkedin } from 'react-icons/fi';
 import { useLanguage } from '../context/LanguageContext';
 
+const footerGrid = {
+  hidden: {},
+  visible: { transition: { staggerChildren: 0.12, delayChildren: 0.05 } },
+};
+
+const footerColumn = {
+  hidden: { opacity: 0, y: 24 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.55, ease: [0.22, 1, 0.36, 1] },
+  },
+};
+
+/* TODO(human): Add the linkUnderline variant here for quick link hover animation.
+   Pattern: scaleX from 0→1 on hover via variant propagation from parent motion.a.
+   const linkUnderline = {
+     initial: { scaleX: 0, originX: 0 },
+     hover: { scaleX: 1 },
+   };
+   Then convert each <a> in the quick links list to a <motion.a> with
+   whileHover="hover" initial="initial", and add a sibling <motion.span
+   variants={linkUnderline} transition={{ duration: 0.25, ease: 'easeOut' }}
+   className="h-px bg-warm-600 dark:bg-warm-400 w-full" /> inside it.
+*/
+
 /* ── Animated wave SVG separator ── */
 const WaveSeparator = () => (
-  <div className="relative w-full overflow-hidden leading-[0] -mb-1">
+  <motion.div
+    className="relative w-full overflow-hidden leading-[0] -mb-1"
+    initial={{ opacity: 0, y: 16 }}
+    whileInView={{ opacity: 1, y: 0 }}
+    viewport={{ once: true }}
+    transition={{ duration: 0.7, ease: 'easeOut' }}
+  >
     <div className="wave-separator w-[200%]">
       <svg
         className="w-full h-16 md:h-24"
@@ -24,7 +56,7 @@ const WaveSeparator = () => (
         />
       </svg>
     </div>
-  </div>
+  </motion.div>
 );
 
 const Footer = () => {
@@ -56,14 +88,15 @@ const Footer = () => {
 
       <footer className="bg-sand-100/50 dark:bg-dark-700/50 backdrop-blur-md border-t border-sand-200 dark:border-dark-500 py-12 px-4">
         <div className="max-w-6xl mx-auto">
-          <div className="grid md:grid-cols-3 gap-8 mb-8">
+          <motion.div
+            variants={footerGrid}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: '-30px' }}
+            className="grid md:grid-cols-3 gap-8 mb-8"
+          >
             {/* Brand */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.6 }}
-            >
+            <motion.div variants={footerColumn}>
               <h3 className="text-2xl font-bold gradient-text mb-2">Mert Soylu</h3>
               <p className="text-sand-600 dark:text-dark-200 text-sm">
                 {isTurkish ? 'Bilgisayar Programcılığı Öğrencisi & Geliştirici' : 'Computer Programming Student & Developer'}
@@ -71,12 +104,7 @@ const Footer = () => {
             </motion.div>
 
             {/* Quick Links */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.6, delay: 0.1 }}
-            >
+            <motion.div variants={footerColumn}>
               <h4 className="font-semibold text-sand-900 dark:text-dark-50 mb-4">{isTurkish ? 'Hızlı Linkler' : 'Quick Links'}</h4>
               <ul className="space-y-2">
                 {[
@@ -85,6 +113,10 @@ const Footer = () => {
                   { name: isTurkish ? 'İletişim' : 'Contact', href: '#contact' },
                 ].map((link) => (
                   <li key={link.name}>
+                    {/* TODO(human): Convert this <a> to a <motion.a> with hover underline animation.
+                        Use whileHover="hover" initial="initial" on the parent motion.a,
+                        and add a <motion.span variants={linkUnderline} ...> sibling for the underline.
+                        See the linkUnderline variant defined above this component. */}
                     <a
                       href={link.href}
                       className="text-sand-600 dark:text-dark-200 hover:text-warm-600 dark:hover:text-warm-400 transition-colors text-sm py-1.5 inline-block"
@@ -97,12 +129,7 @@ const Footer = () => {
             </motion.div>
 
             {/* Social Links */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.6, delay: 0.2 }}
-            >
+            <motion.div variants={footerColumn}>
               <h4 className="font-semibold text-sand-900 dark:text-dark-50 mb-4">{isTurkish ? 'Bağlantılar' : 'Connect'}</h4>
               <div className="flex gap-4">
                 {socialLinks.map((link) => (
@@ -112,19 +139,29 @@ const Footer = () => {
                     target="_blank"
                     rel="noopener noreferrer"
                     className="w-11 h-11 flex items-center justify-center rounded-lg text-sand-600 dark:text-dark-200 hover:text-warm-600 dark:hover:text-warm-400 hover:bg-sand-200/50 dark:hover:bg-dark-500/50 transition-colors"
-                    whileHover={{ scale: 1.2, rotate: 5 }}
-                    whileTap={{ scale: 0.9 }}
+                    whileHover={{ scale: 1.1 }}
+                    whileTap={{ scale: 0.92 }}
                     title={link.name}
+                    aria-label={link.name}
                   >
                     {link.icon}
                   </motion.a>
                 ))}
               </div>
             </motion.div>
-          </div>
+          </motion.div>
 
           {/* Divider */}
-          <div className="border-t border-sand-200 dark:border-dark-500 my-8" />
+          <div className="relative overflow-hidden my-8">
+            <motion.div
+              className="border-t border-sand-200 dark:border-dark-500"
+              style={{ originX: 0 }}
+              initial={{ scaleX: 0 }}
+              whileInView={{ scaleX: 1 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1], delay: 0.35 }}
+            />
+          </div>
 
           {/* Bottom */}
           <motion.div

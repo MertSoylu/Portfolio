@@ -1,41 +1,18 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import TiltCard from './TiltCard';
-import { HiMail, HiPhone, HiArrowRight } from 'react-icons/hi';
+import { HiMail, HiArrowRight } from 'react-icons/hi';
 import { FiMapPin, FiLinkedin } from 'react-icons/fi';
 import { useLanguage } from '../context/LanguageContext';
-
-/* ── Animated underline ── */
-const AnimatedUnderline = () => (
-  <motion.div
-    className="h-1 mx-auto mt-4 rounded-full bg-gradient-to-r from-warm-500 to-sand-400"
-    initial={{ width: 0 }}
-    whileInView={{ width: 80 }}
-    viewport={{ once: true }}
-    transition={{ duration: 0.8, ease: 'easeOut', delay: 0.2 }}
-  />
-);
+import { useDarkMode } from '../context/DarkModeContext';
+import ScrollFloat from './ScrollFloat';
+import ScrollReveal from './ScrollReveal';
+import FadeContent from './FadeContent';
+import ElectricBorder from './ElectricBorder';
+import Magnet from './Magnet';
 
 const Contact = () => {
   const { isTurkish } = useLanguage();
-
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: { staggerChildren: 0.15, delayChildren: 0.2 },
-    },
-  };
-
-  const cardVariants = {
-    hidden: { opacity: 0, scale: 0.8 },
-    visible: { opacity: 1, scale: 1, transition: { duration: 0.5, ease: 'easeOut' } },
-  };
-
-  const headerVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: 'easeOut' } },
-  };
+  const { isDark } = useDarkMode();
 
   const contactInfo = [
     {
@@ -57,110 +34,133 @@ const Contact = () => {
       href: null,
     },
     {
-      icon: <HiPhone className="w-6 h-6" />,
+      icon: <span className="relative flex h-3 w-3"><span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75" /><span className="relative inline-flex rounded-full h-3 w-3 bg-green-500" /></span>,
       label: isTurkish ? 'Müsaitlik' : 'Available',
       value: isTurkish ? 'Yeni fırsatlara açık' : 'For opportunities',
       href: null,
     },
   ];
 
+  const electricColor = isDark ? '#ff9a5c' : '#f07d2d';
+
   return (
-    <section id="contact" className="py-20 px-4 relative overflow-hidden">
-      {/* Dual ambient orbs */}
+    <section id="contact" className="py-12 px-4 relative overflow-hidden">
+      {/* Ambient orbs */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 -translate-x-16 w-[32rem] h-[32rem] rounded-full bg-warm-500/10 dark:bg-warm-500/12 blur-[80px]" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 -translate-x-16 w-[20rem] h-[20rem] sm:w-[32rem] sm:h-[32rem] rounded-full bg-warm-500/10 dark:bg-warm-500/12 blur-[80px]" />
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 translate-x-24 translate-y-16 w-64 h-64 rounded-full bg-sand-400/15 dark:bg-warm-400/8 blur-[60px]" />
       </div>
-      {/* Diagonal light streak */}
-      <div className="absolute inset-x-0 top-1/3 h-px rotate-[-6deg] bg-gradient-to-r from-transparent via-warm-500/20 to-transparent pointer-events-none" />
-      <div className="max-w-4xl mx-auto relative">
-        <motion.div
-          variants={containerVariants}
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, amount: 0.15, margin: '-60px' }}
-        >
-          {/* Section header */}
-          <div className="text-center mb-8">
-            <div style={{ overflow: 'hidden' }}>
-              <motion.h2
-                className="section-title"
-                initial={{ y: '100%', opacity: 0 }}
-                whileInView={{ y: 0, opacity: 1 }}
-                viewport={{ once: true, margin: '-60px' }}
-                transition={{ duration: 0.7, ease: [0.76, 0, 0.24, 1] }}
-              >
-                {isTurkish ? 'İletişime Geç' : 'Get In Touch'}
-              </motion.h2>
-            </div>
-            <AnimatedUnderline />
-            <p className="section-subtitle mt-6">
-              {isTurkish ? 'Bağlantı kuralım ve fikirlerini konuşalım' : "Let's connect and discuss your ideas"}
-            </p>
-          </div>
 
-          {/* Availability blurb */}
-          <motion.div variants={headerVariants} className="text-center mb-12 max-w-xl mx-auto">
+      <div className="max-w-6xl mx-auto relative">
+        {/* Section header */}
+        <div className="text-center mb-8">
+          <ScrollFloat
+            containerClassName="overflow-hidden"
+            textClassName="text-3xl sm:text-4xl md:text-5xl font-bold bg-gradient-to-r from-warm-600 via-warm-500 to-sand-500 bg-clip-text text-transparent"
+            animationDuration={1}
+            ease="back.inOut(2)"
+            scrollStart="center bottom+=50%"
+            scrollEnd="bottom bottom-=40%"
+            stagger={0.03}
+          >
+            {isTurkish ? 'İletişime Geç' : 'Get In Touch'}
+          </ScrollFloat>
+          <ScrollReveal
+            containerClassName="mt-4"
+            textClassName="text-lg text-sand-700 dark:text-dark-200 font-normal"
+            enableBlur={true}
+            baseOpacity={0.1}
+            baseRotation={3}
+            blurStrength={4}
+          >
+            {isTurkish ? 'Bağlantı kuralım ve fikirlerini konuşalım' : "Let's connect and discuss your ideas"}
+          </ScrollReveal>
+        </div>
+
+        {/* Availability blurb */}
+        <div className="text-center mb-12 max-w-xl mx-auto">
+          <FadeContent
+            duration={800}
+            ease="power3.out"
+            threshold={0.2}
+            blur={true}
+          >
             <p className="text-sand-600 dark:text-dark-200">
               {isTurkish
                 ? 'Yeni projeler ve iş birlikleri için hazırım. Mesaj atmaktan çekinme.'
                 : "I'm currently available for new projects and collaborations. Don't hesitate to reach out."}
             </p>
-          </motion.div>
+          </FadeContent>
+        </div>
 
-          {/* Contact info cards */}
-          <motion.div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
-            {contactInfo.map((info, index) => (
-              <motion.div
-                key={index}
-                variants={cardVariants}
-                className="group"
-                whileHover={{ y: -4 }}
-                transition={{ duration: 0.3 }}
+        {/* Contact info cards — FadeContent + ElectricBorder */}
+        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+          {contactInfo.map((info, index) => (
+            <FadeContent
+              key={index}
+              duration={700}
+              ease="power3.out"
+              delay={index * 120}
+              threshold={0.15}
+              blur={true}
+            >
+              <ElectricBorder
+                color={electricColor}
+                speed={0.5}
+                chaos={0.08}
+                borderRadius={12}
               >
-                <TiltCard className="relative bg-white/40 dark:bg-dark-600/40 backdrop-blur-md p-6 rounded-xl border border-sand-200 dark:border-dark-400 text-center card-hover group h-full flex flex-col items-center justify-center">
-                  <motion.div
-                    className="w-12 h-12 rounded-xl bg-warm-500/10 border border-warm-500/20 text-warm-600 mx-auto mb-4 flex items-center justify-center relative z-10"
-                    initial={{ scale: 0, rotate: -20 }}
-                    whileInView={{ scale: 1, rotate: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ type: 'spring', stiffness: 260, damping: 15, delay: 0.2 + index * 0.1 }}
-                    whileHover={{ scale: [1, 1.2, 1.05], transition: { duration: 0.4 } }}
-                  >
+                <div className="bg-white/40 dark:bg-dark-600/40 backdrop-blur-md p-6 rounded-xl text-center h-full flex flex-col items-center justify-center">
+                  <div className="w-12 h-12 rounded-xl bg-warm-500/10 border border-warm-500/20 text-warm-600 mx-auto mb-4 flex items-center justify-center">
                     {info.icon}
-                  </motion.div>
-                  <h4 className="font-semibold text-sand-900 dark:text-dark-50 mb-2 relative z-10 text-sm">{info.label}</h4>
+                  </div>
+                  <h4 className="font-semibold text-sand-900 dark:text-dark-50 mb-2 text-sm">{info.label}</h4>
                   {info.href ? (
                     <a
                       href={info.href}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-warm-600 hover:text-warm-700 dark:text-warm-400 dark:hover:text-warm-300 font-medium relative z-10 text-sm break-all"
+                      className="text-warm-600 hover:text-warm-700 dark:text-warm-400 dark:hover:text-warm-300 font-medium text-sm break-all"
                     >
                       {info.value}
                     </a>
                   ) : (
-                    <p className="text-sand-600 dark:text-dark-200 relative z-10 text-sm">{info.value}</p>
+                    <p className="text-sand-600 dark:text-dark-200 text-sm">{info.value}</p>
                   )}
-                </TiltCard>
-              </motion.div>
-            ))}
-          </motion.div>
+                </div>
+              </ElectricBorder>
+            </FadeContent>
+          ))}
+        </div>
 
-          {/* CTA */}
-          <motion.div variants={headerVariants} className="text-center">
+        {/* CTA — Magnet button */}
+        <FadeContent
+          duration={600}
+          delay={500}
+          threshold={0.2}
+          className="text-center"
+        >
+          <motion.div
+            className="w-px h-8 bg-gradient-to-b from-warm-500/50 to-transparent mx-auto mb-4"
+            initial={{ scaleY: 0, originY: 0 }}
+            whileInView={{ scaleY: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6, delay: 0.3 }}
+          />
+          <Magnet padding={80} magnetStrength={2}>
             <motion.a
               href="mailto:s6ylumert@gmail.com"
               className="inline-flex items-center gap-3 btn-primary text-base group"
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
+              whileHover={{ scale: 1.06, boxShadow: '0 8px 30px rgba(240, 125, 45, 0.45)' }}
+              whileTap={{ scale: 0.97 }}
+              transition={{ type: 'spring', stiffness: 300, damping: 18 }}
             >
               <HiMail className="w-5 h-5" />
               {isTurkish ? 'E-posta Gönder' : 'Send an Email'}
               <HiArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
             </motion.a>
-          </motion.div>
-        </motion.div>
+          </Magnet>
+        </FadeContent>
       </div>
     </section>
   );

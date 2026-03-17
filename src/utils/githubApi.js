@@ -1,18 +1,47 @@
-import axios from 'axios';
-
 const GITHUB_API_BASE = 'https://api.github.com';
 const GITHUB_USERNAME = import.meta.env.VITE_GITHUB_USERNAME || 'MertSoylu';
 const GITHUB_TOKEN = import.meta.env.VITE_GITHUB_TOKEN;
 
 // Cache configuration
 const CACHE_KEY = 'github_repos_cache';
-const CACHE_TTL = 60 * 60 * 1000; // 1 hour in ms (session-scoped anyway)
+const CACHE_TTL = 15 * 60 * 1000; // 15 minutes — shorter for fresher data
 const RATE_LIMIT_KEY = 'github_api_rate_limit';
+const README_CACHE_PREFIX = 'github_readme_cache';
+const README_NOT_FOUND_SENTINEL = '__README_NOT_FOUND__';
 const MAX_REQUESTS_PER_MINUTE = 20;
 const RATE_LIMIT_WINDOW_MS = 60 * 1000;
+let reposMemoryCache = null;
+let reposInFlightRequest = null;
+let reposMemoryCacheTimestamp = 0;
+const readmeMemoryCache = new Map();
+const readmeInFlightRequests = new Map();
+
+const defaultHeaders = {
+  'Accept': 'application/vnd.github.v3+json',
+  ...(GITHUB_TOKEN ? { Authorization: `Bearer ${GITHUB_TOKEN}` } : {}),
+};
 
 /**
- * Get cached data from localStorage
+ * Lightweight fetch wrapper replacing axios (~37KB gzip savings)
+ */
+const apiFetch = async (path) => {
+  const url = `${GITHUB_API_BASE}${path}`;
+  const response = await fetch(url, { headers: defaultHeaders });
+
+  if (!response.ok) {
+    const error = new Error(`GitHub API error: ${response.status}`);
+    error.response = {
+      status: response.status,
+      headers: Object.fromEntries(response.headers.entries()),
+    };
+    throw error;
+  }
+
+  return { data: await response.json(), headers: Object.fromEntries(response.headers.entries()) };
+};
+
+/**
+ * Get cached data from sessionStorage
  */
 const getCachedData = (key) => {
   try {
@@ -24,7 +53,7 @@ const getCachedData = (key) => {
       sessionStorage.removeItem(key);
       return null;
     }
-    return data;
+    return { data, timestamp };
   } catch {
     sessionStorage.removeItem(key);
     return null;
@@ -117,15 +146,6 @@ const applyServerRateLimitCooldown = (error) => {
   setRateLimitState(nextState);
 };
 
-// Create axios instance with default headers
-const apiClient = axios.create({
-  baseURL: GITHUB_API_BASE,
-  headers: {
-    'Accept': 'application/vnd.github.v3+json',
-    ...(GITHUB_TOKEN ? { Authorization: `Bearer ${GITHUB_TOKEN}` } : {}),
-  },
-});
-
 const getGitHubErrorMessage = (error, username = GITHUB_USERNAME) => {
   if (!error?.response) {
     return error?.message || 'Failed to fetch repositories from GitHub.';
@@ -153,64 +173,309 @@ const getGitHubErrorMessage = (error, username = GITHUB_USERNAME) => {
     return 'GitHub is temporarily unavailable. Please try again soon.';
   }
 
-  if (error?.code === 'ERR_NETWORK') {
-    return 'Network error while reaching GitHub. Check your internet connection.';
-  }
-
   return 'Failed to fetch repositories from GitHub.';
 };
+
+const getReadmeCacheKey = (owner, repo) =>
+  `${README_CACHE_PREFIX}_${owner.toLowerCase()}_${repo.toLowerCase()}`;
+
+const parseGitHubUrlReference = (urlValue) => {
+  if (!urlValue || typeof urlValue !== 'string') return null;
+
+  try {
+    const parsedUrl = new URL(urlValue);
+    const host = parsedUrl.hostname.toLowerCase();
+    const parts = parsedUrl.pathname.split('/').filter(Boolean);
+
+    if (host === 'api.github.com' && parts[0] === 'repos' && parts.length >= 3) {
+      return {
+        owner: parts[1],
+        repo: parts[2].replace(/\.git$/i, ''),
+      };
+    }
+
+    if (host.endsWith('github.com') && parts.length >= 2) {
+      return {
+        owner: parts[0],
+        repo: parts[1].replace(/\.git$/i, ''),
+      };
+    }
+  } catch {
+    return null;
+  }
+
+  return null;
+};
+
+const parseOwnerRepoReference = (value) => {
+  if (!value || typeof value !== 'string') return null;
+
+  const trimmed = value.trim();
+  if (!trimmed) return null;
+
+  const urlResult = parseGitHubUrlReference(trimmed);
+  if (urlResult) return urlResult;
+
+  const parts = trimmed.split('/').filter(Boolean);
+  if (parts.length < 2) return null;
+
+  return {
+    owner: parts[0],
+    repo: parts[1].replace(/\.git$/i, ''),
+  };
+};
+
+const decodeBase64Content = (encodedContent = '') => {
+  const normalized = encodedContent.replace(/\n/g, '');
+
+  if (!normalized) return '';
+
+  if (typeof window !== 'undefined' && typeof window.atob === 'function') {
+    const binary = window.atob(normalized);
+    const bytes = Uint8Array.from(binary, (char) => char.charCodeAt(0));
+    return new TextDecoder('utf-8').decode(bytes);
+  }
+
+  if (typeof Buffer !== 'undefined') {
+    return Buffer.from(normalized, 'base64').toString('utf-8');
+  }
+
+  return '';
+};
+
+const getReadmeErrorMessage = (error, owner, repo) => {
+  if (!error?.response) {
+    return error?.message || `Failed to fetch README for ${owner}/${repo}.`;
+  }
+
+  const status = error.response.status;
+
+  if (status === 401) return 'GitHub API token is invalid or expired.';
+  if (status === 403) return 'GitHub API rate limit reached while loading README.';
+  if (status === 429) return 'Too many GitHub API requests. Please wait and retry.';
+  if (status >= 500) return 'GitHub is temporarily unavailable while loading README.';
+
+  return `Failed to fetch README for ${owner}/${repo}.`;
+};
+
+const normalizeRepos = (rawRepos) =>
+  rawRepos
+    .filter((repo) => !repo.fork)
+    .filter((repo) => repo.name !== 'MertSoylu')
+    .map((repo) => ({
+      id: repo.id,
+      name: repo.name,
+      repo: repo.name,
+      owner: repo.owner?.login || GITHUB_USERNAME,
+      full_name: repo.full_name,
+      description: repo.description,
+      url: repo.html_url,
+      html_url: repo.html_url,
+      language: repo.language,
+      stargazers_count: repo.stargazers_count,
+      forks_count: repo.forks_count,
+      watchers_count: repo.watchers_count,
+      updated_at: repo.updated_at,
+      created_at: repo.created_at,
+      topics: repo.topics || [],
+    }))
+    .sort((a, b) => new Date(b.updated_at) - new Date(a.updated_at));
 
 export const getGitHubUsername = () => GITHUB_USERNAME;
 export const getGitHubProfileUrl = () => `https://github.com/${GITHUB_USERNAME}`;
 export const clearRateLimitState = () => localStorage.removeItem(RATE_LIMIT_KEY);
 
-/**
- * Fetch all public repositories for a GitHub user
- * @returns {Promise<Array>} Array of repository objects
- */
-export const fetchGitHubRepos = async () => {
-  // Check cache first
-  const cached = getCachedData(CACHE_KEY);
-  if (cached) {
-    return cached;
+export const resolveGitHubRepoReference = (repoReference) => {
+  if (!repoReference) return null;
+
+  if (typeof repoReference === 'string') {
+    return parseOwnerRepoReference(repoReference);
+  }
+
+  if (typeof repoReference === 'object') {
+    if (repoReference.owner && repoReference.repo) {
+      return {
+        owner: repoReference.owner,
+        repo: repoReference.repo,
+      };
+    }
+
+    if (repoReference.full_name) {
+      return parseOwnerRepoReference(repoReference.full_name);
+    }
+
+    if (repoReference.html_url) {
+      return parseOwnerRepoReference(repoReference.html_url);
+    }
+
+    if (repoReference.url) {
+      return parseOwnerRepoReference(repoReference.url);
+    }
+  }
+
+  return null;
+};
+
+export const fetchRepositoryReadme = async (repoReference) => {
+  const resolvedRepo = resolveGitHubRepoReference(repoReference);
+  if (!resolvedRepo) {
+    return null;
+  }
+
+  const { owner, repo } = resolvedRepo;
+  const cacheKey = getReadmeCacheKey(owner, repo);
+
+  if (readmeMemoryCache.has(cacheKey)) {
+    const cachedReadme = readmeMemoryCache.get(cacheKey);
+    return cachedReadme === README_NOT_FOUND_SENTINEL ? null : cachedReadme;
+  }
+
+  const cachedReadme = getCachedData(cacheKey);
+  if (cachedReadme) {
+    readmeMemoryCache.set(cacheKey, cachedReadme.data);
+    return cachedReadme.data === README_NOT_FOUND_SENTINEL ? null : cachedReadme.data;
+  }
+
+  if (readmeInFlightRequests.has(cacheKey)) {
+    return readmeInFlightRequests.get(cacheKey);
   }
 
   reserveRateLimitSlot();
 
-  try {
-    const response = await apiClient.get(
-      `/users/${GITHUB_USERNAME}/repos?sort=updated&direction=desc&per_page=100&type=public`
-    );
+  const readmeRequest = apiFetch(`/repos/${owner}/${repo}/readme`)
+    .then((response) => {
+      const decodedReadme = decodeBase64Content(response?.data?.content || '');
+      const normalizedReadme = decodedReadme.trim();
+      const cachedValue = normalizedReadme ? decodedReadme : README_NOT_FOUND_SENTINEL;
 
-    // Filter out forked repositories if desired, and sort by recent
-    const repos = response.data
-      .filter((repo) => !repo.fork) // Exclude forked repos
-      .filter((repo) => repo.name !== 'MertSoylu') // Exclude MertSoylu repo
-      .map((repo) => ({
-        id: repo.id,
-        name: repo.name,
-        description: repo.description,
-        url: repo.html_url,
-        html_url: repo.html_url,
-        language: repo.language,
-        stargazers_count: repo.stargazers_count,
-        forks_count: repo.forks_count,
-        watchers_count: repo.watchers_count,
-        updated_at: repo.updated_at,
-        created_at: repo.created_at,
-        topics: repo.topics || [],
-      }))
-      .sort((a, b) => new Date(b.updated_at) - new Date(a.updated_at));
+      readmeMemoryCache.set(cacheKey, cachedValue);
+      setCachedData(cacheKey, cachedValue);
 
-    // Cache the results
-    setCachedData(CACHE_KEY, repos);
+      return normalizedReadme ? decodedReadme : null;
+    })
+    .catch((error) => {
+      applyServerRateLimitCooldown(error);
 
-    return repos;
-  } catch (error) {
-    applyServerRateLimitCooldown(error);
-    console.error('Error fetching GitHub repositories:', error);
-    throw new Error(getGitHubErrorMessage(error));
+      if (error?.response?.status === 404) {
+        readmeMemoryCache.set(cacheKey, README_NOT_FOUND_SENTINEL);
+        setCachedData(cacheKey, README_NOT_FOUND_SENTINEL);
+        return null;
+      }
+
+      console.error(`Error fetching README for ${owner}/${repo}:`, error);
+      throw new Error(getReadmeErrorMessage(error, owner, repo));
+    })
+    .finally(() => {
+      readmeInFlightRequests.delete(cacheKey);
+    });
+
+  readmeInFlightRequests.set(cacheKey, readmeRequest);
+  return readmeRequest;
+};
+
+// Subscribers for stale-while-revalidate updates
+let reposUpdateListeners = new Set();
+
+/**
+ * Subscribe to repo data updates (stale-while-revalidate)
+ * @param {Function} callback - Called with fresh repos when background refresh completes
+ * @returns {Function} Unsubscribe function
+ */
+export const onReposUpdate = (callback) => {
+  reposUpdateListeners.add(callback);
+  return () => reposUpdateListeners.delete(callback);
+};
+
+/**
+ * Background revalidation — fetches fresh data silently
+ */
+const revalidateRepos = () => {
+  apiFetch(`/users/${GITHUB_USERNAME}/repos?sort=updated&direction=desc&per_page=100&type=public`)
+    .then((response) => {
+      const freshRepos = normalizeRepos(response.data);
+      const staleIds = (reposMemoryCache || []).map(r => r.id).join(',');
+      const freshIds = freshRepos.map(r => r.id).join(',');
+
+      // Only notify if data actually changed
+      if (staleIds !== freshIds) {
+        reposMemoryCache = freshRepos;
+        reposMemoryCacheTimestamp = Date.now();
+        setCachedData(CACHE_KEY, freshRepos);
+        reposUpdateListeners.forEach(cb => cb(freshRepos));
+      }
+    })
+    .catch((error) => {
+      applyServerRateLimitCooldown(error);
+      console.warn('Background repo revalidation failed:', error);
+    });
+};
+
+/**
+ * Fetch all public repositories for a GitHub user.
+ * Uses stale-while-revalidate: returns cached data immediately,
+ * then fetches fresh data in background and notifies subscribers.
+ * @returns {Promise<Array>} Array of repository objects
+ */
+export const fetchGitHubRepos = async () => {
+  // 1. Fresh memory cache — return immediately
+  if (reposMemoryCache && Date.now() - reposMemoryCacheTimestamp <= CACHE_TTL) {
+    return reposMemoryCache;
   }
+
+  // 2. Session cache — return stale data + revalidate in background
+  const cached = getCachedData(CACHE_KEY);
+  if (cached) {
+    reposMemoryCache = cached.data;
+    reposMemoryCacheTimestamp = cached.timestamp;
+    // Stale data served, revalidate in background
+    revalidateRepos();
+    return cached.data;
+  }
+
+  // 3. No cache at all — must wait for fresh fetch
+  if (reposInFlightRequest) {
+    return reposInFlightRequest;
+  }
+
+  reserveRateLimitSlot();
+
+  reposInFlightRequest = apiFetch(`/users/${GITHUB_USERNAME}/repos?sort=updated&direction=desc&per_page=100&type=public`)
+    .then((response) => {
+      const repos = normalizeRepos(response.data);
+      reposMemoryCache = repos;
+      reposMemoryCacheTimestamp = Date.now();
+      setCachedData(CACHE_KEY, repos);
+      return repos;
+    })
+    .catch((error) => {
+      applyServerRateLimitCooldown(error);
+      console.error('Error fetching GitHub repositories:', error);
+      throw new Error(getGitHubErrorMessage(error));
+    })
+    .finally(() => {
+      reposInFlightRequest = null;
+    });
+
+  return reposInFlightRequest;
+};
+
+/**
+ * Force clear all GitHub caches — use when data is known stale
+ */
+export const clearGitHubCache = () => {
+  reposMemoryCache = null;
+  reposMemoryCacheTimestamp = 0;
+  readmeMemoryCache.clear();
+  try {
+    sessionStorage.removeItem(CACHE_KEY);
+    // Clear all readme caches
+    for (let i = sessionStorage.length - 1; i >= 0; i--) {
+      const key = sessionStorage.key(i);
+      if (key && key.startsWith(README_CACHE_PREFIX)) {
+        sessionStorage.removeItem(key);
+      }
+    }
+  } catch { /* ignore */ }
 };
 
 /**
@@ -222,13 +487,14 @@ export const fetchGitHubRepo = async (repoName) => {
   reserveRateLimitSlot();
 
   try {
-    const response = await apiClient.get(
-      `/repos/${GITHUB_USERNAME}/${repoName}`
-    );
+    const response = await apiFetch(`/repos/${GITHUB_USERNAME}/${repoName}`);
 
     return {
       id: response.data.id,
       name: response.data.name,
+      repo: response.data.name,
+      owner: response.data.owner?.login || GITHUB_USERNAME,
+      full_name: response.data.full_name,
       description: response.data.description,
       url: response.data.html_url,
       html_url: response.data.html_url,
@@ -255,7 +521,7 @@ export const fetchGitHubUser = async () => {
   reserveRateLimitSlot();
 
   try {
-    const response = await apiClient.get(`/users/${GITHUB_USERNAME}`);
+    const response = await apiFetch(`/users/${GITHUB_USERNAME}`);
 
     return {
       name: response.data.name,

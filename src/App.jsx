@@ -1,6 +1,5 @@
-import React, { useEffect, lazy, Suspense } from 'react';
+import React, { useEffect, useState, lazy, Suspense } from 'react';
 import { Routes, Route, useLocation } from 'react-router-dom';
-import { Analytics } from '@vercel/analytics/react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { DarkModeProvider, useDarkMode } from './context/DarkModeContext';
 import { LanguageProvider } from './context/LanguageContext';
@@ -11,7 +10,6 @@ import About from './components/About';
 import Projects from './components/Projects';
 import Contact from './components/Contact';
 import Footer from './components/Footer';
-import ScrollProgress from './components/ScrollProgress';
 import CustomCursor from './components/CustomCursor';
 import LoadingSpinner from './components/LoadingSpinner';
 
@@ -19,38 +17,83 @@ const AndroidPage = lazy(() => import('./pages/AndroidPage'));
 const WebDevPage = lazy(() => import('./pages/WebDevPage'));
 const CyberSecurityPage = lazy(() => import('./pages/CyberSecurityPage'));
 
+const SectionDivider = () => (
+  <div className="h-12 bg-gradient-to-b from-transparent via-sand-200/20 dark:via-dark-500/20 to-transparent" />
+);
+
 const HomePage = () => (
   <>
     <Hero />
+    <SectionDivider />
     <About />
+    <SectionDivider />
     <Projects />
+    <SectionDivider />
     <Contact />
   </>
 );
 
-const pageVariants = {
-  initial: { opacity: 0, y: 24, filter: 'blur(4px)', scale: 0.98 },
-  animate: {
-    opacity: 1,
-    y: 0,
-    filter: 'blur(0px)',
-    scale: 1,
-    transition: { duration: 0.55, ease: [0.22, 1, 0.36, 1] },
-  },
-  exit: {
-    opacity: 0,
-    y: -16,
-    filter: 'blur(2px)',
-    scale: 1.01,
-    transition: { duration: 0.22, ease: [0.55, 0, 1, 0.45] },
-  },
+/* Directional wipe transitions per route */
+const ROUTE_DIRECTIONS = {
+  '/': 'fade',
+  '/android': 'left',
+  '/web': 'right',
+  '/cybersecurity': 'up',
 };
 
-const PageTransition = ({ children }) => (
-  <motion.div variants={pageVariants} initial="initial" animate="animate" exit="exit">
-    {children}
-  </motion.div>
-);
+const getClipPath = (direction, state) => {
+  const clips = {
+    left: {
+      initial: 'inset(0 100% 0 0)',
+      animate: 'inset(0 0% 0 0)',
+      exit: 'inset(0 0 0 100%)',
+    },
+    right: {
+      initial: 'inset(0 0 0 100%)',
+      animate: 'inset(0 0 0 0%)',
+      exit: 'inset(0 100% 0 0)',
+    },
+    up: {
+      initial: 'inset(100% 0 0 0)',
+      animate: 'inset(0% 0 0 0)',
+      exit: 'inset(0 0 100% 0)',
+    },
+    fade: {
+      initial: 'inset(0 0 0 0)',
+      animate: 'inset(0 0 0 0)',
+      exit: 'inset(0 0 0 0)',
+    },
+  };
+  return clips[direction]?.[state] || clips.fade[state];
+};
+
+const PageTransition = ({ children, direction = 'fade' }) => {
+  const isFade = direction === 'fade';
+
+  return (
+    <motion.div
+      initial={{
+        opacity: 0,
+        clipPath: getClipPath(direction, 'initial'),
+        ...(isFade && { y: 24, filter: 'blur(4px)', scale: 0.98 }),
+      }}
+      animate={{
+        opacity: 1,
+        clipPath: getClipPath(direction, 'animate'),
+        ...(isFade && { y: 0, filter: 'blur(0px)', scale: 1 }),
+        transition: { duration: isFade ? 0.55 : 0.5, ease: [0.22, 1, 0.36, 1] },
+      }}
+      exit={{
+        opacity: 0,
+        clipPath: getClipPath(direction, 'exit'),
+        ...(isFade && { y: -16, filter: 'blur(2px)', scale: 1.01 }),
+        transition: { duration: 0.3, ease: [0.55, 0, 1, 0.45] },
+      }}
+    >
+      {children}
+    </motion.div>
+  );
+};
 
 /* Scroll to top or hash on route change */
 const ScrollToTop = () => {
@@ -60,7 +103,12 @@ const ScrollToTop = () => {
   useEffect(() => {
     if (isInitialMount.current) {
       isInitialMount.current = false;
-      window.scrollTo({ top: 0, behavior: 'instant' });
+      document.documentElement.style.scrollBehavior = 'auto';
+      window.scrollTo(0, 0);
+      requestAnimationFrame(() => {
+        window.scrollTo(0, 0);
+        document.documentElement.style.scrollBehavior = '';
+      });
       return;
     }
     if (hash) {
@@ -81,18 +129,23 @@ const AppContent = () => {
 
   return (
     <div className={`overflow-x-hidden transition-colors duration-300 ${isDark ? 'dark' : ''}`}>
+      <a
+        href="#main"
+        className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[9999] focus:px-4 focus:py-2 focus:bg-warm-600 focus:text-white focus:rounded-lg focus:shadow-lg"
+      >
+        Skip to main content
+      </a>
       <SandBackground isDark={isDark} />
-      <ScrollProgress />
-      <CustomCursor />
+      <CustomCursor isDark={isDark} />
       <Navbar />
       <ScrollToTop />
-      <main>
+      <main id="main">
         <AnimatePresence mode="wait">
           <Routes location={location} key={location.pathname}>
-            <Route path="/" element={<PageTransition><HomePage /></PageTransition>} />
-            <Route path="/android" element={<Suspense fallback={<LoadingSpinner />}><PageTransition><AndroidPage /></PageTransition></Suspense>} />
-            <Route path="/web" element={<Suspense fallback={<LoadingSpinner />}><PageTransition><WebDevPage /></PageTransition></Suspense>} />
-            <Route path="/cybersecurity" element={<Suspense fallback={<LoadingSpinner />}><PageTransition><CyberSecurityPage /></PageTransition></Suspense>} />
+            <Route path="/" element={<PageTransition direction="fade"><HomePage /></PageTransition>} />
+            <Route path="/android" element={<Suspense fallback={<LoadingSpinner />}><PageTransition direction="left"><AndroidPage /></PageTransition></Suspense>} />
+            <Route path="/web" element={<Suspense fallback={<LoadingSpinner />}><PageTransition direction="right"><WebDevPage /></PageTransition></Suspense>} />
+            <Route path="/cybersecurity" element={<Suspense fallback={<LoadingSpinner />}><PageTransition direction="up"><CyberSecurityPage /></PageTransition></Suspense>} />
           </Routes>
         </AnimatePresence>
       </main>
@@ -101,12 +154,67 @@ const AppContent = () => {
   );
 };
 
+const scheduleNonCriticalTask = (callback) => {
+  if ('requestIdleCallback' in window) {
+    const idleId = window.requestIdleCallback(callback, { timeout: 2000 });
+    return () => window.cancelIdleCallback(idleId);
+  }
+
+  const timeoutId = window.setTimeout(callback, 1200);
+  return () => window.clearTimeout(timeoutId);
+};
+
+const DeferredAnalytics = () => {
+  const [AnalyticsComponent, setAnalyticsComponent] = useState(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    let removeLoadListener = null;
+    let cancelScheduledLoad = null;
+
+    const loadAnalytics = () => {
+      import('@vercel/analytics/react')
+        .then(({ Analytics }) => {
+          if (!cancelled) {
+            setAnalyticsComponent(() => Analytics);
+          }
+        })
+        .catch((error) => {
+          console.error('Failed to load Vercel Analytics:', error);
+        });
+    };
+
+    const scheduleLoad = () => {
+      cancelScheduledLoad = scheduleNonCriticalTask(loadAnalytics);
+    };
+
+    if (document.readyState === 'complete') {
+      scheduleLoad();
+    } else {
+      const handleLoad = () => {
+        scheduleLoad();
+      };
+      window.addEventListener('load', handleLoad, { once: true });
+      removeLoadListener = () => window.removeEventListener('load', handleLoad);
+    }
+
+    return () => {
+      cancelled = true;
+      if (removeLoadListener) removeLoadListener();
+      if (cancelScheduledLoad) cancelScheduledLoad();
+    };
+  }, []);
+
+  if (!AnalyticsComponent) return null;
+  return <AnalyticsComponent />;
+};
+
 function App() {
   return (
     <DarkModeProvider>
       <LanguageProvider>
         <AppContent />
-        <Analytics />
+        <DeferredAnalytics />
       </LanguageProvider>
     </DarkModeProvider>
   );

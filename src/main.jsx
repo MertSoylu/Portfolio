@@ -8,6 +8,7 @@ import './index.css'
 if ('scrollRestoration' in window.history) {
   window.history.scrollRestoration = 'manual';
 }
+document.documentElement.style.scrollBehavior = 'auto';
 window.scrollTo(0, 0);
 
 ReactDOM.createRoot(document.getElementById('root')).render(
