@@ -16,6 +16,7 @@ import LoadingSpinner from './components/LoadingSpinner';
 const AndroidPage = lazy(() => import('./pages/AndroidPage'));
 const WebDevPage = lazy(() => import('./pages/WebDevPage'));
 const CyberSecurityPage = lazy(() => import('./pages/CyberSecurityPage'));
+const NotFoundPage = lazy(() => import('./pages/NotFoundPage'));
 
 const SectionDivider = () => (
   <div className="h-12 bg-gradient-to-b from-transparent via-sand-200/20 dark:via-dark-500/20 to-transparent" />
@@ -146,6 +147,7 @@ const AppContent = () => {
             <Route path="/android" element={<Suspense fallback={<LoadingSpinner />}><PageTransition direction="left"><AndroidPage /></PageTransition></Suspense>} />
             <Route path="/web" element={<Suspense fallback={<LoadingSpinner />}><PageTransition direction="right"><WebDevPage /></PageTransition></Suspense>} />
             <Route path="/cybersecurity" element={<Suspense fallback={<LoadingSpinner />}><PageTransition direction="up"><CyberSecurityPage /></PageTransition></Suspense>} />
+            <Route path="*" element={<Suspense fallback={<LoadingSpinner />}><PageTransition direction="fade"><NotFoundPage /></PageTransition></Suspense>} />
           </Routes>
         </AnimatePresence>
       </main>

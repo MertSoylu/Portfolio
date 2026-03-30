@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useRef, useState } from 'react';
+import emailjs from '@emailjs/browser';
 import { motion } from 'framer-motion';
-import { HiMail, HiArrowRight } from 'react-icons/hi';
+import { HiMail, HiArrowRight, HiCheckCircle, HiXCircle } from 'react-icons/hi';
 import { FiMapPin, FiLinkedin } from 'react-icons/fi';
 import { useLanguage } from '../context/LanguageContext';
 import { useDarkMode } from '../context/DarkModeContext';
@@ -9,6 +10,136 @@ import ScrollReveal from './ScrollReveal';
 import FadeContent from './FadeContent';
 import ElectricBorder from './ElectricBorder';
 import Magnet from './Magnet';
+
+const ContactForm = ({ isTurkish, isDark }) => {
+  const formRef = useRef(null);
+  const [status, setStatus] = useState('idle'); // idle | sending | success | error
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setStatus('sending');
+    try {
+      await emailjs.sendForm(
+        import.meta.env.VITE_EMAILJS_SERVICE_ID,
+        import.meta.env.VITE_EMAILJS_TEMPLATE_ID,
+        formRef.current,
+        { publicKey: import.meta.env.VITE_EMAILJS_PUBLIC_KEY },
+      );
+      setStatus('success');
+      formRef.current?.reset();
+    } catch {
+      setStatus('error');
+    }
+  };
+
+  const inputClass = `w-full px-4 py-3 rounded-xl bg-white/60 dark:bg-dark-600/60 border border-sand-200 dark:border-dark-400 text-sand-900 dark:text-dark-50 placeholder-sand-400 dark:placeholder-dark-300 focus:outline-none focus:border-warm-500 dark:focus:border-warm-400 transition-colors text-sm`;
+
+  return (
+    <FadeContent duration={700} delay={200} threshold={0.1} blur>
+      <form ref={formRef} onSubmit={handleSubmit} className="bg-white/40 dark:bg-dark-600/40 backdrop-blur-md rounded-2xl border border-sand-200 dark:border-dark-400 p-6 sm:p-8 space-y-4">
+        <h3 className="text-lg font-semibold text-sand-900 dark:text-dark-50 mb-2">
+          {isTurkish ? 'Mesaj Gönder' : 'Send a Message'}
+        </h3>
+
+        <div className="grid sm:grid-cols-2 gap-4">
+          <div>
+            <label className="block text-xs font-medium text-sand-600 dark:text-dark-300 mb-1.5">
+              {isTurkish ? 'Adın' : 'Your Name'}
+            </label>
+            <input
+              type="text"
+              name="from_name"
+              required
+              placeholder={isTurkish ? 'Adın Soyadın' : 'John Doe'}
+              className={inputClass}
+            />
+          </div>
+          <div>
+            <label className="block text-xs font-medium text-sand-600 dark:text-dark-300 mb-1.5">
+              {isTurkish ? 'E-posta' : 'Email'}
+            </label>
+            <input
+              type="email"
+              name="from_email"
+              required
+              placeholder="email@example.com"
+              className={inputClass}
+            />
+          </div>
+        </div>
+
+        <div>
+          <label className="block text-xs font-medium text-sand-600 dark:text-dark-300 mb-1.5">
+            {isTurkish ? 'Konu' : 'Subject'}
+          </label>
+          <input
+            type="text"
+            name="subject"
+            required
+            placeholder={isTurkish ? 'Mesajının konusu' : 'What is this about?'}
+            className={inputClass}
+          />
+        </div>
+
+        <div>
+          <label className="block text-xs font-medium text-sand-600 dark:text-dark-300 mb-1.5">
+            {isTurkish ? 'Mesaj' : 'Message'}
+          </label>
+          <textarea
+            name="message"
+            required
+            rows={5}
+            placeholder={isTurkish ? 'Mesajını buraya yaz...' : 'Write your message here...'}
+            className={`${inputClass} resize-none`}
+          />
+        </div>
+
+        {/* Status feedback */}
+        {status === 'success' && (
+          <motion.div
+            initial={{ opacity: 0, y: -8 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="flex items-center gap-2 text-sm text-green-600 dark:text-green-400 bg-green-50 dark:bg-green-900/30 border border-green-200 dark:border-green-700 rounded-xl px-4 py-3"
+          >
+            <HiCheckCircle className="w-5 h-5 flex-shrink-0" />
+            {isTurkish ? 'Mesajın iletildi! En kısa sürede döneceğim.' : 'Message sent! I\'ll get back to you soon.'}
+          </motion.div>
+        )}
+        {status === 'error' && (
+          <motion.div
+            initial={{ opacity: 0, y: -8 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="flex items-center gap-2 text-sm text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-700 rounded-xl px-4 py-3"
+          >
+            <HiXCircle className="w-5 h-5 flex-shrink-0" />
+            {isTurkish ? 'Bir hata oluştu. Lütfen e-posta ile ulaş.' : 'Something went wrong. Please email me directly.'}
+          </motion.div>
+        )}
+
+        <motion.button
+          type="submit"
+          disabled={status === 'sending'}
+          className="w-full btn-primary flex items-center justify-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed"
+          whileHover={status !== 'sending' ? { scale: 1.02, boxShadow: '0 8px 30px rgba(240, 125, 45, 0.35)' } : {}}
+          whileTap={status !== 'sending' ? { scale: 0.98 } : {}}
+        >
+          {status === 'sending' ? (
+            <>
+              <span className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin" />
+              {isTurkish ? 'Gönderiliyor...' : 'Sending...'}
+            </>
+          ) : (
+            <>
+              <HiMail className="w-5 h-5" />
+              {isTurkish ? 'Gönder' : 'Send Message'}
+              <HiArrowRight className="w-4 h-4" />
+            </>
+          )}
+        </motion.button>
+      </form>
+    </FadeContent>
+  );
+};
 
 const Contact = () => {
   const { isTurkish } = useLanguage();
@@ -93,44 +224,49 @@ const Contact = () => {
           </FadeContent>
         </div>
 
-        {/* Contact info cards — FadeContent + ElectricBorder */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
-          {contactInfo.map((info, index) => (
-            <FadeContent
-              key={index}
-              duration={700}
-              ease="power3.out"
-              delay={index * 120}
-              threshold={0.15}
-              blur={true}
-            >
-              <ElectricBorder
-                color={electricColor}
-                speed={0.5}
-                chaos={0.08}
-                borderRadius={12}
+        {/* Contact form + info side by side */}
+        <div className="grid lg:grid-cols-2 gap-10 mb-12 items-start">
+          <ContactForm isTurkish={isTurkish} isDark={isDark} />
+
+          {/* Info cards */}
+          <div className="grid sm:grid-cols-2 gap-4">
+            {contactInfo.map((info, index) => (
+              <FadeContent
+                key={index}
+                duration={700}
+                ease="power3.out"
+                delay={index * 120}
+                threshold={0.15}
+                blur={true}
               >
-                <div className="bg-white/40 dark:bg-dark-600/40 backdrop-blur-md p-6 rounded-xl text-center h-full flex flex-col items-center justify-center">
-                  <div className="w-12 h-12 rounded-xl bg-warm-500/10 border border-warm-500/20 text-warm-600 mx-auto mb-4 flex items-center justify-center">
-                    {info.icon}
+                <ElectricBorder
+                  color={electricColor}
+                  speed={0.5}
+                  chaos={0.08}
+                  borderRadius={12}
+                >
+                  <div className="bg-white/40 dark:bg-dark-600/40 backdrop-blur-md p-6 rounded-xl text-center h-full flex flex-col items-center justify-center">
+                    <div className="w-12 h-12 rounded-xl bg-warm-500/10 border border-warm-500/20 text-warm-600 mx-auto mb-4 flex items-center justify-center">
+                      {info.icon}
+                    </div>
+                    <h4 className="font-semibold text-sand-900 dark:text-dark-50 mb-2 text-sm">{info.label}</h4>
+                    {info.href ? (
+                      <a
+                        href={info.href}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-warm-600 hover:text-warm-700 dark:text-warm-400 dark:hover:text-warm-300 font-medium text-sm break-all"
+                      >
+                        {info.value}
+                      </a>
+                    ) : (
+                      <p className="text-sand-600 dark:text-dark-200 text-sm">{info.value}</p>
+                    )}
                   </div>
-                  <h4 className="font-semibold text-sand-900 dark:text-dark-50 mb-2 text-sm">{info.label}</h4>
-                  {info.href ? (
-                    <a
-                      href={info.href}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-warm-600 hover:text-warm-700 dark:text-warm-400 dark:hover:text-warm-300 font-medium text-sm break-all"
-                    >
-                      {info.value}
-                    </a>
-                  ) : (
-                    <p className="text-sand-600 dark:text-dark-200 text-sm">{info.value}</p>
-                  )}
-                </div>
-              </ElectricBorder>
-            </FadeContent>
-          ))}
+                </ElectricBorder>
+              </FadeContent>
+            ))}
+          </div>
         </div>
 
         {/* CTA — Magnet button */}

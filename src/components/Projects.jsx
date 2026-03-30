@@ -302,6 +302,20 @@ const Projects = () => {
     };
   }, [expandedProject, closeProjectModal]);
 
+  const getProjectCategory = (project) => {
+    const androidLangs = ['Java', 'Kotlin'];
+    const webLangs = ['JavaScript', 'TypeScript', 'HTML', 'CSS'];
+    const securityTopics = ['security', 'cybersecurity', 'pentest', 'ctf', 'hacking', 'scanner', 'exploit'];
+    const topics = Array.isArray(project.topics) ? project.topics.map((t) => t.toLowerCase()) : [];
+    const name = (project.name || '').toLowerCase();
+
+    if (androidLangs.includes(project.language)) return 'Android';
+    if (topics.some((t) => securityTopics.includes(t)) || name.includes('scan') || name.includes('ctf') || name.includes('hack')) return 'Security';
+    if (project.language === 'Python') return 'Security';
+    if (webLangs.includes(project.language)) return 'Web';
+    return 'Other';
+  };
+
   const getLanguageColor = (language) => {
     const colors = {
       JavaScript: 'from-yellow-400 to-yellow-600',
@@ -316,8 +330,17 @@ const Projects = () => {
     return colors[language] || colors.null;
   };
 
-  const languages = ['All', ...Array.from(new Set(projects.map((p) => p.language).filter(Boolean)))];
-  const filteredProjects = activeFilter === 'All' ? projects : projects.filter((p) => p.language === activeFilter);
+  const CATEGORIES = ['All', 'Web', 'Android', 'Security'];
+  const CATEGORY_LABELS = {
+    All: isTurkish ? 'Tümü' : 'All',
+    Web: isTurkish ? 'Web' : 'Web',
+    Android: 'Android',
+    Security: isTurkish ? 'Güvenlik' : 'Security',
+  };
+
+  const filteredProjects = activeFilter === 'All'
+    ? projects
+    : projects.filter((p) => getProjectCategory(p) === activeFilter);
 
   return (
     <section id="projects" className="py-12 px-4 relative">
@@ -362,7 +385,7 @@ const Projects = () => {
           </ScrollReveal>
         </div>
 
-        {/* Language filter buttons */}
+        {/* Category filter buttons */}
         {!loading && projects.length > 0 && (
           <motion.div
             initial={{ opacity: 0, y: 10 }}
@@ -370,26 +393,24 @@ const Projects = () => {
             transition={{ duration: 0.4 }}
             className="flex flex-wrap gap-2 justify-center mb-10"
           >
-            {languages.map((lang) => (
+            {CATEGORIES.map((cat) => (
               <button
-                key={lang}
-                onClick={() => setActiveFilter(lang)}
+                key={cat}
+                onClick={() => setActiveFilter(cat)}
                 className={`relative px-4 py-2 min-h-[44px] rounded-full text-sm font-medium border transition-colors duration-200 cursor-pointer flex items-center ${
-                  activeFilter === lang
+                  activeFilter === cat
                     ? 'border-warm-500 shadow-md text-white'
                     : 'bg-white/40 dark:bg-dark-600/40 text-sand-700 dark:text-dark-200 border-sand-200 dark:border-dark-400 hover:border-warm-500/50 hover:text-warm-600 dark:hover:text-warm-400'
                 }`}
               >
-                {activeFilter === lang && (
+                {activeFilter === cat && (
                   <motion.div
                     layoutId="activeFilterPill"
                     className="absolute inset-0 bg-warm-500 rounded-full -z-10"
                     transition={{ type: 'spring', stiffness: 380, damping: 30 }}
                   />
                 )}
-                <span className="relative z-10">
-                  {lang === 'All' ? (isTurkish ? 'Tümü' : 'All') : lang}
-                </span>
+                <span className="relative z-10">{CATEGORY_LABELS[cat]}</span>
               </button>
             ))}
           </motion.div>
