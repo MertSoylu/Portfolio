@@ -9,7 +9,6 @@ import ScrollFloat from './ScrollFloat';
 import ScrollReveal from './ScrollReveal';
 import FadeContent from './FadeContent';
 import ElectricBorder from './ElectricBorder';
-import Magnet from './Magnet';
 
 const ContactForm = ({ isTurkish, isDark }) => {
   const formRef = useRef(null);
@@ -225,7 +224,7 @@ const Contact = () => {
         </div>
 
         {/* Contact form + info side by side */}
-        <div className="grid lg:grid-cols-2 gap-10 mb-12 items-start">
+        <div className="grid lg:grid-cols-2 gap-10 items-start">
           <ContactForm isTurkish={isTurkish} isDark={isDark} />
 
           {/* Info cards */}
@@ -269,34 +268,6 @@ const Contact = () => {
           </div>
         </div>
 
-        {/* CTA — Magnet button */}
-        <FadeContent
-          duration={600}
-          delay={500}
-          threshold={0.2}
-          className="text-center"
-        >
-          <motion.div
-            className="w-px h-8 bg-gradient-to-b from-warm-500/50 to-transparent mx-auto mb-4"
-            initial={{ scaleY: 0, originY: 0 }}
-            whileInView={{ scaleY: 1 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6, delay: 0.3 }}
-          />
-          <Magnet padding={80} magnetStrength={2}>
-            <motion.a
-              href="mailto:s6ylumert@gmail.com"
-              className="inline-flex items-center gap-3 btn-primary text-base group"
-              whileHover={{ scale: 1.06, boxShadow: '0 8px 30px rgba(240, 125, 45, 0.45)' }}
-              whileTap={{ scale: 0.97 }}
-              transition={{ type: 'spring', stiffness: 300, damping: 18 }}
-            >
-              <HiMail className="w-5 h-5" />
-              {isTurkish ? 'E-posta Gönder' : 'Send an Email'}
-              <HiArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-            </motion.a>
-          </Magnet>
-        </FadeContent>
       </div>
     </section>
   );
