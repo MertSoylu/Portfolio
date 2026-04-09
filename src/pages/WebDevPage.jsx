@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { HiArrowLeft, HiExternalLink, HiGlobe, HiCode } from 'react-icons/hi';
+import { HiArrowLeft, HiExternalLink, HiGlobe } from 'react-icons/hi';
 import { Link } from 'react-router-dom';
 import { useLanguage } from '../context/LanguageContext';
 import { useDarkMode } from '../context/DarkModeContext';
