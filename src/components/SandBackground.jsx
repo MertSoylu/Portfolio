@@ -1,14 +1,20 @@
-import React, { useState, useEffect } from 'react';
-import Threads from './Threads';
+import React, { useState, useEffect, lazy, Suspense } from 'react';
+
+const Threads = lazy(() => import('./Threads'));
 
 const SandBackground = ({ isDark }) => {
   const [hasWebGL, setHasWebGL] = useState(true);
+  const [showThreads, setShowThreads] = useState(false);
 
   useEffect(() => {
     try {
       const canvas = document.createElement('canvas');
       const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
-      if (!gl) setHasWebGL(false);
+      if (gl) {
+        setShowThreads(true);
+      } else {
+        setHasWebGL(false);
+      }
     } catch {
       setHasWebGL(false);
     }
@@ -25,13 +31,15 @@ const SandBackground = ({ isDark }) => {
       role="presentation"
       aria-hidden="true"
     >
-      {hasWebGL ? (
-        <Threads
-          color={isDark ? darkColor : lightColor}
-          amplitude={0.8}
-          distance={0.3}
-          enableMouseInteraction={true}
-        />
+      {hasWebGL && showThreads ? (
+        <Suspense fallback={null}>
+          <Threads
+            color={isDark ? darkColor : lightColor}
+            amplitude={0.8}
+            distance={0.3}
+            enableMouseInteraction={true}
+          />
+        </Suspense>
       ) : (
         <div
           className="absolute inset-0 transition-opacity duration-500"

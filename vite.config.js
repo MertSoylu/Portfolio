@@ -8,18 +8,46 @@ export default defineConfig({
     open: true,
   },
   build: {
+    minify: 'esbuild',
+    sourcemap: false,
     rollupOptions: {
       output: {
-        manualChunks: {
-          'vendor-react': ['react', 'react-dom', 'react-router-dom'],
-          'vendor-motion': ['framer-motion'],
-          'vendor-icons': ['react-icons'],
-          'vendor-ogl': ['ogl'],
-          'vendor-gsap': ['gsap'],
-          'vendor-lenis': ['lenis'],
+        manualChunks: (id) => {
+          if (id.includes('node_modules')) {
+            if (id.includes('react') || id.includes('react-dom') || id.includes('react-router')) {
+              return 'vendor-react';
+            }
+            if (id.includes('framer-motion')) {
+              return 'vendor-motion';
+            }
+            if (id.includes('react-icons')) {
+              return 'vendor-icons';
+            }
+            if (id.includes('ogl')) {
+              return 'vendor-ogl';
+            }
+            if (id.includes('gsap')) {
+              return 'vendor-gsap';
+            }
+            if (id.includes('lenis')) {
+              return 'vendor-lenis';
+            }
+            if (id.includes('three') || id.includes('@react-three')) {
+              return 'vendor-three';
+            }
+            if (id.includes('vercel')) {
+              return 'vendor-vercel';
+            }
+            return 'vendor-common';
+          }
         },
       },
     },
     chunkSizeWarningLimit: 600,
+    target: 'esnext',
+    cssCodeSplit: true,
+  },
+  optimizeDeps: {
+    include: ['react', 'react-dom', 'react-router-dom', 'framer-motion'],
   },
 })
