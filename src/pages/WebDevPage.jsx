@@ -37,11 +37,11 @@ const WebDevPage = () => {
       accentDark: 'dark:text-blue-400',
       icon: <HiCode className="w-10 h-10 text-white" />,
       description: isTurkish
-        ? 'TypeSprint, gerçek zamanlı harf doğrulaması, akıcı arayüzü ve çok dilli kelime setleriyle modern bir yazma hızı (WPM) testidir. Yanlış harfe bastığında ilerleyemezsin — bu sayede sonuçlar net ve tekrar edilebilir olur.'
-        : 'TypeSprint is a modern typing speed (WPM) test with real-time letter validation, smooth UI, and multilingual word sets. You can\'t proceed when hitting wrong keys — making results clean and repeatable.',
+        ? 'TypeSprint, gerçek zamanlı çalışan modern bir yazma hızı (WPM) testi uygulamasıdır. Akıcı bir arayüze ve birden fazla dil seçeneğine sahiptir. Yanlış tuşa bastığınızda ilerlemenizi durdurarak, her zaman en doğru ve ölçülebilir sonuçları almanızı sağlar.'
+        : 'TypeSprint is a modern typing speed (WPM) test application featuring real-time validation, a smooth interface, and multiple language options. It halts your progress if you press the wrong key, ensuring that your results are always highly accurate and measurable.',
       longDesc: isTurkish
-        ? 'Türkçe ve Avrupa dillerinde kelime havuzları, gün/hafta/ay/genel skor tabloları, mobil uyumlu tasarım ve hile önleme sistemiyle donatılmış kapsamlı bir platform. Kullanıcılar yazma hızlarını ölçebilir, geliştirebilir ve arkadaşlarıyla kıyaslayabilir.'
-        : 'A comprehensive platform equipped with word pools in Turkish and European languages, daily/weekly/monthly/all-time leaderboards, mobile-friendly design, and anti-cheat system. Users can measure their typing speed, improve it, and compare with friends.',
+        ? 'İçerisinde Türkçe dahil farklı dillerin kelime havuzunu barındıran kapsamlı bir projedir. Günlük, haftalık ve tüm zamanların skor tabloları rekabet ortamı yaratırken, hile önleme sistemi adil bir test deneyimi sunar. İster telefondan ister bilgisayardan hızınızı ölçebilir ve sonuçlarınızı arkadaşlarınızla karşılaştırabilirsiniz.'
+        : 'A comprehensive platform featuring word pools in multiple languages, including Turkish. Daily, weekly, and all-time leaderboards encourage competition, while the anti-cheat system ensures a fair testing experience. You can measure your speed from any device and easily compare your scores with friends.',
       tags: ['JavaScript', 'HTML/CSS', isTurkish ? 'Skor Tablosu' : 'Leaderboard', isTurkish ? 'Çok Dilli' : 'Multilingual'],
       features: isTurkish
         ? ['Gerçek zamanlı harf doğrulama', 'Çok dilli kelime havuzları', 'Skor tabloları ve sayfalama', 'Hile önleme sistemi']
@@ -56,11 +56,11 @@ const WebDevPage = () => {
       accentDark: 'dark:text-emerald-400',
       icon: <HiGlobe className="w-10 h-10 text-white" />,
       description: isTurkish
-        ? 'BİZ Topluluğu için geliştirdiğim Dert Haritası, insanların şehirleriyle ilgili şikayetlerini ve sorunlarını paylaşabildiği interaktif bir harita platformudur. Şehirlerdeki sorunların daha görünür olması ve topluluk odaklı çözümler üretilmesi amaçlanmıştır.'
-        : 'Dert Haritası (Complaint Map) is an interactive map platform I built for BİZ Community, where people can share complaints and problems about their cities. It aims to make urban issues more visible and produce community-driven solutions.',
+        ? 'BİZ Topluluğu için hazırladığım Dert Haritası, herkesin yaşadığı şehirle ilgili sorunları kolayca dile getirebildiği interaktif bir platformdur. Amacı, kentsel sorunları daha görünür hale getirmek ve topluluk odaklı çözümler üretilmesine yardımcı olmaktır.'
+        : 'Dert Haritası (Complaint Map) is an interactive platform I developed for the BİZ Community, allowing anyone to easily voice issues regarding their city. Its goal is to make urban problems more visible and encourage community-driven solutions.',
       longDesc: isTurkish
-        ? '"Şehrinin sesi ol!" sloganıyla yola çıkan platform, yol/altyapı, toplu taşıma, güvenlik, çevre, konut, sağlık, eğitim ve ekonomi gibi birçok kategoride şikayetleri toplar. Kullanıcılar haritadan şehir seçerek o şehre ait istatistikleri ve şikayetleri görüntüleyebilir.'
-        : 'With the motto "Be the voice of your city!", the platform collects complaints in categories like roads/infrastructure, public transport, security, environment, housing, health, education, and economy. Users can select a city from the map to view statistics and complaints.',
+        ? '"Şehrinin sesi ol!" sloganıyla hareket eden bu platform; altyapıdan ulaşıma, çevre sorunlarından eğitime kadar birçok farklı alanda şikayetleri bir araya getiriyor. Harita üzerinden istediğiniz şehre tıklayarak o bölgenin sorunlarını ve genel istatistiklerini doğrudan inceleyebilirsiniz.'
+        : 'Guided by the motto "Be the voice of your city!", this platform gathers complaints across various fields—from infrastructure and transportation to the environment and education. By simply clicking on a city on the map, you can directly explore that area\'s reported issues and overall statistics.',
       tags: ['React', 'Vercel', isTurkish ? 'İnteraktif Harita' : 'Interactive Map', isTurkish ? 'Topluluk' : 'Community'],
       features: isTurkish
         ? ['İnteraktif Türkiye haritası', 'Kategori bazlı şikayet sistemi', 'Şehir istatistikleri', 'BİZ Topluluğu entegrasyon']
@@ -76,7 +76,7 @@ const WebDevPage = () => {
       exit="exit"
       className={`min-h-screen pt-24 pb-16 px-4 ${isDark ? 'dark' : ''}`}
     >
-      <div className="max-w-5xl mx-auto">
+      <div className="max-w-3xl mx-auto">
         {/* Back button */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}
@@ -94,7 +94,7 @@ const WebDevPage = () => {
         </motion.div>
 
         {/* Hero Section — framer-motion for above-the-fold */}
-        <div className="text-center mb-16">
+        <div className="text-center mb-8">
           <motion.span
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
@@ -109,14 +109,14 @@ const WebDevPage = () => {
             delay={80}
             animateBy="words"
             direction="top"
-            className="text-3xl sm:text-4xl md:text-6xl font-bold text-sand-900 dark:text-dark-50 mb-6 justify-center"
+            className="text-2xl sm:text-3xl md:text-5xl font-bold text-sand-900 dark:text-dark-50 mb-6 justify-center"
           />
 
           <motion.p
             initial={{ opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.4 }}
-            className="text-lg text-sand-600 dark:text-dark-200 max-w-2xl mx-auto"
+            className="text-base text-sand-600 dark:text-dark-200 max-w-2xl mx-auto"
           >
             {isTurkish
               ? 'React, JavaScript ve modern web teknolojileri kullanarak kullanıcı odaklı, performanslı ve estetik web uygulamaları geliştiriyorum.'
@@ -125,7 +125,7 @@ const WebDevPage = () => {
         </div>
 
         {/* Projects — one FadeContent per project card */}
-        <div className="space-y-20">
+        <div className="space-y-4">
           {projects.map((project, index) => (
             <FadeContent key={project.id} duration={700} delay={index * 150} blur={true} threshold={0.1}>
               <GlareHover
