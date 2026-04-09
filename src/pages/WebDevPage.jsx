@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { HiArrowLeft, HiExternalLink, HiGlobe, HiCode } from 'react-icons/hi';
 import { Link } from 'react-router-dom';
@@ -26,6 +26,16 @@ const pageVariants = {
 const WebDevPage = () => {
   const { isTurkish } = useLanguage();
   const { isDark } = useDarkMode();
+  const [expandedIds, setExpandedIds] = useState(new Set());
+
+  const toggleExpanded = (id) => {
+    setExpandedIds(prev => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  };
 
   const projects = [
     {
@@ -35,7 +45,6 @@ const WebDevPage = () => {
       gradient: 'from-blue-500 to-indigo-600',
       accentLight: 'bg-blue-500/10 text-blue-600 border-blue-500/20',
       accentDark: 'dark:text-blue-400',
-      icon: <HiCode className="w-10 h-10 text-white" />,
       description: isTurkish
         ? 'TypeSprint, gerçek zamanlı çalışan modern bir yazma hızı (WPM) testi uygulamasıdır. Akıcı bir arayüze ve birden fazla dil seçeneğine sahiptir. Yanlış tuşa bastığınızda ilerlemenizi durdurarak, her zaman en doğru ve ölçülebilir sonuçları almanızı sağlar.'
         : 'TypeSprint is a modern typing speed (WPM) test application featuring real-time validation, a smooth interface, and multiple language options. It halts your progress if you press the wrong key, ensuring that your results are always highly accurate and measurable.',
@@ -54,7 +63,6 @@ const WebDevPage = () => {
       gradient: 'from-emerald-500 to-teal-600',
       accentLight: 'bg-emerald-500/10 text-emerald-600 border-emerald-500/20',
       accentDark: 'dark:text-emerald-400',
-      icon: <HiGlobe className="w-10 h-10 text-white" />,
       description: isTurkish
         ? 'BİZ Topluluğu için hazırladığım Dert Haritası, herkesin yaşadığı şehirle ilgili sorunları kolayca dile getirebildiği interaktif bir platformdur. Amacı, kentsel sorunları daha görünür hale getirmek ve topluluk odaklı çözümler üretilmesine yardımcı olmaktır.'
         : 'Dert Haritası (Complaint Map) is an interactive platform I developed for the BİZ Community, allowing anyone to easily voice issues regarding their city. Its goal is to make urban problems more visible and encourage community-driven solutions.',
@@ -132,7 +140,7 @@ const WebDevPage = () => {
                 width="100%"
                 height="auto"
                 background="transparent"
-                borderRadius="24px"
+                borderRadius="16px"
                 borderColor={isDark ? 'rgba(71,85,105,0.4)' : 'rgba(212,196,175,0.4)'}
                 glareColor={isDark ? '#ff9a5c' : '#f07d2d'}
                 glareOpacity={0.12}
@@ -140,87 +148,109 @@ const WebDevPage = () => {
                 transitionDuration={800}
                 className="!grid !place-items-stretch"
               >
-                <div className="bg-white/50 dark:bg-dark-600/50 backdrop-blur-md rounded-3xl overflow-hidden w-full">
-                  {/* Project Header */}
-                  <div className={`bg-gradient-to-r ${project.gradient} p-5 sm:p-8 md:p-10`}>
-                    <div className="flex items-center gap-4">
-                      <motion.span
-                        whileHover={{ scale: 1.2, rotate: 8 }}
-                        transition={{ type: 'spring', stiffness: 300, damping: 15 }}
-                      >
-                        {project.icon}
-                      </motion.span>
-                      <div>
-                        <h2 className="text-2xl sm:text-3xl font-bold text-white">{project.title}</h2>
-                        <p className="text-white/70 text-sm mt-1">{project.url.replace('https://', '')}</p>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Content: Preview + Details */}
-                  <div className="p-5 sm:p-8 md:p-10">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                      <div>
+                <div className="bg-white/50 dark:bg-dark-600/50 backdrop-blur-md rounded-2xl overflow-hidden w-full p-4 sm:p-5">
+                  {/* Ana satır: thumbnail + bilgi + buton */}
+                  <div className="flex gap-4 items-start">
+                    {/* Thumbnail */}
+                    <div className={`flex-shrink-0 w-28 h-20 rounded-xl overflow-hidden bg-gradient-to-r ${project.gradient} p-0.5`}>
+                      <div className="w-full h-full rounded-[10px] overflow-hidden bg-white dark:bg-dark-600">
                         <SitePreview
                           url={project.url}
                           type="web"
                           title={project.title}
                           gradient={project.gradient}
+                          expandable={false}
                         />
                       </div>
+                    </div>
 
-                      <div>
-                        <div className="mb-6">
-                          <p className="text-sand-700 dark:text-dark-200 leading-relaxed text-lg mb-3">
-                            {project.description}
+                    {/* Bilgi alanı */}
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-start justify-between gap-3 mb-1">
+                        <div>
+                          <h2 className="text-lg font-bold text-sand-900 dark:text-dark-50 leading-tight">
+                            {project.title}
+                          </h2>
+                          <p className="text-xs text-sand-500 dark:text-dark-300">
+                            {project.url.replace('https://', '')}
                           </p>
-                          <p className="text-sand-600 dark:text-dark-300 leading-relaxed">
-                            {project.longDesc}
-                          </p>
                         </div>
 
-                        <div className="mb-6">
-                          <h4 className="text-lg font-semibold text-sand-900 dark:text-dark-50 mb-4">
-                            {isTurkish ? 'Öne Çıkan Özellikler' : 'Key Features'}
-                          </h4>
-                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                            {project.features.map((feat, i) => (
-                              <div
-                                key={i}
-                                className="flex items-center gap-3 p-3 rounded-lg bg-sand-100/60 dark:bg-dark-500/40 hover:translate-x-1 transition-transform"
-                              >
-                                <div className={`w-2 h-2 rounded-full bg-gradient-to-r ${project.gradient} flex-shrink-0`} />
-                                <span className="text-sand-700 dark:text-dark-200 text-sm">{feat}</span>
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-
-                        <div className="flex flex-wrap gap-2 mb-6">
-                          {project.tags.map((tag) => (
-                            <span
-                              key={tag}
-                              className={`px-3 py-1 text-xs rounded-full border ${project.accentLight} ${project.accentDark}`}
-                            >
-                              {tag}
-                            </span>
-                          ))}
-                        </div>
-
+                        {/* Ziyaret Et butonu */}
                         <motion.a
                           href={project.url}
                           target="_blank"
                           rel="noopener noreferrer"
-                          whileHover={{ scale: 1.04, y: -2 }}
+                          whileHover={{ scale: 1.04, y: -1 }}
                           whileTap={{ scale: 0.97 }}
-                          className={`inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r ${project.gradient} text-white rounded-xl font-semibold shadow-lg hover:shadow-xl transition-shadow`}
+                          className={`flex-shrink-0 inline-flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r ${project.gradient} text-white rounded-lg text-xs font-semibold shadow-md hover:shadow-lg transition-shadow`}
                         >
-                          <HiExternalLink className="w-5 h-5" />
-                          {isTurkish ? 'Siteyi Ziyaret Et' : 'Visit Website'}
+                          <HiExternalLink className="w-3.5 h-3.5" />
+                          {isTurkish ? 'Ziyaret Et' : 'Visit'}
                         </motion.a>
                       </div>
+
+                      {/* Kısa açıklama */}
+                      <p className="text-sm text-sand-700 dark:text-dark-200 leading-relaxed mb-2 line-clamp-2">
+                        {project.description}
+                      </p>
+
+                      {/* Birleşik tag + özellik satırı */}
+                      <div className="flex flex-wrap gap-1.5 mb-2">
+                        {project.tags.map((tag) => (
+                          <span
+                            key={tag}
+                            className={`px-2 py-0.5 text-xs rounded-full border ${project.accentLight} ${project.accentDark}`}
+                          >
+                            {tag}
+                          </span>
+                        ))}
+                        {project.features.map((feat) => (
+                          <span
+                            key={feat}
+                            className="px-2 py-0.5 text-xs rounded-full border border-sand-200 dark:border-dark-400 text-sand-600 dark:text-dark-300"
+                          >
+                            {feat}
+                          </span>
+                        ))}
+                      </div>
+
+                      {/* Daha fazla oku toggle */}
+                      <button
+                        onClick={() => toggleExpanded(project.id)}
+                        className="flex items-center gap-1 text-xs font-medium text-sand-500 dark:text-dark-300 hover:text-sand-700 dark:hover:text-dark-100 transition-colors"
+                      >
+                        <motion.span
+                          animate={{ rotate: expandedIds.has(project.id) ? 90 : 0 }}
+                          transition={{ duration: 0.2 }}
+                          className="inline-block"
+                        >
+                          ▸
+                        </motion.span>
+                        {expandedIds.has(project.id)
+                          ? (isTurkish ? 'Kapat' : 'Close')
+                          : (isTurkish ? 'Daha fazla oku' : 'Read more')}
+                      </button>
                     </div>
                   </div>
+
+                  {/* Genişleyen longDesc */}
+                  <AnimatePresence>
+                    {expandedIds.has(project.id) && (
+                      <motion.div
+                        key="longdesc"
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: 'auto', opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        transition={{ duration: 0.3, ease: 'easeInOut' }}
+                        className="overflow-hidden"
+                      >
+                        <p className="mt-3 pt-3 border-t border-sand-200/60 dark:border-dark-400/60 text-sm text-sand-600 dark:text-dark-300 leading-relaxed">
+                          {project.longDesc}
+                        </p>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
                 </div>
               </GlareHover>
             </FadeContent>
