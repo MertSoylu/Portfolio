@@ -127,7 +127,7 @@ const CyberSecurityPage = () => {
             className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-white/80 dark:bg-dark-600/80 backdrop-blur-md border border-sand-200/60 dark:border-dark-400/60 text-warm-600 dark:text-warm-400 hover:text-warm-700 dark:hover:text-warm-300 font-medium group transition-colors shadow-md hover:shadow-lg"
           >
             <HiArrowLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
-            {isTurkish ? 'Ana Sayfaya Dön' : 'Back to Home'}
+            <span className="hidden sm:inline">{isTurkish ? 'Ana Sayfaya Dön' : 'Back to Home'}</span>
           </Link>
         </motion.div>
 
@@ -262,8 +262,8 @@ const CyberSecurityPage = () => {
                           <div>
                             <p className="text-sm text-sand-600 dark:text-dark-200 mb-4 leading-relaxed">
                               {isTurkish
-                                ? 'Python ile geliştirdiğim terminal tabanlı web uygulama güvenlik tarayıcısı. Hedef siteye yönelik XSS, SQL Injection, CSRF, SSRF, Open Redirect, HTTP güvenlik başlıkları ve subdomain tespiti olmak üzere 7 farklı güvenlik modülü içeriyor. İstek hızı ve zaman aşımı ayarlarıyla özelleştirilebilir; tarama sonunda bulgular önem derecesine göre sıralanmış HTML raporu olarak dışa aktarılıyor.'
-                                : 'A terminal-based web application security scanner I built with Python. It runs 7 security modules against a target — XSS, SQL Injection, CSRF, SSRF, Open Redirect, HTTP security headers, and subdomain enumeration. Configurable request rate and timeout settings keep scans within safe limits, and results are exported as an HTML report sorted by severity.'}
+                                ? 'Python kullanarak geliştirdiğim terminal tabanlı bir web güvenlik tarayıcısıdır. İçerisinde XSS, SQL Injection, CSRF ve alt alan adı (subdomain) tespiti gibi toplam 7 farklı güvenlik modülü bulunur. Hedef sistemi yormamak adına istek hızını ve zaman aşımı değerlerini tamamen kendiniz belirleyebilirsiniz. Tarama tamamlandığında ise tüm bulguları önem sırasına göre düzenlenmiş, temiz bir HTML raporu olarak sunar.'
+                                : 'A terminal-based web security scanner I developed using Python. It includes a total of 7 security modules, covering vulnerabilities like XSS, SQL Injection, CSRF, and subdomain enumeration. You can freely adjust the request rate and timeout settings to avoid overwhelming the target system. Once the scan is complete, it provides a clean HTML report with all findings sorted by severity.'}
                             </p>
                             <div className="flex flex-wrap gap-2 mb-5">
                               {['XSS', 'SQLi', 'CSRF', 'SSRF', 'Open Redirect', 'Headers', 'Subdomains'].map((tag) => (

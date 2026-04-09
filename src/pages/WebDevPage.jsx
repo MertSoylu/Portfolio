@@ -97,7 +97,7 @@ const WebDevPage = () => {
             className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-white/80 dark:bg-dark-600/80 backdrop-blur-md border border-sand-200/60 dark:border-dark-400/60 text-warm-600 dark:text-warm-400 hover:text-warm-700 dark:hover:text-warm-300 font-medium group transition-colors shadow-md hover:shadow-lg"
           >
             <HiArrowLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
-            {isTurkish ? 'Ana Sayfaya Dön' : 'Back to Home'}
+            <span className="hidden sm:inline">{isTurkish ? 'Ana Sayfaya Dön' : 'Back to Home'}</span>
           </Link>
         </motion.div>
 

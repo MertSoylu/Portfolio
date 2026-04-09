@@ -67,7 +67,7 @@ const AndroidPage = () => {
             className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-white/80 dark:bg-dark-600/80 backdrop-blur-md border border-sand-200/60 dark:border-dark-400/60 text-warm-600 dark:text-warm-400 hover:text-warm-700 dark:hover:text-warm-300 font-medium group transition-colors shadow-md hover:shadow-lg"
           >
             <HiArrowLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
-            {isTurkish ? 'Ana Sayfaya Dön' : 'Back to Home'}
+            <span className="hidden sm:inline">{isTurkish ? 'Ana Sayfaya Dön' : 'Back to Home'}</span>
           </Link>
         </motion.div>
 
@@ -147,13 +147,13 @@ const AndroidPage = () => {
                   </h3>
                   <p className="text-sand-600 dark:text-dark-200 mb-4 leading-relaxed">
                     {isTurkish
-                      ? 'WalkKittie, günlük fiziksel aktiviteyi eğlenceli bir sanal evcil hayvan deneyimiyle birleştiren yenilikçi bir sağlık uygulamasıdır. Uygulama, adım sayacınızı kullanarak yürüyüşlerinizi takip eder ve attığınız adımları mama puanlarına dönüştürür. Bu puanlarla sanal kedinizi besleyebilir, onunla oyunlar oynayabilir ve bağınızı güçlendirebilirsiniz.'
-                      : 'WalkKittie is an innovative health app that combines daily physical activity with a fun virtual pet experience. The app tracks your walks using the step counter and converts your steps into food points. You can use these points to feed your virtual cat, play games with it, and strengthen your bond.'}
+                      ? 'WalkKittie, günlük yürüyüşlerinizi sanal bir evcil hayvan besleme deneyimiyle birleştirerek daha eğlenceli hale getiren bir sağlık uygulamasıdır. Attığınız her adım mama puanına dönüşür. Bu sayede hem fiziksel olarak aktif kalır hem de sanal kedinizin karnını doyurmuş olursunuz. Ayrıca kazandığınız puanları kullanarak kedinizle çeşitli oyunlar oynayabilirsiniz.'
+                      : 'WalkKittie is a health app that makes your daily walks more enjoyable by combining them with a virtual pet experience. Every step you take is converted into food points. This keeps you physically active while making sure your virtual cat is well-fed. You can also use your points to play games and interact with your cat.'}
                   </p>
                   <p className="text-sand-600 dark:text-dark-200 mb-6 leading-relaxed">
                     {isTurkish
-                      ? 'Ayrıca günlük su tüketimi takibi, haftalık ve aylık istatistikler gibi özelliklerle sağlıklı alışkanlıklar edinmenize yardımcı olur. Karmaşık kurulumlar yok — sadece yürü, oyna ve kedine bak!'
-                      : 'It also helps you build healthy habits with features like daily water intake tracking, weekly and monthly statistics. No complex setup needed — just walk, play, and take care of your cat!'}
+                      ? 'Sadece yürüyüş değil, günlük su tüketimi takibi ve detaylı istatistiklerle de sağlıklı alışkanlıklar kazanmanızı destekler. Karmaşık ayarlarla uğraşmanıza gerek yoktur; tek yapmanız gereken yürümek, kedinizle ilgilenmek ve sağlıklı kalmaktır.'
+                      : 'Beyond walking, it supports you in building healthy habits through daily water tracking and detailed statistics. There are no complicated settings to deal with—just walk, take care of your cat, and stay healthy.'}
                   </p>
 
                   {/* Features Grid — SpotlightCards without individual FadeContent */}
