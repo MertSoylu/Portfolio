@@ -1,5 +1,5 @@
-import React from 'react';
-import { motion } from 'framer-motion';
+import React, { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { HiArrowLeft, HiDeviceMobile, HiStar, HiHeart, HiTrendingUp } from 'react-icons/hi';
 import { Link } from 'react-router-dom';
 import { useLanguage } from '../context/LanguageContext';
@@ -26,6 +26,7 @@ const pageVariants = {
 const AndroidPage = () => {
   const { isTurkish } = useLanguage();
   const { isDark } = useDarkMode();
+  const [expanded, setExpanded] = useState(false);
   const googlePlayBadgeSrc = isTurkish
     ? 'https://play.google.com/intl/en_us/badges/static/images/badges/tr_badge_web_generic.png'
     : 'https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png';
@@ -54,7 +55,7 @@ const AndroidPage = () => {
       exit="exit"
       className={`min-h-screen pt-24 pb-16 px-4 ${isDark ? 'dark' : ''}`}
     >
-      <div className="max-w-5xl mx-auto">
+      <div className="max-w-3xl mx-auto">
         {/* Back button — lightweight CSS animation, no ScrollTrigger */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}
@@ -72,7 +73,7 @@ const AndroidPage = () => {
         </motion.div>
 
         {/* Hero Section — above the fold, use framer-motion instead of ScrollTrigger */}
-        <div className="text-center mb-16">
+        <div className="text-center mb-8">
           <motion.span
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
@@ -87,14 +88,14 @@ const AndroidPage = () => {
             delay={80}
             animateBy="words"
             direction="top"
-            className="text-3xl sm:text-4xl md:text-6xl font-bold text-sand-900 dark:text-dark-50 mb-6 justify-center"
+            className="text-2xl sm:text-3xl md:text-5xl font-bold text-sand-900 dark:text-dark-50 mb-6 justify-center"
           />
 
           <motion.p
             initial={{ opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.4 }}
-            className="text-lg text-sand-600 dark:text-dark-200 max-w-2xl mx-auto"
+            className="text-base text-sand-600 dark:text-dark-200 max-w-2xl mx-auto"
           >
             {isTurkish
               ? 'Kotlin ve React Native kullanarak modern, kullanıcı odaklı Android uygulamaları geliştiriyorum. Temiz mimari ve sezgisel arayüz tasarımı önceliğimdir.'
@@ -104,33 +105,12 @@ const AndroidPage = () => {
 
         {/* WalkKittie App Showcase — single FadeContent for the whole card */}
         <FadeContent duration={700} blur={true} threshold={0.1}>
-          <div className="bg-white/50 dark:bg-dark-600/50 backdrop-blur-md rounded-3xl border border-sand-200 dark:border-dark-400 overflow-hidden mb-16">
-            {/* App Header */}
-            <div className="bg-gradient-to-r from-warm-500 to-orange-500 p-5 sm:p-8 md:p-10 text-white">
-              <div className="flex items-center gap-4">
-                <motion.div
-                  whileHover={{ rotate: [0, -8, 8, -5, 0], scale: 1.1 }}
-                  transition={{ type: 'spring', stiffness: 300, damping: 12 }}
-                  className="w-20 h-20 rounded-3xl bg-white/20 backdrop-blur-sm flex items-center justify-center shadow-xl cursor-pointer"
-                >
-                  <HiHeart className="w-10 h-10 text-white" />
-                </motion.div>
-                <div>
-                  <h2 className="text-2xl sm:text-3xl font-bold">WalkKittie (PatiCat)</h2>
-                  <p className="text-white/70 text-sm mt-1">
-                    {isTurkish
-                      ? 'Adımlarını eğlenceye dönüştür, sanal kedine bak!'
-                      : 'Turn your steps into fun, care for your virtual cat!'}
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            {/* Content: Preview + Details */}
-            <div className="p-5 sm:p-8 md:p-10">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                {/* Left: Mobile Preview */}
-                <div className="flex items-start justify-center">
+          <div className="bg-white/50 dark:bg-dark-600/50 backdrop-blur-md rounded-2xl overflow-hidden p-4 sm:p-5">
+            {/* Ana satır: thumbnail + bilgi */}
+            <div className="flex gap-4 items-start">
+              {/* Thumbnail */}
+              <div className="flex-shrink-0 w-28 h-20 rounded-xl overflow-hidden bg-gradient-to-r from-warm-500 to-orange-500 p-0.5">
+                <div className="w-full h-full rounded-[10px] overflow-hidden bg-white dark:bg-dark-600">
                   <SitePreview
                     url={playUrl}
                     type="mobile"
@@ -139,50 +119,25 @@ const AndroidPage = () => {
                     expandable={false}
                   />
                 </div>
+              </div>
 
-                {/* Right: Details */}
-                <div>
-                  <h3 className="text-2xl font-bold text-sand-900 dark:text-dark-50 mb-4">
-                    {isTurkish ? 'Uygulama Hakkında' : 'About the App'}
-                  </h3>
-                  <p className="text-sand-600 dark:text-dark-200 mb-4 leading-relaxed">
-                    {isTurkish
-                      ? 'WalkKittie, günlük yürüyüşlerinizi sanal bir evcil hayvan besleme deneyimiyle birleştirerek daha eğlenceli hale getiren bir sağlık uygulamasıdır. Attığınız her adım mama puanına dönüşür. Bu sayede hem fiziksel olarak aktif kalır hem de sanal kedinizin karnını doyurmuş olursunuz. Ayrıca kazandığınız puanları kullanarak kedinizle çeşitli oyunlar oynayabilirsiniz.'
-                      : 'WalkKittie is a health app that makes your daily walks more enjoyable by combining them with a virtual pet experience. Every step you take is converted into food points. This keeps you physically active while making sure your virtual cat is well-fed. You can also use your points to play games and interact with your cat.'}
-                  </p>
-                  <p className="text-sand-600 dark:text-dark-200 mb-6 leading-relaxed">
-                    {isTurkish
-                      ? 'Sadece yürüyüş değil, günlük su tüketimi takibi ve detaylı istatistiklerle de sağlıklı alışkanlıklar kazanmanızı destekler. Karmaşık ayarlarla uğraşmanıza gerek yoktur; tek yapmanız gereken yürümek, kedinizle ilgilenmek ve sağlıklı kalmaktır.'
-                      : 'Beyond walking, it supports you in building healthy habits through daily water tracking and detailed statistics. There are no complicated settings to deal with—just walk, take care of your cat, and stay healthy.'}
-                  </p>
-
-                  {/* Features Grid — SpotlightCards without individual FadeContent */}
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
-                    {features.map((feature, i) => (
-                      <SpotlightCard
-                        key={i}
-                        spotlightColor={isDark ? 'rgba(255,154,92,0.15)' : 'rgba(240,125,45,0.12)'}
-                        className="flex items-start gap-4 p-4 rounded-xl bg-sand-100/80 dark:bg-dark-500/50 border border-sand-200/60 dark:border-dark-400/40"
-                      >
-                        <div className="w-12 h-12 rounded-xl bg-warm-500/10 flex items-center justify-center text-warm-600 dark:text-warm-400 flex-shrink-0">
-                          {feature.icon}
-                        </div>
-                        <div>
-                          <h4 className="font-semibold text-sand-900 dark:text-dark-50">{feature.title}</h4>
-                          <p className="text-sm text-sand-600 dark:text-dark-300">{feature.desc}</p>
-                        </div>
-                      </SpotlightCard>
-                    ))}
+              {/* Bilgi alanı */}
+              <div className="flex-1 min-w-0">
+                <div className="flex items-start justify-between gap-3 mb-1">
+                  <div>
+                    <h2 className="text-lg font-bold text-sand-900 dark:text-dark-50 leading-tight">
+                      WalkKittie (PatiCat)
+                    </h2>
+                    <p className="text-xs text-sand-500 dark:text-dark-300">play.google.com</p>
                   </div>
-
-                  {/* Google Play Button */}
+                  {/* Google Play Badge */}
                   <motion.a
                     href={playUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    whileHover={{ scale: 1.04, y: -2 }}
+                    whileHover={{ scale: 1.04, y: -1 }}
                     whileTap={{ scale: 0.97 }}
-                    className="inline-flex"
+                    className="inline-flex flex-shrink-0"
                     aria-label={isTurkish ? "Google Play'den indir" : 'Get it on Google Play'}
                   >
                     <img
@@ -190,7 +145,7 @@ const AndroidPage = () => {
                       alt={isTurkish ? "Google Play'den al" : 'Get it on Google Play'}
                       width="646"
                       height="250"
-                      className="h-16 w-auto"
+                      className="h-8 w-auto"
                       loading="lazy"
                       decoding="async"
                       fetchPriority="low"
@@ -201,8 +156,64 @@ const AndroidPage = () => {
                     />
                   </motion.a>
                 </div>
+
+                {/* Kısa açıklama */}
+                <p className="text-sm text-sand-700 dark:text-dark-200 leading-relaxed mb-2 line-clamp-2">
+                  {isTurkish
+                    ? 'WalkKittie, günlük yürüyüşlerinizi sanal bir evcil hayvan besleme deneyimiyle birleştirerek daha eğlenceli hale getiren bir sağlık uygulamasıdır. Attığınız her adım mama puanına dönüşür.'
+                    : 'WalkKittie is a health app that makes your daily walks more enjoyable by combining them with a virtual pet experience. Every step you take is converted into food points.'}
+                </p>
+
+                {/* Özellik tag'ları */}
+                <div className="flex flex-wrap gap-1.5 mb-2">
+                  {features.map((feat) => (
+                    <span
+                      key={feat.title}
+                      className="px-2 py-0.5 text-xs rounded-full border bg-warm-500/10 text-warm-600 dark:text-warm-400 border-warm-500/20"
+                    >
+                      {feat.title}
+                    </span>
+                  ))}
+                </div>
+
+                {/* Daha fazla oku toggle */}
+                <button
+                  onClick={() => setExpanded(prev => !prev)}
+                  className="flex items-center gap-1 text-xs font-medium text-sand-500 dark:text-dark-300 hover:text-sand-700 dark:hover:text-dark-100 transition-colors"
+                >
+                  <motion.span
+                    animate={{ rotate: expanded ? 90 : 0 }}
+                    transition={{ duration: 0.2 }}
+                    className="inline-block"
+                  >
+                    ▸
+                  </motion.span>
+                  {expanded
+                    ? (isTurkish ? 'Kapat' : 'Close')
+                    : (isTurkish ? 'Daha fazla oku' : 'Read more')}
+                </button>
               </div>
             </div>
+
+            {/* Genişleyen detaylar */}
+            <AnimatePresence>
+              {expanded && (
+                <motion.div
+                  key="details"
+                  initial={{ height: 0, opacity: 0 }}
+                  animate={{ height: 'auto', opacity: 1 }}
+                  exit={{ height: 0, opacity: 0 }}
+                  transition={{ duration: 0.3, ease: 'easeInOut' }}
+                  className="overflow-hidden"
+                >
+                  <p className="mt-3 pt-3 border-t border-sand-200/60 dark:border-dark-400/60 text-sm text-sand-600 dark:text-dark-300 leading-relaxed">
+                    {isTurkish
+                      ? 'Sadece yürüyüş değil, günlük su tüketimi takibi ve detaylı istatistiklerle de sağlıklı alışkanlıklar kazanmanızı destekler. Karmaşık ayarlarla uğraşmanıza gerek yoktur; tek yapmanız gereken yürümek, kedinizle ilgilenmek ve sağlıklı kalmaktır.'
+                      : 'Beyond walking, it supports you in building healthy habits through daily water tracking and detailed statistics. There are no complicated settings to deal with—just walk, take care of your cat, and stay healthy.'}
+                  </p>
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
         </FadeContent>
       </div>
