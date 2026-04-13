@@ -1,6 +1,6 @@
 // Site metadata
 export const SITE_TITLE = 'Mert Soylu | Portfolio';
-export const SITE_DESCRIPTION = 'Computer Programming Student & Developer - Web Development, Android Development, Cybersecurity';
+export const SITE_DESCRIPTION = 'Computer Programming Student & Developer - Web Development, Android Development, Cybersecurity, Data Science and Deep Learning';
 
 // Personal information
 export const PERSONAL_INFO = {
@@ -17,6 +17,8 @@ export const SKILLS = [
   'Web Development',
   'Android Development',
   'Cybersecurity',
+  'Data Science',
+  'Deep Learning',
 ];
 
 export const TECHNOLOGIES = {

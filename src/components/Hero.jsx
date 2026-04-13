@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, useScroll, useTransform, useMotionValue, useSpring } from 'framer-motion';
-import { HiArrowRight, HiCode, HiShieldCheck } from 'react-icons/hi';
+import { HiArrowRight, HiCode, HiShieldCheck, HiChip } from 'react-icons/hi';
 import { HiDevicePhoneMobile } from 'react-icons/hi2';
 import { Link } from 'react-router-dom';
 import { fetchGitHubRepos } from '../utils/githubApi';
@@ -53,16 +53,16 @@ const useIsometricTilt = (intensity = 15) => {
 };
 
 /* ── Zone Card — isometric 3D interactive entry point ── */
-const ZoneCard = ({ icon, title, description, link, color, delay }) => {
+const ZoneCard = ({ icon, title, link, color, delay }) => {
   const [hovered, setHovered] = useState(false);
   const tilt = useIsometricTilt(20);
 
   return (
-    <Link to={link} style={{ perspective: '800px', display: 'block' }}>
+    <Link to={link} className="h-full" style={{ perspective: '800px', display: 'block' }}>
       <motion.div
-        className="relative group cursor-pointer overflow-hidden rounded-xl sm:rounded-2xl border border-sand-200/50 dark:border-dark-400/50 bg-white/20 dark:bg-dark-600/20 backdrop-blur-sm p-3 sm:p-6 h-full"
-        initial={{ opacity: 0, y: 40, rotateX: 45, rotateZ: -5 }}
-        animate={{ opacity: 1, y: 0, rotateX: 0, rotateZ: 0 }}
+        className="relative group h-full min-h-[150px] cursor-pointer overflow-hidden rounded-xl border border-sand-200/50 bg-white/20 p-4 backdrop-blur-sm sm:min-h-[170px] sm:rounded-2xl sm:p-6 dark:border-dark-400/50 dark:bg-dark-600/20"
+        initial={{ opacity: 0, y: 26 }}
+        animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8, delay, ease: [0.22, 1, 0.36, 1] }}
         whileHover={{ y: -8, scale: 1.02 }}
         onMouseEnter={() => setHovered(true)}
@@ -84,17 +84,16 @@ const ZoneCard = ({ icon, title, description, link, color, delay }) => {
           animate={hovered ? { opacity: 0.6, scale: 1.05 } : { opacity: 0.3, scale: 1 }}
           transition={{ duration: 0.3 }}
         />
-        <div className="relative z-10" style={{ transform: 'translateZ(20px)' }}>
+        <div className="relative z-10 flex flex-col items-center text-center" style={{ transform: 'translateZ(20px)' }}>
           <motion.div
-            className="w-9 h-9 sm:w-12 sm:h-12 rounded-lg sm:rounded-xl bg-white/30 dark:bg-dark-500/30 border border-white/20 dark:border-dark-300/20 flex items-center justify-center mb-2 sm:mb-4 text-warm-600 dark:text-warm-400"
+            className="mb-2 flex h-9 w-9 items-center justify-center rounded-lg border border-white/20 bg-white/30 text-warm-600 dark:border-dark-300/20 dark:bg-dark-500/30 dark:text-warm-400 sm:mb-4 sm:h-12 sm:w-12 sm:rounded-xl"
             animate={hovered ? { rotate: [0, -10, 10, 0], scale: 1.1 } : { rotate: 0, scale: 1 }}
             transition={{ duration: 0.5 }}
             style={{ transform: 'translateZ(10px)' }}
           >
             {icon}
           </motion.div>
-          <h3 className="text-sm sm:text-lg font-bold text-sand-900 dark:text-dark-50 mb-1 sm:mb-2">{title}</h3>
-          <p className="text-[11px] sm:text-sm text-sand-600 dark:text-dark-200 mb-2 sm:mb-4 leading-tight sm:leading-normal">{description}</p>
+          <h3 className="mb-2 whitespace-nowrap px-1 text-[13px] font-bold text-sand-900 dark:text-dark-50 sm:mb-4 sm:text-lg">{title}</h3>
           <motion.span
             className="hidden sm:inline-flex items-center gap-1 text-sm font-semibold text-warm-600 dark:text-warm-400"
             animate={hovered ? { x: 4 } : { x: 0 }}
@@ -160,25 +159,32 @@ const Hero = () => {
 
   const zones = [
     {
+      id: 'web',
       icon: <HiCode className="w-5 h-5 sm:w-6 sm:h-6" />,
       title: 'Web',
-      description: isTurkish ? 'Modern web uygulamaları' : 'Modern web apps',
       link: '/web',
-      color: 'bg-blue-500/10',
+      color: 'bg-zinc-900/20',
     },
     {
+      id: 'android',
       icon: <HiDevicePhoneMobile className="w-5 h-5 sm:w-6 sm:h-6" />,
       title: 'Android',
-      description: isTurkish ? 'Mobil deneyimler' : 'Mobile experiences',
       link: '/android',
       color: 'bg-green-500/10',
     },
     {
+      id: 'security',
       icon: <HiShieldCheck className="w-5 h-5 sm:w-6 sm:h-6" />,
       title: isTurkish ? 'Güvenlik' : 'Security',
-      description: isTurkish ? 'Siber güvenlik' : 'Cybersecurity',
       link: '/cybersecurity',
       color: 'bg-red-500/10',
+    },
+    {
+      id: 'data-science',
+      icon: <HiChip className="w-5 h-5 sm:w-6 sm:h-6" />,
+      title: isTurkish ? 'Veri Bilimi' : 'Data Science',
+      link: '/data-science',
+      color: 'bg-zinc-900/20',
     },
   ];
 
@@ -282,14 +288,14 @@ const Hero = () => {
 
           {/* Zone Cards */}
           <motion.div
-            className="grid grid-cols-3 gap-2 sm:gap-4 max-w-sm sm:max-w-xl mx-auto"
+            className="mx-auto grid max-w-md grid-cols-2 items-stretch gap-3 sm:max-w-2xl sm:grid-cols-4 sm:gap-4"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 1.5, duration: 0.5 }}
             style={{ transform: 'translateZ(30px)', transformStyle: 'preserve-3d' }}
           >
             {zones.map((zone, i) => (
-              <ZoneCard key={zone.title} {...zone} delay={1.6 + i * 0.15} />
+              <ZoneCard key={zone.id} {...zone} delay={1.6 + i * 0.15} />
             ))}
           </motion.div>
 

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { HiArrowLeft, HiExternalLink, HiGlobe } from 'react-icons/hi';
 import { Link } from 'react-router-dom';
 import { useLanguage } from '../context/LanguageContext';
@@ -39,12 +39,31 @@ const WebDevPage = () => {
 
   const projects = [
     {
+      id: 'mnemosyne',
+      title: 'Mnemosyne',
+      url: 'https://m-nemosyne.live',
+      previewImage: 'https://image.thum.io/get/width/1600/https://m-nemosyne.live',
+      gradient: 'from-zinc-700 to-zinc-900',
+      accentLight: 'bg-zinc-500/10 text-zinc-700 border-zinc-500/20',
+      accentDark: 'dark:text-zinc-300',
+      description: isTurkish
+        ? 'Mnemosyne, konum bazlı bir hafıza ağıdır. Dünyanın herhangi bir noktasına fotoğraf bırakabilir, o konumdaki anıları keşfedebilir ve zaman içinde mekanların nasıl değiştiğini görebilirsiniz.'
+        : 'Mnemosyne is a location-based memory network where you can drop photos on real-world places, discover moments left by others, and observe how locations evolve over time.',
+      longDesc: isTurkish
+        ? 'Platform; harita üzerinde fotoğraf bırakma, aynı noktadaki farklı yılları karşılaştırma (before/after), topluluk etkileşimi ve PWA deneyimi gibi güçlü özellikler sunuyor. Özellikle "Time Layers" yaklaşımıyla bir mekanın geçmişten bugüne dönüşümünü tek bir akışta anlatabilmesi, projeyi klasik galeri uygulamalarından ayırıyor.'
+        : 'The platform combines map-based photo drops, before/after comparison from the same spot, community interaction, and a PWA experience. Its "Time Layers" approach is the standout: instead of being a simple gallery, it tells how places transform across time through user-generated memories.',
+      tags: ['PWA', isTurkish ? 'Konum Bazlı' : 'Location Based', isTurkish ? 'Zaman Katmanları' : 'Time Layers', isTurkish ? 'Topluluk' : 'Community'],
+      features: isTurkish
+        ? ['Harita üzerinde anı bırakma', 'Before/After zaman karşılaştırması', 'Yorum ve keşif akışı', 'PWA kurulum ve çok cihaz desteği']
+        : ['Drop memories on a world map', 'Before/after time comparison', 'Comments and discovery feed', 'PWA install with cross-device support'],
+    },
+    {
       id: 'typesprint',
       title: 'TypeSprint',
       url: 'https://typesprint.online',
-      gradient: 'from-blue-500 to-indigo-600',
-      accentLight: 'bg-blue-500/10 text-blue-600 border-blue-500/20',
-      accentDark: 'dark:text-blue-400',
+      gradient: 'from-zinc-700 to-black',
+      accentLight: 'bg-zinc-500/10 text-zinc-700 border-zinc-500/20',
+      accentDark: 'dark:text-zinc-300',
       description: isTurkish
         ? 'TypeSprint, gerçek zamanlı çalışan modern bir yazma hızı (WPM) testi uygulamasıdır. Akıcı bir arayüze ve birden fazla dil seçeneğine sahiptir. Yanlış tuşa bastığınızda ilerlemenizi durdurarak, her zaman en doğru ve ölçülebilir sonuçları almanızı sağlar.'
         : 'TypeSprint is a modern typing speed (WPM) test application featuring real-time validation, a smooth interface, and multiple language options. It halts your progress if you press the wrong key, ensuring that your results are always highly accurate and measurable.',
@@ -90,11 +109,11 @@ const WebDevPage = () => {
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1], delay: 0.1 }}
-          className="fixed top-4 left-4 sm:left-20 z-50"
+          className="fixed top-4 left-[4.25rem] z-50 sm:top-5 sm:left-[4.5rem] lg:top-8 lg:left-[5rem]"
         >
           <Link
             to="/"
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-white/80 dark:bg-dark-600/80 backdrop-blur-md border border-sand-200/60 dark:border-dark-400/60 text-warm-600 dark:text-warm-400 hover:text-warm-700 dark:hover:text-warm-300 font-medium group transition-colors shadow-md hover:shadow-lg"
+            className="group inline-flex items-center justify-center gap-0 rounded-xl border border-sand-200/60 bg-white/80 p-2.5 font-medium text-warm-600 shadow-md backdrop-blur-md transition-colors hover:text-warm-700 hover:shadow-lg dark:border-dark-400/60 dark:bg-dark-600/80 dark:text-warm-400 dark:hover:text-warm-300 sm:justify-start sm:gap-2 sm:px-4 sm:py-2"
           >
             <HiArrowLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
             <span className="hidden sm:inline">{isTurkish ? 'Ana Sayfaya Dön' : 'Back to Home'}</span>
@@ -107,7 +126,7 @@ const WebDevPage = () => {
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.4, delay: 0.15 }}
-            className="inline-block px-4 py-2 bg-blue-500/10 text-blue-600 dark:text-blue-400 rounded-full text-sm font-medium border border-blue-500/20 mb-4"
+            className="inline-block px-4 py-2 bg-zinc-700/10 text-zinc-700 dark:text-zinc-300 rounded-full text-sm font-medium border border-zinc-500/20 mb-4"
           >
             <HiGlobe className="w-4 h-4 inline-block mr-1" /> {isTurkish ? 'Web Geliştirme' : 'Web Development'}
           </motion.span>
@@ -133,7 +152,7 @@ const WebDevPage = () => {
         </div>
 
         {/* Projects — one FadeContent per project card */}
-        <div className="space-y-4">
+        <div className="space-y-6">
           {projects.map((project, index) => (
             <FadeContent key={project.id} duration={700} delay={index * 150} blur={true} threshold={0.1}>
               <GlareHover
@@ -149,24 +168,36 @@ const WebDevPage = () => {
                 className="!grid !place-items-stretch"
               >
                 <div className="bg-white/50 dark:bg-dark-600/50 backdrop-blur-md rounded-2xl overflow-hidden w-full p-4 sm:p-5">
-                  {/* Ana satır: thumbnail + bilgi + buton */}
-                  <div className="flex gap-4 items-start">
-                    {/* Thumbnail */}
-                    <div className={`flex-shrink-0 w-28 h-20 rounded-xl overflow-hidden bg-gradient-to-r ${project.gradient} p-0.5`}>
-                      <div className="w-full h-full rounded-[10px] overflow-hidden bg-white dark:bg-dark-600">
-                        <SitePreview
-                          url={project.url}
-                          type="web"
-                          title={project.title}
-                          gradient={project.gradient}
-                          expandable={false}
-                        />
+                  <div className="space-y-4">
+                    <div className={`hidden sm:block rounded-xl overflow-hidden bg-gradient-to-r ${project.gradient} p-0.5`}>
+                      <div className="rounded-[10px] overflow-hidden bg-white dark:bg-dark-600">
+                        {project.previewImage ? (
+                          <div className="relative w-full overflow-hidden bg-sand-100 dark:bg-dark-700" style={{ aspectRatio: '16 / 9' }}>
+                            <img
+                              src={project.previewImage}
+                              alt={`${project.title} preview`}
+                              className="h-full w-full object-cover"
+                              loading="lazy"
+                              decoding="async"
+                              referrerPolicy="no-referrer"
+                            />
+                          </div>
+                        ) : (
+                          <SitePreview
+                            url={project.url}
+                            type="web"
+                            title={project.title}
+                            gradient={project.gradient}
+                            expandable={false}
+                            showActions={false}
+                          />
+                        )}
                       </div>
                     </div>
 
                     {/* Bilgi alanı */}
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-start justify-between gap-3 mb-1">
+                    <div className="min-w-0">
+                      <div className="mb-1 flex items-start justify-between gap-3">
                         <div>
                           <h2 className="text-lg font-bold text-sand-900 dark:text-dark-50 leading-tight">
                             {project.title}

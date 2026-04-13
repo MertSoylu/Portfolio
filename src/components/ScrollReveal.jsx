@@ -8,7 +8,7 @@ const ScrollReveal = ({
   children,
   scrollContainerRef,
   enableBlur = true,
-  baseOpacity = 0.1,
+  baseOpacity = 0.45,
   baseRotation = 3,
   blurStrength = 4,
   containerClassName = '',
@@ -36,51 +36,54 @@ const ScrollReveal = ({
 
     const scroller = scrollContainerRef && scrollContainerRef.current ? scrollContainerRef.current : window;
 
-    gsap.fromTo(el, { transformOrigin: '0% 50%', rotate: baseRotation }, {
-      ease: 'none',
-      rotate: 0,
-      scrollTrigger: {
-        trigger: el,
-        scroller,
-        start: 'top bottom',
-        end: rotationEnd,
-        scrub: true
-      }
-    });
-
-    const wordElements = el.querySelectorAll('.word');
-
-    gsap.fromTo(wordElements, { opacity: baseOpacity, willChange: 'opacity' }, {
-      ease: 'none',
-      opacity: 1,
-      stagger: 0.05,
-      scrollTrigger: {
-        trigger: el,
-        scroller,
-        start: 'top bottom-=20%',
-        end: wordAnimationEnd,
-        scrub: true
-      }
-    });
-
-    if (enableBlur) {
-      gsap.fromTo(wordElements, { filter: `blur(${blurStrength}px)` }, {
+    const ctx = gsap.context(() => {
+      gsap.fromTo(el, { transformOrigin: '0% 50%', rotate: baseRotation }, {
         ease: 'none',
-        filter: 'blur(0px)',
+        rotate: 0,
+        scrollTrigger: {
+          trigger: el,
+          scroller,
+          start: 'top bottom',
+          end: rotationEnd,
+          scrub: true,
+          invalidateOnRefresh: true,
+        }
+      });
+
+      const wordElements = el.querySelectorAll('.word');
+
+      gsap.fromTo(wordElements, { opacity: baseOpacity, willChange: 'opacity' }, {
+        ease: 'none',
+        opacity: 1,
         stagger: 0.05,
         scrollTrigger: {
           trigger: el,
           scroller,
           start: 'top bottom-=20%',
           end: wordAnimationEnd,
-          scrub: true
+          scrub: true,
+          invalidateOnRefresh: true,
         }
       });
-    }
 
-    return () => {
-      ScrollTrigger.getAll().forEach(trigger => trigger.kill());
-    };
+      if (enableBlur) {
+        gsap.fromTo(wordElements, { filter: `blur(${blurStrength}px)` }, {
+          ease: 'none',
+          filter: 'blur(0px)',
+          stagger: 0.05,
+          scrollTrigger: {
+            trigger: el,
+            scroller,
+            start: 'top bottom-=20%',
+            end: wordAnimationEnd,
+            scrub: true,
+            invalidateOnRefresh: true,
+          }
+        });
+      }
+    }, el);
+
+    return () => ctx.revert();
   }, [scrollContainerRef, enableBlur, baseRotation, baseOpacity, rotationEnd, wordAnimationEnd, blurStrength]);
 
   return (

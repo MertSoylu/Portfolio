@@ -2,6 +2,32 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  --warm-50: 255 251 245;
+  --warm-100: 255 248 240;
+  --warm-200: 255 232 214;
+  --warm-300: 255 212 179;
+  --warm-400: 255 184 138;
+  --warm-500: 255 154 92;
+  --warm-600: 240 125 45;
+  --warm-700: 212 94 31;
+  --warm-800: 168 70 23;
+  --warm-900: 122 52 16;
+}
+
+html.dark {
+  --warm-50: 24 24 27;
+  --warm-100: 39 39 42;
+  --warm-200: 63 63 70;
+  --warm-300: 82 82 91;
+  --warm-400: 113 113 122;
+  --warm-500: 161 161 170;
+  --warm-600: 212 212 216;
+  --warm-700: 228 228 231;
+  --warm-800: 244 244 245;
+  --warm-900: 250 250 250;
+}
+
 * {
   margin: 0;
   padding: 0;
@@ -30,7 +56,7 @@ body {
 
 .dark body,
 html.dark body {
-  background-color: #0f172a;
+  background-color: #050505;
   color: #e2e8f0;
 }
 
@@ -110,7 +136,7 @@ code {
 }
 
 .dark ::-webkit-scrollbar-track {
-  background: #1e293b;
+  background: #0f0f0f;
 }
 
 ::-webkit-scrollbar-thumb {
@@ -119,7 +145,7 @@ code {
 }
 
 .dark ::-webkit-scrollbar-thumb {
-  background: #475569;
+  background: #2a2a2a;
 }
 
 ::-webkit-scrollbar-thumb:hover {
@@ -127,7 +153,7 @@ code {
 }
 
 .dark ::-webkit-scrollbar-thumb:hover {
-  background: #64748b;
+  background: #3a3a3a;
 }
 
 /* Selection color */
@@ -137,7 +163,7 @@ code {
 }
 
 .dark ::selection {
-  background-color: #475569;
+  background-color: #2a2a2a;
   color: #fff;
 }
 
@@ -161,11 +187,11 @@ a {
 }
 
 .dark .btn-secondary {
-  background-color: #334155;
+  background-color: #171717;
   color: #e2e8f0;
 }
 .dark .btn-secondary:hover {
-  background-color: #475569;
+  background-color: #262626;
 }
 
 .btn-outline {

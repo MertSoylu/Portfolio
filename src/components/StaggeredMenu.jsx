@@ -475,7 +475,7 @@ export const StaggeredMenu = ({
   .sm-scope .staggered-menu-header { padding: 1.25rem; }
   .sm-scope .staggered-menu-panel { width: 100%; left: 0; right: 0; padding: 6em 1.25em 1.5em 1.25em; }
   .sm-scope .sm-prelayers { width: 100%; left: 0; right: 0; }
-  .sm-scope .staggered-menu-wrapper[data-open] .sm-logo-img { filter: invert(100%); }
+  .sm-scope .staggered-menu-wrapper[data-open] .sm-logo-img { filter: none; }
 }
 @media (max-width: 640px) {
   .sm-scope .staggered-menu-header { padding: 1rem; }
@@ -484,7 +484,7 @@ export const StaggeredMenu = ({
   .sm-scope .sm-toggle { padding: 0 0.65rem; }
   .sm-scope .sm-panel-item { font-size: clamp(2rem, 12vw, 2.8rem); letter-spacing: -1px; padding-right: 1em; }
   .sm-scope .sm-panel-list[data-numbering] .sm-panel-item::after { right: 2.6em; font-size: 14px; }
-  .sm-scope .staggered-menu-wrapper[data-open] .sm-logo-img { filter: invert(100%); }
+  .sm-scope .staggered-menu-wrapper[data-open] .sm-logo-img { filter: none; }
 }
       `}</style>
     </div>

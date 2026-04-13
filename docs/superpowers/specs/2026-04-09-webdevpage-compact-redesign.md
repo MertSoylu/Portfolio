@@ -35,7 +35,7 @@ Gradient başlık bandı **tamamen kaldırılır**. Her kart yatay düzende üç
 
 - Framer Motion `AnimatePresence` ile `height: 0 → auto`, `opacity: 0 → 1`
 - `duration: 0.3s`, `ease: easeInOut`
-- Toggle state her kart için bağımsız (`useState` per kart veya `openId` state ile)
+- Toggle state her kart için bağımsız — `openExpanded` Set state ile birden fazla kart aynı anda açık kalabilir
 
 ### Sayfa Genel Düzeni
 

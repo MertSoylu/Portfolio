@@ -90,8 +90,8 @@ const Navbar = () => {
       logoUrl="/favicon.svg"
       headerContent={headerControls}
       onItemClick={handleItemClick}
-      colors={isDark ? ['rgba(30,41,59,0.58)', 'rgba(15,23,42,0.64)'] : ['rgba(245,240,232,0.58)', 'rgba(250,248,243,0.64)']}
-      panelBg={isDark ? 'rgba(15,23,42,0.68)' : 'rgba(250,248,243,0.68)'}
+      colors={isDark ? ['rgba(8,8,8,0.72)', 'rgba(0,0,0,0.82)'] : ['rgba(245,240,232,0.58)', 'rgba(250,248,243,0.64)']}
+      panelBg={isDark ? 'rgba(0,0,0,0.84)' : 'rgba(250,248,243,0.68)'}
       panelTextColor={isDark ? '#e2e8f0' : '#5a4a42'}
       accentColor={isDark ? '#ff9a5c' : '#f07d2d'}
       menuButtonColor={isDark ? '#e2e8f0' : '#5a4a42'}

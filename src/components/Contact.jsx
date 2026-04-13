@@ -31,18 +31,18 @@ const ContactForm = ({ isTurkish, isDark }) => {
     }
   };
 
-  const inputClass = `w-full px-4 py-3 rounded-xl bg-white/60 dark:bg-dark-600/60 border border-sand-200 dark:border-dark-400 text-sand-900 dark:text-dark-50 placeholder-sand-400 dark:placeholder-dark-300 focus:outline-none focus:border-warm-500 dark:focus:border-warm-400 transition-colors text-sm`;
+  const inputClass = `w-full px-3.5 sm:px-4 py-2.5 sm:py-3 rounded-lg sm:rounded-xl bg-white/60 dark:bg-black/70 border border-sand-200 dark:border-zinc-700 text-sand-900 dark:text-zinc-100 placeholder-sand-400 dark:placeholder-zinc-500 focus:outline-none focus:border-warm-500 dark:focus:border-warm-400 transition-colors text-sm`;
 
   return (
     <FadeContent duration={700} delay={200} threshold={0.1} blur>
-      <form ref={formRef} onSubmit={handleSubmit} className="bg-white/40 dark:bg-dark-600/40 backdrop-blur-md rounded-2xl border border-sand-200 dark:border-dark-400 p-6 sm:p-8 space-y-4">
+      <form ref={formRef} onSubmit={handleSubmit} className="bg-white/40 dark:bg-black/70 backdrop-blur-md rounded-xl sm:rounded-2xl border border-sand-200 dark:border-zinc-700 p-4 sm:p-8 space-y-3 sm:space-y-4">
         <h3 className="text-lg font-semibold text-sand-900 dark:text-dark-50 mb-2">
           {isTurkish ? 'Mesaj Gönder' : 'Send a Message'}
         </h3>
 
-        <div className="grid sm:grid-cols-2 gap-4">
+        <div className="grid sm:grid-cols-2 gap-3 sm:gap-4">
           <div>
-            <label className="block text-xs font-medium text-sand-600 dark:text-dark-300 mb-1.5">
+            <label className="block text-xs font-medium text-sand-600 dark:text-zinc-400 mb-1.5">
               {isTurkish ? 'Adın' : 'Your Name'}
             </label>
             <input
@@ -54,7 +54,7 @@ const ContactForm = ({ isTurkish, isDark }) => {
             />
           </div>
           <div>
-            <label className="block text-xs font-medium text-sand-600 dark:text-dark-300 mb-1.5">
+            <label className="block text-xs font-medium text-sand-600 dark:text-zinc-400 mb-1.5">
               {isTurkish ? 'E-posta' : 'Email'}
             </label>
             <input
@@ -68,7 +68,7 @@ const ContactForm = ({ isTurkish, isDark }) => {
         </div>
 
         <div>
-          <label className="block text-xs font-medium text-sand-600 dark:text-dark-300 mb-1.5">
+          <label className="block text-xs font-medium text-sand-600 dark:text-zinc-400 mb-1.5">
             {isTurkish ? 'Konu' : 'Subject'}
           </label>
           <input
@@ -81,13 +81,13 @@ const ContactForm = ({ isTurkish, isDark }) => {
         </div>
 
         <div>
-          <label className="block text-xs font-medium text-sand-600 dark:text-dark-300 mb-1.5">
+          <label className="block text-xs font-medium text-sand-600 dark:text-zinc-400 mb-1.5">
             {isTurkish ? 'Mesaj' : 'Message'}
           </label>
           <textarea
             name="message"
             required
-            rows={5}
+            rows={4}
             placeholder={isTurkish ? 'Mesajını buraya yaz...' : 'Write your message here...'}
             className={`${inputClass} resize-none`}
           />
@@ -98,7 +98,7 @@ const ContactForm = ({ isTurkish, isDark }) => {
           <motion.div
             initial={{ opacity: 0, y: -8 }}
             animate={{ opacity: 1, y: 0 }}
-            className="flex items-center gap-2 text-sm text-green-600 dark:text-green-400 bg-green-50 dark:bg-green-900/30 border border-green-200 dark:border-green-700 rounded-xl px-4 py-3"
+            className="flex items-center gap-2 text-sm text-green-600 dark:text-green-400 bg-green-50 dark:bg-green-900/30 border border-green-200 dark:border-green-700 rounded-lg sm:rounded-xl px-3 sm:px-4 py-2.5 sm:py-3"
           >
             <HiCheckCircle className="w-5 h-5 flex-shrink-0" />
             {isTurkish ? 'Mesajın iletildi! En kısa sürede döneceğim.' : 'Message sent! I\'ll get back to you soon.'}
@@ -108,7 +108,7 @@ const ContactForm = ({ isTurkish, isDark }) => {
           <motion.div
             initial={{ opacity: 0, y: -8 }}
             animate={{ opacity: 1, y: 0 }}
-            className="flex items-center gap-2 text-sm text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-700 rounded-xl px-4 py-3"
+            className="flex items-center gap-2 text-sm text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-700 rounded-lg sm:rounded-xl px-3 sm:px-4 py-2.5 sm:py-3"
           >
             <HiXCircle className="w-5 h-5 flex-shrink-0" />
             {isTurkish ? 'Bir hata oluştu. Lütfen e-posta ile ulaş.' : 'Something went wrong. Please email me directly.'}
@@ -197,25 +197,25 @@ const Contact = () => {
           </ScrollFloat>
           <ScrollReveal
             containerClassName="mt-4"
-            textClassName="text-lg text-sand-700 dark:text-dark-200 font-normal"
+            textClassName="text-lg text-sand-700 dark:text-zinc-300 font-normal"
             enableBlur={true}
-            baseOpacity={0.1}
+            baseOpacity={0.75}
             baseRotation={3}
-            blurStrength={4}
+            blurStrength={1.5}
           >
             {isTurkish ? 'Bağlantı kuralım ve fikirlerini konuşalım' : "Let's connect and discuss your ideas"}
           </ScrollReveal>
         </div>
 
         {/* Availability blurb */}
-        <div className="text-center mb-12 max-w-xl mx-auto">
+        <div className="text-center mb-8 sm:mb-12 max-w-xl mx-auto">
           <FadeContent
             duration={800}
             ease="power3.out"
             threshold={0.2}
             blur={true}
           >
-            <p className="text-sand-600 dark:text-dark-200">
+            <p className="text-sand-600 dark:text-zinc-300">
               {isTurkish
                 ? 'Yeni projeler ve iş birlikleri için hazırım. Mesaj atmaktan çekinme.'
                 : "I'm currently available for new projects and collaborations. Don't hesitate to reach out."}
@@ -224,11 +224,11 @@ const Contact = () => {
         </div>
 
         {/* Contact form + info side by side */}
-        <div className="grid lg:grid-cols-2 gap-10 items-start">
+        <div className="grid lg:grid-cols-2 gap-6 sm:gap-10 items-start">
           <ContactForm isTurkish={isTurkish} isDark={isDark} />
 
           {/* Info cards */}
-          <div className="grid sm:grid-cols-2 gap-4">
+          <div className="grid md:grid-cols-2 gap-3 sm:gap-4">
             {contactInfo.map((info, index) => (
               <FadeContent
                 key={index}
@@ -242,24 +242,24 @@ const Contact = () => {
                   color={electricColor}
                   speed={0.5}
                   chaos={0.08}
-                  borderRadius={12}
+                  borderRadius={10}
                 >
-                  <div className="bg-white/40 dark:bg-dark-600/40 backdrop-blur-md p-6 rounded-xl text-center h-full flex flex-col items-center justify-center">
-                    <div className="w-12 h-12 rounded-xl bg-warm-500/10 border border-warm-500/20 text-warm-600 mx-auto mb-4 flex items-center justify-center">
+                  <div className="bg-white/40 dark:bg-black/70 backdrop-blur-md p-4 sm:p-6 rounded-lg sm:rounded-xl text-center h-full flex flex-col items-center justify-center">
+                    <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg sm:rounded-xl bg-warm-500/10 border border-warm-500/20 text-warm-600 mx-auto mb-3 sm:mb-4 flex items-center justify-center">
                       {info.icon}
                     </div>
-                    <h4 className="font-semibold text-sand-900 dark:text-dark-50 mb-2 text-sm">{info.label}</h4>
+                    <h4 className="font-semibold text-sand-900 dark:text-zinc-100 mb-1.5 sm:mb-2 text-xs sm:text-sm">{info.label}</h4>
                     {info.href ? (
                       <a
                         href={info.href}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-warm-600 hover:text-warm-700 dark:text-warm-400 dark:hover:text-warm-300 font-medium text-sm break-all"
+                        className="text-warm-600 hover:text-warm-700 dark:text-warm-300 dark:hover:text-warm-200 font-medium text-xs sm:text-sm break-all"
                       >
                         {info.value}
                       </a>
                     ) : (
-                      <p className="text-sand-600 dark:text-dark-200 text-sm">{info.value}</p>
+                      <p className="text-sand-600 dark:text-zinc-300 text-xs sm:text-sm">{info.value}</p>
                     )}
                   </div>
                 </ElectricBorder>

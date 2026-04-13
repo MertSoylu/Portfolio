@@ -216,7 +216,7 @@ const Terminal = ({ isTurkish }) => {
       </div>
 
       {/* Terminal body */}
-      <div data-terminal-scroll className="bg-[#1e293b] dark:bg-[#0d1117] p-4 font-mono text-sm leading-relaxed text-gray-200 max-h-[400px] overflow-y-auto min-h-[280px] cursor-text">
+      <div data-terminal-scroll className="bg-[#0f0f0f] dark:bg-[#050505] p-4 font-mono text-sm leading-relaxed text-gray-200 max-h-[400px] overflow-y-auto min-h-[280px] cursor-text">
         {/* Welcome message */}
         <motion.div
           initial={{ opacity: 0 }}

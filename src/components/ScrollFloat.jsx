@@ -32,31 +32,37 @@ const ScrollFloat = ({
 
     const scroller = scrollContainerRef && scrollContainerRef.current ? scrollContainerRef.current : window;
 
-    const charElements = el.querySelectorAll('.inline-block');
+    const ctx = gsap.context(() => {
+      const charElements = el.querySelectorAll('.inline-block');
+      if (!charElements.length) return;
 
-    gsap.fromTo(charElements, {
-      willChange: 'opacity, transform',
-      opacity: 0,
-      yPercent: 120,
-      scaleY: 2.3,
-      scaleX: 0.7,
-      transformOrigin: '50% 0%'
-    }, {
-      duration: animationDuration,
-      ease: ease,
-      opacity: 1,
-      yPercent: 0,
-      scaleY: 1,
-      scaleX: 1,
-      stagger: stagger,
-      scrollTrigger: {
+      ScrollTrigger.create({
         trigger: el,
         scroller,
         start: scrollStart,
         end: scrollEnd,
-        scrub: true
-      }
-    });
+        once: true,
+        invalidateOnRefresh: true,
+        onEnter: () => {
+          gsap.fromTo(
+            charElements,
+            {
+              y: 14,
+              transformOrigin: '50% 50%'
+            },
+            {
+              duration: animationDuration,
+              ease,
+              y: 0,
+              stagger,
+              clearProps: 'transform'
+            }
+          );
+        },
+      });
+    }, el);
+
+    return () => ctx.revert();
   }, [scrollContainerRef, animationDuration, ease, scrollStart, scrollEnd, stagger]);
 
   return (

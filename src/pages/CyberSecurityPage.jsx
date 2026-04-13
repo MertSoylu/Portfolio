@@ -120,11 +120,11 @@ const CyberSecurityPage = () => {
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1], delay: 0.1 }}
-          className="fixed top-4 left-4 sm:left-20 z-50"
+          className="fixed top-4 left-[4.25rem] z-50 sm:top-5 sm:left-[4.5rem] lg:top-8 lg:left-[5rem]"
         >
           <Link
             to="/"
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-white/80 dark:bg-dark-600/80 backdrop-blur-md border border-sand-200/60 dark:border-dark-400/60 text-warm-600 dark:text-warm-400 hover:text-warm-700 dark:hover:text-warm-300 font-medium group transition-colors shadow-md hover:shadow-lg"
+            className="group inline-flex items-center justify-center gap-0 rounded-xl border border-sand-200/60 bg-white/80 p-2.5 font-medium text-warm-600 shadow-md backdrop-blur-md transition-colors hover:text-warm-700 hover:shadow-lg dark:border-dark-400/60 dark:bg-dark-600/80 dark:text-warm-400 dark:hover:text-warm-300 sm:justify-start sm:gap-2 sm:px-4 sm:py-2"
           >
             <HiArrowLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
             <span className="hidden sm:inline">{isTurkish ? 'Ana Sayfaya Dön' : 'Back to Home'}</span>

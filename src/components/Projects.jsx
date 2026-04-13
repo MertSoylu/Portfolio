@@ -319,12 +319,12 @@ const Projects = () => {
   const getLanguageColor = (language) => {
     const colors = {
       JavaScript: 'from-yellow-400 to-yellow-600',
-      TypeScript: 'from-blue-400 to-blue-600',
-      Python: 'from-cyan-400 to-cyan-600',
+      TypeScript: 'from-zinc-500 to-zinc-700',
+      Python: 'from-zinc-400 to-zinc-600',
       Java: 'from-orange-400 to-orange-600',
       HTML: 'from-red-400 to-red-600',
       CSS: 'from-pink-400 to-pink-600',
-      React: 'from-cyan-400 to-blue-600',
+      React: 'from-zinc-500 to-zinc-800',
       null: 'from-gray-400 to-gray-600',
     };
     return colors[language] || colors.null;
@@ -377,9 +377,9 @@ const Projects = () => {
             containerClassName="mt-4"
             textClassName="text-lg text-sand-700 dark:text-dark-200 font-normal"
             enableBlur={true}
-            baseOpacity={0.1}
+            baseOpacity={0.75}
             baseRotation={3}
-            blurStrength={4}
+            blurStrength={1.5}
           >
             {isTurkish ? 'GitHub profilimdeki repolar' : 'Repositories from my GitHub profile'}
           </ScrollReveal>
@@ -400,7 +400,7 @@ const Projects = () => {
                 className={`relative px-4 py-2 min-h-[44px] rounded-full text-sm font-medium border transition-colors duration-200 cursor-pointer flex items-center ${
                   activeFilter === cat
                     ? 'border-warm-500 shadow-md text-white'
-                    : 'bg-white/40 dark:bg-dark-600/40 text-sand-700 dark:text-dark-200 border-sand-200 dark:border-dark-400 hover:border-warm-500/50 hover:text-warm-600 dark:hover:text-warm-400'
+                    : 'bg-white/40 dark:bg-black/60 text-sand-700 dark:text-zinc-300 border-sand-200 dark:border-zinc-700 hover:border-warm-500/50 hover:text-warm-600 dark:hover:text-warm-400'
                 }`}
               >
                 {activeFilter === cat && (
@@ -418,10 +418,10 @@ const Projects = () => {
 
         {/* Error state */}
         {!loading && error && (
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="bg-amber-50 dark:bg-amber-900/30 border border-amber-300 dark:border-amber-600 text-amber-800 dark:text-amber-200 px-4 py-3 rounded-lg text-center mb-8">
+      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="bg-amber-50 dark:bg-zinc-900/80 border border-amber-300 dark:border-zinc-700 text-amber-800 dark:text-zinc-200 px-4 py-3 rounded-lg text-center mb-8">
             {error === 'empty' ? (isTurkish ? 'Herkese açık repo bulunamadı.' : 'No public repositories found.') : error}
             {error !== 'empty' && (
-              <motion.button onClick={() => { clearRateLimitState(); getProjects(); }} className="mt-3 inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-amber-100 dark:bg-amber-800/40 border border-amber-300 dark:border-amber-600 text-amber-800 dark:text-amber-200 text-sm font-medium hover:bg-amber-200 dark:hover:bg-amber-700/40 transition-colors cursor-pointer" whileHover={{ scale: 1.04, y: -2 }} whileTap={{ scale: 0.97 }}>
+              <motion.button onClick={() => { clearRateLimitState(); getProjects(); }} className="mt-3 inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-amber-100 dark:bg-zinc-800/90 border border-amber-300 dark:border-zinc-700 text-amber-800 dark:text-zinc-200 text-sm font-medium hover:bg-amber-200 dark:hover:bg-zinc-700/90 transition-colors cursor-pointer" whileHover={{ scale: 1.04, y: -2 }} whileTap={{ scale: 0.97 }}>
                 <HiRefresh className="w-4 h-4" />{isTurkish ? 'Tekrar Dene' : 'Try Again'}
               </motion.button>
             )}
@@ -454,7 +454,7 @@ const Projects = () => {
                 itemClassName="!h-auto !my-4 !p-0 !rounded-2xl !shadow-none"
               >
                 <div
-                  className="bg-white/80 dark:bg-dark-600/80 backdrop-blur-md border border-sand-200 dark:border-dark-400 rounded-2xl p-6 cursor-pointer hover:border-warm-500/50 transition-colors"
+                  className="bg-white/80 dark:bg-black/70 backdrop-blur-md border border-sand-200 dark:border-zinc-700 rounded-2xl p-6 cursor-pointer hover:border-warm-500/50 transition-colors"
                   onClick={() => openProjectModal(project)}
                 >
                   <div className="flex items-start justify-between gap-4 mb-3">
@@ -464,11 +464,11 @@ const Projects = () => {
                           {project.language}
                         </span>
                       )}
-                      <h3 className="text-xl font-bold text-sand-900 dark:text-dark-50">
+                      <h3 className="text-xl font-bold text-sand-900 dark:text-zinc-100">
                         {project.name}
                       </h3>
                     </div>
-                    <div className="flex items-center gap-3 text-sm text-sand-500 dark:text-dark-300 shrink-0">
+                    <div className="flex items-center gap-3 text-sm text-sand-500 dark:text-zinc-400 shrink-0">
                       {project.stargazers_count > 0 && (
                         <div className="flex items-center gap-1">
                           <HiStar className="text-warm-500" />
@@ -480,13 +480,13 @@ const Projects = () => {
                       )}
                     </div>
                   </div>
-                  <p className="text-sand-600 dark:text-dark-200 text-sm mb-4 line-clamp-2">
+                  <p className="text-sand-600 dark:text-zinc-300 text-sm mb-4 line-clamp-2">
                     {project.description || (isTurkish ? 'Açıklama yok' : 'No description available')}
                   </p>
                   <div className="flex items-center justify-between">
                     <div className="flex flex-wrap gap-1.5">
                       {Array.isArray(project.topics) && project.topics.slice(0, 4).map((topic) => (
-                        <span key={topic} className="px-2 py-0.5 rounded-full text-[11px] font-medium bg-sand-200/70 dark:bg-dark-500/70 text-sand-600 dark:text-dark-200">
+                        <span key={topic} className="px-2 py-0.5 rounded-full text-[11px] font-medium bg-sand-200/70 dark:bg-zinc-800/80 text-sand-600 dark:text-zinc-300">
                           {topic}
                         </span>
                       ))}
@@ -509,7 +509,7 @@ const Projects = () => {
         )}
 
         {!loading && filteredProjects.length === 0 && !error && (
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-center text-sand-600 dark:text-dark-200 py-12">
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-center text-sand-600 dark:text-zinc-300 py-12">
             {activeFilter !== 'All'
               ? (isTurkish ? `"${activeFilter}" dilinde proje bulunamadı.` : `No projects found in ${activeFilter}.`)
               : (isTurkish ? 'Gösterilecek proje yok.' : 'No projects to display.')}

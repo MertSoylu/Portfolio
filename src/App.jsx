@@ -4,7 +4,6 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { DarkModeProvider, useDarkMode } from './context/DarkModeContext';
 import { LanguageProvider } from './context/LanguageContext';
 import Navbar from './components/Navbar';
-import SandBackground from './components/SandBackground';
 import Hero from './components/Hero';
 import About from './components/About';
 import Projects from './components/Projects';
@@ -12,11 +11,34 @@ import Contact from './components/Contact';
 import Footer from './components/Footer';
 import CustomCursor from './components/CustomCursor';
 import LoadingSpinner from './components/LoadingSpinner';
+import { FluidParticlesBackground } from '@/components/ui/fluid-particles-background';
+import WebDevPage from './pages/WebDevPage';
+import DataSciencePage from './pages/DataSciencePage';
 
-const AndroidPage = lazy(() => import('./pages/AndroidPage'));
-const WebDevPage = lazy(() => import('./pages/WebDevPage'));
-const CyberSecurityPage = lazy(() => import('./pages/CyberSecurityPage'));
-const NotFoundPage = lazy(() => import('./pages/NotFoundPage'));
+const lazyWithRetry = (importer, cacheKey) =>
+  lazy(async () => {
+    try {
+      const module = await importer();
+      if (typeof window !== 'undefined') {
+        window.sessionStorage.removeItem(cacheKey);
+      }
+      return module;
+    } catch (error) {
+      if (typeof window !== 'undefined') {
+        const hasRetried = window.sessionStorage.getItem(cacheKey) === '1';
+        if (!hasRetried) {
+          window.sessionStorage.setItem(cacheKey, '1');
+          window.location.reload();
+          return { default: () => null };
+        }
+      }
+      throw error;
+    }
+  });
+
+const AndroidPage = lazyWithRetry(() => import('./pages/AndroidPage'), 'lazy-retry-android');
+const CyberSecurityPage = lazyWithRetry(() => import('./pages/CyberSecurityPage'), 'lazy-retry-cyber');
+const NotFoundPage = lazyWithRetry(() => import('./pages/NotFoundPage'), 'lazy-retry-404');
 
 const SectionDivider = () => (
   <div className="h-12 bg-gradient-to-b from-transparent via-sand-200/20 dark:via-dark-500/20 to-transparent" />
@@ -40,6 +62,23 @@ const ROUTE_DIRECTIONS = {
   '/android': 'left',
   '/web': 'right',
   '/cybersecurity': 'up',
+  '/data-science': 'left',
+};
+
+const ROUTE_OVERLAYS = {
+  '/': 'from-white/68 via-white/52 to-white/68 dark:from-black/84 dark:via-zinc-950/72 dark:to-black/84',
+  '/web': 'from-white/66 via-white/50 to-white/66 dark:from-black/80 dark:via-zinc-950/68 dark:to-black/80',
+  '/android': 'from-white/60 via-white/42 to-white/60 dark:from-black/76 dark:via-zinc-950/62 dark:to-black/76',
+  '/cybersecurity': 'from-white/76 via-white/62 to-white/76 dark:from-black/88 dark:via-zinc-950/78 dark:to-black/88',
+  '/data-science': 'from-white/67 via-white/52 to-white/67 dark:from-black/82 dark:via-zinc-950/70 dark:to-black/82',
+};
+
+const ROUTE_PARTICLES = {
+  '/': { particleCount: 950, noiseIntensity: 0.0024 },
+  '/web': { particleCount: 780, noiseIntensity: 0.0021 },
+  '/android': { particleCount: 900, noiseIntensity: 0.0023 },
+  '/cybersecurity': { particleCount: 1150, noiseIntensity: 0.0028 },
+  '/data-science': { particleCount: 720, noiseIntensity: 0.0018 },
 };
 
 const getClipPath = (direction, state) => {
@@ -127,31 +166,60 @@ const ScrollToTop = () => {
 const AppContent = () => {
   const { isDark } = useDarkMode();
   const location = useLocation();
+  const [isMobile, setIsMobile] = useState(false);
+  const overlayClass = ROUTE_OVERLAYS[location.pathname] || ROUTE_OVERLAYS['/'];
+  const particleSettings = ROUTE_PARTICLES[location.pathname] || ROUTE_PARTICLES['/'];
+  const particleCount = isMobile
+    ? Math.max(350, Math.round(particleSettings.particleCount * 0.65))
+    : particleSettings.particleCount;
+
+  useEffect(() => {
+    const mediaQuery = window.matchMedia('(max-width: 767px)');
+    const handleChange = (event) => setIsMobile(event.matches);
+
+    setIsMobile(mediaQuery.matches);
+
+    if (mediaQuery.addEventListener) {
+      mediaQuery.addEventListener('change', handleChange);
+      return () => mediaQuery.removeEventListener('change', handleChange);
+    }
+
+    mediaQuery.addListener(handleChange);
+    return () => mediaQuery.removeListener(handleChange);
+  }, []);
 
   return (
-    <div className={`overflow-x-hidden transition-colors duration-300 ${isDark ? 'dark' : ''}`}>
-      <a
-        href="#main"
-        className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[9999] focus:px-4 focus:py-2 focus:bg-warm-600 focus:text-white focus:rounded-lg focus:shadow-lg"
-      >
-        Skip to main content
-      </a>
-      <SandBackground isDark={isDark} />
-      <CustomCursor isDark={isDark} />
-      <Navbar />
-      <ScrollToTop />
-      <main id="main">
-        <AnimatePresence mode="wait">
-          <Routes location={location} key={location.pathname}>
-            <Route path="/" element={<PageTransition direction="fade"><HomePage /></PageTransition>} />
-            <Route path="/android" element={<Suspense fallback={<LoadingSpinner />}><PageTransition direction="left"><AndroidPage /></PageTransition></Suspense>} />
-            <Route path="/web" element={<Suspense fallback={<LoadingSpinner />}><PageTransition direction="right"><WebDevPage /></PageTransition></Suspense>} />
-            <Route path="/cybersecurity" element={<Suspense fallback={<LoadingSpinner />}><PageTransition direction="up"><CyberSecurityPage /></PageTransition></Suspense>} />
-            <Route path="*" element={<Suspense fallback={<LoadingSpinner />}><PageTransition direction="fade"><NotFoundPage /></PageTransition></Suspense>} />
-          </Routes>
-        </AnimatePresence>
-      </main>
-      <Footer />
+    <div className={`relative overflow-x-hidden transition-colors duration-300 ${isDark ? 'dark' : ''}`}>
+      <FluidParticlesBackground
+        particleCount={particleCount}
+        noiseIntensity={particleSettings.noiseIntensity}
+        className="pointer-events-none fixed inset-0 z-0 h-full bg-transparent dark:bg-transparent"
+      />
+      <div className={`pointer-events-none fixed inset-0 z-[1] bg-gradient-to-b ${overlayClass}`} />
+      <div className="relative z-10">
+        <a
+          href="#main"
+          className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[9999] focus:px-4 focus:py-2 focus:bg-warm-600 focus:text-white focus:rounded-lg focus:shadow-lg"
+        >
+          Skip to main content
+        </a>
+        <CustomCursor isDark={isDark} />
+        <Navbar />
+        <ScrollToTop />
+        <main id="main">
+          <AnimatePresence mode="wait">
+            <Routes location={location} key={location.pathname}>
+              <Route path="/" element={<PageTransition direction="fade"><HomePage /></PageTransition>} />
+              <Route path="/android" element={<Suspense fallback={<LoadingSpinner />}><PageTransition direction="left"><AndroidPage /></PageTransition></Suspense>} />
+              <Route path="/web" element={<PageTransition direction="right"><WebDevPage /></PageTransition>} />
+              <Route path="/cybersecurity" element={<Suspense fallback={<LoadingSpinner />}><PageTransition direction="up"><CyberSecurityPage /></PageTransition></Suspense>} />
+              <Route path="/data-science" element={<PageTransition direction="left"><DataSciencePage /></PageTransition>} />
+              <Route path="*" element={<Suspense fallback={<LoadingSpinner />}><PageTransition direction="fade"><NotFoundPage /></PageTransition></Suspense>} />
+            </Routes>
+          </AnimatePresence>
+        </main>
+        <Footer />
+      </div>
     </div>
   );
 };

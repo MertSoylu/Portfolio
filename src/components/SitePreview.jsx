@@ -87,7 +87,7 @@ const PreviewModal = ({ isOpen, onClose, url, title, type, terminalContent }) =>
 };
 
 /* ─── Site Preview ─── */
-const SitePreview = ({ url, type = 'web', title, gradient, terminalContent, expandable = true }) => {
+const SitePreview = ({ url, type = 'web', title, gradient, terminalContent, expandable = true, showActions = true }) => {
   const { isTurkish } = useLanguage();
   const [isLoading, setIsLoading] = useState(type === 'web');
   const [modalOpen, setModalOpen] = useState(false);
@@ -110,7 +110,7 @@ const SitePreview = ({ url, type = 'web', title, gradient, terminalContent, expa
           </div>
 
           {/* iframe container */}
-          <div className="relative bg-white dark:bg-dark-700" style={{ aspectRatio: '16/9' }}>
+          <div className="relative bg-white dark:bg-dark-700" style={{ aspectRatio: '16 / 9' }}>
             {isLoading && (
               <div className="absolute inset-0 flex items-center justify-center bg-sand-50 dark:bg-dark-600 z-10">
                 <div className="flex flex-col items-center gap-2">
@@ -139,27 +139,28 @@ const SitePreview = ({ url, type = 'web', title, gradient, terminalContent, expa
             </div>
           </div>
 
-          {/* Action buttons */}
-          <div className="bg-sand-50 dark:bg-dark-600 px-3 py-2 flex items-center gap-2 border-t border-sand-200 dark:border-dark-400">
-            {expandable && (
-              <button
-                onClick={() => setModalOpen(true)}
+          {showActions && (
+            <div className="bg-sand-50 dark:bg-dark-600 px-3 py-2 flex items-center gap-2 border-t border-sand-200 dark:border-dark-400">
+              {expandable && (
+                <button
+                  onClick={() => setModalOpen(true)}
+                  className="flex-1 inline-flex items-center justify-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg bg-sand-200/80 dark:bg-dark-500 text-sand-700 dark:text-dark-200 hover:bg-sand-300 dark:hover:bg-dark-400 transition-colors"
+                >
+                  <HiArrowsExpand className="w-3.5 h-3.5" />
+                  {isTurkish ? 'Büyüt' : 'Expand'}
+                </button>
+              )}
+              <a
+                href={url}
+                target="_blank"
+                rel="noopener noreferrer"
                 className="flex-1 inline-flex items-center justify-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg bg-sand-200/80 dark:bg-dark-500 text-sand-700 dark:text-dark-200 hover:bg-sand-300 dark:hover:bg-dark-400 transition-colors"
               >
-                <HiArrowsExpand className="w-3.5 h-3.5" />
-                {isTurkish ? 'Büyüt' : 'Expand'}
-              </button>
-            )}
-            <a
-              href={url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex-1 inline-flex items-center justify-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg bg-sand-200/80 dark:bg-dark-500 text-sand-700 dark:text-dark-200 hover:bg-sand-300 dark:hover:bg-dark-400 transition-colors"
-            >
-              <HiExternalLink className="w-3.5 h-3.5" />
-              {isTurkish ? 'Siteyi Aç' : 'Open Site'}
-            </a>
-          </div>
+                <HiExternalLink className="w-3.5 h-3.5" />
+                {isTurkish ? 'Siteyi Aç' : 'Open Site'}
+              </a>
+            </div>
+          )}
         </div>
 
         {expandable && (
@@ -199,27 +200,28 @@ const SitePreview = ({ url, type = 'web', title, gradient, terminalContent, expa
                 </p>
               </div>
 
-              {/* Action buttons */}
-              <div className="bg-sand-50 dark:bg-dark-600 px-3 py-2 flex items-center gap-2 border-t border-sand-200 dark:border-dark-400">
-                {expandable && (
-                  <button
-                    onClick={() => setModalOpen(true)}
+              {showActions && (
+                <div className="bg-sand-50 dark:bg-dark-600 px-3 py-2 flex items-center gap-2 border-t border-sand-200 dark:border-dark-400">
+                  {expandable && (
+                    <button
+                      onClick={() => setModalOpen(true)}
+                      className="flex-1 inline-flex items-center justify-center gap-1.5 px-2 py-1.5 text-[10px] font-medium rounded-lg bg-sand-200/80 dark:bg-dark-500 text-sand-700 dark:text-dark-200 hover:bg-sand-300 dark:hover:bg-dark-400 transition-colors"
+                    >
+                      <HiArrowsExpand className="w-3 h-3" />
+                      {isTurkish ? 'Büyüt' : 'Expand'}
+                    </button>
+                  )}
+                  <a
+                    href={playUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
                     className="flex-1 inline-flex items-center justify-center gap-1.5 px-2 py-1.5 text-[10px] font-medium rounded-lg bg-sand-200/80 dark:bg-dark-500 text-sand-700 dark:text-dark-200 hover:bg-sand-300 dark:hover:bg-dark-400 transition-colors"
                   >
-                    <HiArrowsExpand className="w-3 h-3" />
-                    {isTurkish ? 'Büyüt' : 'Expand'}
-                  </button>
-                )}
-                <a
-                  href={playUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex-1 inline-flex items-center justify-center gap-1.5 px-2 py-1.5 text-[10px] font-medium rounded-lg bg-sand-200/80 dark:bg-dark-500 text-sand-700 dark:text-dark-200 hover:bg-sand-300 dark:hover:bg-dark-400 transition-colors"
-                >
-                  <HiExternalLink className="w-3 h-3" />
-                  {isTurkish ? "Play'de Aç" : 'Open Play'}
-                </a>
-              </div>
+                    <HiExternalLink className="w-3 h-3" />
+                    {isTurkish ? "Play'de Aç" : 'Open Play'}
+                  </a>
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -255,29 +257,30 @@ const SitePreview = ({ url, type = 'web', title, gradient, terminalContent, expa
             {terminalContent}
           </div>
 
-          {/* Action buttons */}
-          <div className="bg-[#2d333b] px-3 py-2 flex items-center gap-2 border-t border-gray-700/30">
-            {expandable && (
-              <button
-                onClick={() => setModalOpen(true)}
-                className="flex-1 inline-flex items-center justify-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg bg-gray-700/50 text-gray-300 hover:bg-gray-700 transition-colors"
-              >
-                <HiArrowsExpand className="w-3.5 h-3.5" />
-                {isTurkish ? 'Büyüt' : 'Expand'}
-              </button>
-            )}
-            {url && (
-              <a
-                href={url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex-1 inline-flex items-center justify-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg bg-gray-700/50 text-gray-300 hover:bg-gray-700 transition-colors"
-              >
-                <HiExternalLink className="w-3.5 h-3.5" />
-                GitHub
-              </a>
-            )}
-          </div>
+          {showActions && (
+            <div className="bg-[#2d333b] px-3 py-2 flex items-center gap-2 border-t border-gray-700/30">
+              {expandable && (
+                <button
+                  onClick={() => setModalOpen(true)}
+                  className="flex-1 inline-flex items-center justify-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg bg-gray-700/50 text-gray-300 hover:bg-gray-700 transition-colors"
+                >
+                  <HiArrowsExpand className="w-3.5 h-3.5" />
+                  {isTurkish ? 'Büyüt' : 'Expand'}
+                </button>
+              )}
+              {url && (
+                <a
+                  href={url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex-1 inline-flex items-center justify-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg bg-gray-700/50 text-gray-300 hover:bg-gray-700 transition-colors"
+                >
+                  <HiExternalLink className="w-3.5 h-3.5" />
+                  GitHub
+                </a>
+              )}
+            </div>
+          )}
         </div>
 
         {expandable && (

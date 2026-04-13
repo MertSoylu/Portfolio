@@ -1,10 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, useInView } from 'framer-motion';
 import { HiCode, HiShieldCheck, HiArrowRight } from 'react-icons/hi';
-import { HiAcademicCap } from 'react-icons/hi';
+import { HiAcademicCap, HiChip } from 'react-icons/hi';
 import { Link } from 'react-router-dom';
 import { fetchGitHubRepos } from '../utils/githubApi';
-import { TECHNOLOGIES } from '../utils/constants';
 import { useLanguage } from '../context/LanguageContext';
 import ScrollFloat from './ScrollFloat';
 import ScrollReveal from './ScrollReveal';
@@ -55,23 +54,14 @@ const About = () => {
       });
   }, []);
 
-  const slideUpVariants = {
-    hidden: { opacity: 0, y: 40 },
-    visible: (i) => ({
-      opacity: 1,
-      y: 0,
-      transition: { duration: 0.5, ease: 'easeOut', delay: i * 0.12 },
-    }),
-  };
-
   const skills = [
     {
       icon: <HiCode className="w-8 h-8" />,
       title: isTurkish ? 'Web Geliştirme' : 'Web Development',
       description:
         isTurkish
-          ? 'React, Tailwind CSS ve modern JavaScript ekosistemi ile modern ve duyarlı web siteleri geliştiriyorum.'
-          : 'Building modern, responsive websites using React, Tailwind CSS, and contemporary JavaScript frameworks.',
+          ? 'React, Tailwind CSS ve JavaScript kullanarak modern, hızlı ve her cihaza uyumlu web projeleri geliştiriyorum.'
+          : 'Developing fast, modern, and fully responsive web projects using React, Tailwind CSS, and JavaScript.',
       technologies: ['React', 'JavaScript', 'Tailwind CSS', 'HTML/CSS'],
       link: '/web',
     },
@@ -80,8 +70,8 @@ const About = () => {
       title: isTurkish ? 'Android Geliştirme' : 'Android Development',
       description:
         isTurkish
-          ? 'Temiz mimari ve sezgisel kullanıcı deneyimiyle sağlam Android uygulamaları geliştiriyorum.'
-          : 'Creating robust Android applications with clean architecture and intuitive user interfaces.',
+          ? 'Temiz bir kod mimarisi ve kullanıcı dostu arayüzlere sahip sağlam Android uygulamaları tasarlıyorum.'
+          : 'Designing and building robust Android applications with a focus on clean architecture and user-friendly interfaces.',
       technologies: ['Kotlin', 'React Native', 'Android Studio', 'Mobile UI/UX'],
       link: '/android',
     },
@@ -90,10 +80,20 @@ const About = () => {
       title: isTurkish ? 'Siber Güvenlik' : 'Cybersecurity',
       description:
         isTurkish
-          ? 'Güvenli kodlama, şifreleme ve uygulamaları zafiyetlere karşı koruma konularında çalışıyorum.'
-          : 'Understanding security best practices, encryption, and protecting applications from vulnerabilities.',
+          ? 'Güvenli kod geliştirme, veri şifreleme ve uygulamaları olası güvenlik açıklarına karşı koruma konuları üzerine çalışmalar yapıyorum.'
+          : 'Focusing on secure coding practices, data encryption, and actively protecting applications from potential vulnerabilities.',
       technologies: ['Python', 'Network Security', 'Encryption', 'Secure Coding'],
       link: '/cybersecurity',
+    },
+    {
+      icon: <HiChip className="w-8 h-8" />,
+      title: isTurkish ? 'Veri Bilimi ve Derin Öğrenme' : 'Data Science & Deep Learning',
+      description:
+        isTurkish
+          ? 'Bu alanda şu an öğrenme odaklı ilerliyorum; temelleri güçlendirip küçük deneylerle pratik yapıyorum.'
+          : 'I am currently in the learning phase in this area, strengthening fundamentals and building small experiments.',
+      technologies: ['Python', 'NumPy', 'Pandas', 'Deep Learning'],
+      link: '/data-science',
     },
   ];
 
@@ -117,9 +117,9 @@ const About = () => {
             containerClassName="mt-4"
             textClassName="text-lg text-sand-700 dark:text-dark-200 font-normal"
             enableBlur={true}
-            baseOpacity={0.1}
+            baseOpacity={0.75}
             baseRotation={3}
-            blurStrength={4}
+            blurStrength={1.5}
           >
             {isTurkish ? 'Tutkulu geliştirici ve ömür boyu öğrenen' : 'Passionate developer and lifelong learner'}
           </ScrollReveal>
@@ -138,18 +138,18 @@ const About = () => {
           </h3>
           <p className="text-lg text-sand-600 dark:text-dark-200 mb-4 text-center">
             {isTurkish
-              ? 'Kütahya Dumlupınar Üniversitesi\'nde Bilgisayar Programcılığı öğrencisiyim; estetik tasarımı güçlü işlevsellikle birleştiren çözümler üretmeye odaklanıyorum.'
-              : "I'm a computer programming student at Kütahya Dumlupınar University, passionate about creating solutions that combine beautiful design with solid functionality."}
+              ? 'Kütahya Dumlupınar Üniversitesi\'nde Bilgisayar Programcılığı okuyorum. Amacım, modern tasarımı yüksek performansla buluşturan sağlam çözümler geliştirmek.'
+              : "I'm a Computer Programming student at Kütahya Dumlupınar University. My goal is to build reliable solutions that bring together modern design and strong performance."}
           </p>
           <p className="text-lg text-sand-600 dark:text-dark-200 mb-4 pl-4 border-l-2 border-warm-500/40">
             {isTurkish
-              ? 'Teknoloji yolculuğum merakla başladı ve gerçek problemleri çözen uygulamalar geliştirme tutkusuna dönüştü.'
-              : 'My journey in tech started with curiosity about how things work, and it has evolved into a passion for building applications that solve real-world problems.'}
+              ? 'Teknolojiye olan ilgim sistemlerin nasıl çalıştığını merak etmemle başladı. Zamanla bu merak, gerçek hayattaki problemleri çözen faydalı uygulamalar geliştirme hedefine dönüştü.'
+              : "My interest in tech started simply by wondering how systems work behind the scenes. Over time, it grew into a focused goal to build useful applications that solve real-world problems."}
           </p>
           <p className="text-lg text-sand-600 dark:text-dark-200 pl-4 border-l-2 border-warm-500/20">
             {isTurkish
-              ? 'Kod yazmadığım zamanlarda yeni teknolojileri keşfetmeyi ve açık kaynak projelere katkı sunmayı seviyorum.'
-              : "When I'm not coding, I love exploring new technologies and contributing to open-source projects."}
+              ? 'Kod yazmaktan arta kalan zamanlarımda ise yeni teknolojileri incelemeyi ve açık kaynaklı projelere destek olmayı seviyorum.'
+              : "When I'm away from the keyboard, I enjoy exploring new technologies and contributing to open-source projects."}
           </p>
         </motion.div>
 
@@ -165,43 +165,12 @@ const About = () => {
           <CountUp end={3} label={isTurkish ? 'Odak Alanı' : 'Focus Areas'} />
         </motion.div>
 
-        {/* Tech stack row */}
-        <motion.div
-          className="mb-16"
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          viewport={{ once: true, margin: '-40px' }}
-          transition={{ duration: 0.5 }}
-        >
-          <h4 className="text-center text-sm font-semibold text-sand-500 dark:text-dark-300 uppercase tracking-widest mb-6">
-            {isTurkish ? 'Teknolojiler' : 'Technologies'}
-          </h4>
-          <motion.div
-            className="flex flex-wrap gap-2 justify-center"
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-            variants={{ visible: { transition: { staggerChildren: 0.05, delayChildren: 0.1 } } }}
-          >
-            {[...TECHNOLOGIES.frontend, ...TECHNOLOGIES.mobile, ...TECHNOLOGIES.tools].map((tech, i) => (
-              <motion.span
-                key={tech}
-                custom={i}
-                variants={slideUpVariants}
-                className="inline-flex items-center px-3 py-1.5 text-xs font-medium rounded-lg bg-white/50 dark:bg-dark-500/50 border border-sand-200 dark:border-dark-400 text-sand-700 dark:text-dark-200 hover:bg-warm-500/10 hover:border-warm-500/30 hover:text-warm-600 dark:hover:text-warm-400 transition-all duration-150 cursor-default"
-              >
-                {tech}
-              </motion.span>
-            ))}
-          </motion.div>
-        </motion.div>
-
         {/* Skills — SpotlightCard grid */}
         <div>
-          <h3 className="text-3xl font-bold text-sand-900 dark:text-dark-50 mb-12 text-center">
+          <h3 className="text-2xl sm:text-3xl font-bold text-sand-900 dark:text-dark-50 mb-8 sm:mb-12 text-center">
             {isTurkish ? 'Uzmanlık Alanları' : 'Areas of Expertise'}
           </h3>
-          <div className="grid md:grid-cols-3 gap-6">
+          <div className="grid gap-4 sm:gap-6 md:grid-cols-2 xl:grid-cols-4">
             {skills.map((skill, index) => (
               <motion.div
                 key={index}
@@ -211,21 +180,21 @@ const About = () => {
                 transition={{ duration: 0.5, delay: index * 0.12 }}
               >
                 <SpotlightCard
-                  className="bg-white/60 dark:bg-dark-600/60 backdrop-blur-md border border-sand-200 dark:border-dark-400 rounded-2xl p-6 h-full flex flex-col"
+                  className="bg-white/60 dark:bg-black/70 backdrop-blur-md border border-sand-200 dark:border-zinc-700 rounded-xl sm:rounded-2xl p-4 sm:p-6 h-full flex flex-col"
                   spotlightColor={isDark ? 'rgba(255, 154, 92, 0.15)' : 'rgba(240, 125, 45, 0.12)'}
                 >
-                  <div className="w-12 h-12 rounded-xl bg-warm-500/10 border border-warm-500/20 text-warm-600 dark:text-warm-400 mb-4 flex items-center justify-center">
+                  <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg sm:rounded-xl bg-warm-500/10 border border-warm-500/20 text-warm-600 dark:text-warm-400 mb-3 sm:mb-4 flex items-center justify-center">
                     {skill.icon}
                   </div>
-                  <h4 className="text-xl font-bold text-sand-900 dark:text-dark-50 mb-3">
+                  <h4 className="text-lg sm:text-xl font-bold text-sand-900 dark:text-zinc-100 mb-2 sm:mb-3">
                     {skill.title}
                   </h4>
-                  <p className="text-sand-600 dark:text-dark-200 mb-4 text-sm leading-relaxed">{skill.description}</p>
-                  <div className="flex flex-wrap gap-2 mb-4">
+                  <p className="text-sand-600 dark:text-zinc-300 mb-3 sm:mb-4 text-[13px] sm:text-sm leading-relaxed">{skill.description}</p>
+                  <div className="flex flex-wrap gap-1.5 sm:gap-2 mb-3 sm:mb-4">
                     {skill.technologies.map((tech) => (
                       <span
                         key={tech}
-                        className="px-3 py-1 bg-warm-500/10 text-warm-600 dark:text-warm-400 text-xs rounded-full border border-warm-500/20"
+                        className="px-2.5 py-1 bg-warm-500/10 text-warm-600 dark:text-warm-400 text-[11px] sm:text-xs rounded-full border border-warm-500/20"
                       >
                         {tech}
                       </span>
@@ -234,7 +203,7 @@ const About = () => {
                   {skill.link && (
                     <Link
                       to={skill.link}
-                      className="inline-flex items-center gap-1.5 text-sm font-medium text-warm-600 dark:text-warm-400 hover:text-warm-700 dark:hover:text-warm-300 mt-auto"
+                      className="inline-flex items-center gap-1.5 text-xs sm:text-sm font-medium text-warm-600 dark:text-warm-400 hover:text-warm-700 dark:hover:text-warm-300 mt-auto"
                     >
                       {isTurkish ? 'Detayları Gör' : 'View Details'}
                       <HiArrowRight className="w-4 h-4" />
