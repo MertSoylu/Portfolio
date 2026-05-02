@@ -6,6 +6,7 @@ import { Link } from 'react-router-dom';
 import { fetchGitHubRepos } from '../utils/githubApi';
 import { useLanguage } from '../context/LanguageContext';
 import { useDarkMode } from '../context/DarkModeContext';
+import { HERO_ROLES } from '../utils/constants';
 import { MorphingRoles } from './SplitFlapText';
 import TextPressure from './TextPressure';
 
@@ -140,9 +141,7 @@ const Hero = () => {
   const magBtn1 = useMagneticButton();
   const magBtn2 = useMagneticButton();
 
-  const roles = isTurkish
-    ? ['Web Geliştirici', 'Android Geliştirici', 'Siber Güvenlik Meraklısı']
-    : ['Web Developer', 'Android Developer', 'Cybersecurity Enthusiast'];
+  const roles = isTurkish ? HERO_ROLES.tr : HERO_ROLES.en;
 
   const [repoCount, setRepoCount] = useState(null);
 

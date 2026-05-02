@@ -5,6 +5,7 @@ import { HiAcademicCap, HiChip } from 'react-icons/hi';
 import { Link } from 'react-router-dom';
 import { fetchGitHubRepos } from '../utils/githubApi';
 import { useLanguage } from '../context/LanguageContext';
+import { SKILLS_DESCRIPTIONS } from '../utils/constants';
 import ScrollFloat from './ScrollFloat';
 import ScrollReveal from './ScrollReveal';
 import SpotlightCard from './SpotlightCard';
@@ -57,43 +58,31 @@ const About = () => {
   const skills = [
     {
       icon: <HiCode className="w-8 h-8" />,
-      title: isTurkish ? 'Web Geliştirme' : 'Web Development',
-      description:
-        isTurkish
-          ? 'React, Tailwind CSS ve JavaScript kullanarak modern, hızlı ve her cihaza uyumlu web projeleri geliştiriyorum.'
-          : 'Developing fast, modern, and fully responsive web projects using React, Tailwind CSS, and JavaScript.',
-      technologies: ['React', 'JavaScript', 'Tailwind CSS', 'HTML/CSS'],
-      link: '/web',
+      title: isTurkish ? SKILLS_DESCRIPTIONS.web.title.tr : SKILLS_DESCRIPTIONS.web.title.en,
+      description: isTurkish ? SKILLS_DESCRIPTIONS.web.description.tr : SKILLS_DESCRIPTIONS.web.description.en,
+      technologies: SKILLS_DESCRIPTIONS.web.technologies,
+      link: SKILLS_DESCRIPTIONS.web.link,
     },
     {
       icon: <HiAcademicCap className="w-8 h-8" />,
-      title: isTurkish ? 'Android Geliştirme' : 'Android Development',
-      description:
-        isTurkish
-          ? 'Temiz bir kod mimarisi ve kullanıcı dostu arayüzlere sahip sağlam Android uygulamaları tasarlıyorum.'
-          : 'Designing and building robust Android applications with a focus on clean architecture and user-friendly interfaces.',
-      technologies: ['Kotlin', 'React Native', 'Android Studio', 'Mobile UI/UX'],
-      link: '/android',
+      title: isTurkish ? SKILLS_DESCRIPTIONS.android.title.tr : SKILLS_DESCRIPTIONS.android.title.en,
+      description: isTurkish ? SKILLS_DESCRIPTIONS.android.description.tr : SKILLS_DESCRIPTIONS.android.description.en,
+      technologies: SKILLS_DESCRIPTIONS.android.technologies,
+      link: SKILLS_DESCRIPTIONS.android.link,
     },
     {
       icon: <HiShieldCheck className="w-8 h-8" />,
-      title: isTurkish ? 'Siber Güvenlik' : 'Cybersecurity',
-      description:
-        isTurkish
-          ? 'Güvenli kod geliştirme, veri şifreleme ve uygulamaları olası güvenlik açıklarına karşı koruma konuları üzerine çalışmalar yapıyorum.'
-          : 'Focusing on secure coding practices, data encryption, and actively protecting applications from potential vulnerabilities.',
-      technologies: ['Python', 'Network Security', 'Encryption', 'Secure Coding'],
-      link: '/cybersecurity',
+      title: isTurkish ? SKILLS_DESCRIPTIONS.security.title.tr : SKILLS_DESCRIPTIONS.security.title.en,
+      description: isTurkish ? SKILLS_DESCRIPTIONS.security.description.tr : SKILLS_DESCRIPTIONS.security.description.en,
+      technologies: SKILLS_DESCRIPTIONS.security.technologies,
+      link: SKILLS_DESCRIPTIONS.security.link,
     },
     {
       icon: <HiChip className="w-8 h-8" />,
-      title: isTurkish ? 'Veri Bilimi ve Derin Öğrenme' : 'Data Science & Deep Learning',
-      description:
-        isTurkish
-          ? 'Bu alanda şu an öğrenme odaklı ilerliyorum; temelleri güçlendirip küçük deneylerle pratik yapıyorum.'
-          : 'I am currently in the learning phase in this area, strengthening fundamentals and building small experiments.',
-      technologies: ['Python', 'NumPy', 'Pandas', 'Deep Learning'],
-      link: '/data-science',
+      title: isTurkish ? SKILLS_DESCRIPTIONS.datascience.title.tr : SKILLS_DESCRIPTIONS.datascience.title.en,
+      description: isTurkish ? SKILLS_DESCRIPTIONS.datascience.description.tr : SKILLS_DESCRIPTIONS.datascience.description.en,
+      technologies: SKILLS_DESCRIPTIONS.datascience.technologies,
+      link: SKILLS_DESCRIPTIONS.datascience.link,
     },
   ];
 
@@ -138,8 +127,8 @@ const About = () => {
           </h3>
           <p className="text-lg text-sand-600 dark:text-dark-200 mb-4 text-center">
             {isTurkish
-              ? 'Kütahya Dumlupınar Üniversitesi\'nde Bilgisayar Programcılığı okuyorum. Amacım, modern tasarımı yüksek performansla buluşturan sağlam çözümler geliştirmek.'
-              : "I'm a Computer Programming student at Kütahya Dumlupınar University. My goal is to build reliable solutions that bring together modern design and strong performance."}
+              ? 'Bilgisayar Programcılığı öğrencisiyim. Web, mobil, güvenlikte odaklı. Temiz kod, iyi tasarım, mutlu kullanıcılar = amacım.'
+              : "Computer Programming student focused on web, mobile, and security. My goal: clean code, great design, users who feel heard."}
           </p>
           <p className="text-lg text-sand-600 dark:text-dark-200 mb-4 pl-4 border-l-2 border-warm-500/40">
             {isTurkish

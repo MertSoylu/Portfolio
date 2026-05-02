@@ -77,6 +77,54 @@ export const SECTIONS = {
   contact: 'contact',
 };
 
+export const HERO_ROLES = {
+  tr: ['React Developer', 'Mobil Uygulama Geliştirici', 'Güvenlik Odaklı', 'Hızlı Öğrenen'],
+  en: ['React Developer', 'Mobile App Builder', 'Security-Minded', 'Adaptable Learner'],
+};
+
+export const SKILLS_DESCRIPTIONS = {
+  web: {
+    icon: 'HiCode',
+    title: { tr: 'Web Geliştirme', en: 'Web Development' },
+    description: {
+      tr: 'React ve Tailwind CSS ile hızlı, responsive siteler yapıyorum. Tasarım güzel, kod temiz. Lighthouse 90+, erişilebilir.',
+      en: 'Building fast, responsive web apps with React and Tailwind CSS. Beautiful design, clean code. Lighthouse 90+, accessible.',
+    },
+    technologies: ['React', 'JavaScript', 'Tailwind CSS', 'HTML/CSS'],
+    link: '/web',
+  },
+  android: {
+    icon: 'HiAcademicCap',
+    title: { tr: 'Android Geliştirme', en: 'Android Development' },
+    description: {
+      tr: 'Temiz mimari ile mobil uygulamalar geliştiriyorum. Hızlı yükleme, kusursuz deneyim, bakım kolay.',
+      en: 'Creating mobile apps with clean architecture. Fast load times, seamless experiences, code built to last.',
+    },
+    technologies: ['Kotlin', 'React Native', 'Android Studio', 'Mobile UI/UX'],
+    link: '/android',
+  },
+  security: {
+    icon: 'HiShieldCheck',
+    title: { tr: 'Siber Güvenlik', en: 'Cybersecurity' },
+    description: {
+      tr: 'Güvenli kod yazma ve veri korumasını ciddiye alıyorum. Attacker gibi düşün, Defender gibi kod yaz.',
+      en: 'I prioritize secure coding and data protection. Think like an attacker, code like a defender.',
+    },
+    technologies: ['Python', 'Network Security', 'Encryption', 'Secure Coding'],
+    link: '/cybersecurity',
+  },
+  datascience: {
+    icon: 'HiChip',
+    title: { tr: 'Veri Bilimi ve Derin Öğrenme', en: 'Data Science & Deep Learning' },
+    description: {
+      tr: 'Python, NumPy, Pandas öğreniyorum. Temel bilgiler sağlam, küçük projelerle pratik yapıyorum.',
+      en: 'Learning Python, NumPy, Pandas with strong fundamentals. Building projects to deepen real-world knowledge.',
+    },
+    technologies: ['Python', 'NumPy', 'Pandas', 'Deep Learning'],
+    link: '/data-science',
+  },
+};
+
 export const FALLBACK_PROJECTS = [
   {
     id: 'fallback-1',

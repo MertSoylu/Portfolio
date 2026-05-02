@@ -217,8 +217,8 @@ const Contact = () => {
           >
             <p className="text-sand-600 dark:text-zinc-300">
               {isTurkish
-                ? 'Yeni projeler ve iş birlikleri için hazırım. Mesaj atmaktan çekinme.'
-                : "I'm currently available for new projects and collaborations. Don't hesitate to reach out."}
+                ? 'Yeni projelere ve işbirliğine açığım. Full-time, freelance, mentorship—ne istiyorsan söyle.'
+                : "Open to new projects and collaboration. Full-time roles, freelance work, mentorship. Tell me what you're building."}
             </p>
           </FadeContent>
         </div>
