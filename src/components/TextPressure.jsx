@@ -73,11 +73,13 @@ const TextPressure = ({
     window.addEventListener('touchmove', handleTouchMove, { passive: true });
 
     if (containerRef.current) {
-      const { left, top, width, height } = containerRef.current.getBoundingClientRect();
-      mouseRef.current.x = left + width / 2;
-      mouseRef.current.y = top + height / 2;
-      cursorRef.current.x = mouseRef.current.x;
-      cursorRef.current.y = mouseRef.current.y;
+      // Initialize mouse refs to off-screen position
+      // This ensures characters don't get distorted while waiting for first mousemove
+      // Once user moves mouse, cursorRef updates and animation takes over naturally
+      mouseRef.current.x = -99999;
+      mouseRef.current.y = -99999;
+      cursorRef.current.x = -99999;
+      cursorRef.current.y = -99999;
     }
 
     return () => {
