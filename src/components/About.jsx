@@ -127,8 +127,8 @@ const About = () => {
           </h3>
           <p className="text-lg text-sand-600 dark:text-dark-200 mb-4 text-center">
             {isTurkish
-              ? 'Bilgisayar Programcılığı öğrencisiyim. Web, mobil, güvenlikte odaklı. Temiz kod, iyi tasarım, mutlu kullanıcılar = amacım.'
-              : "Computer Programming student focused on web, mobile, and security. My goal: clean code, great design, users who feel heard."}
+              ? 'Bilgisayar Programcılığı öğrencisiyim. Web, mobil, güvenlikte odaklı. Teknolojileri keşfederek öğreniyorum, öğrendiklerimi uygulamaya dönüştürüyorum.'
+              : "Computer Programming student focused on web, mobile, and security. I learn by exploring, and turn what I learn into working applications."}
           </p>
           <p className="text-lg text-sand-600 dark:text-dark-200 mb-4 pl-4 border-l-2 border-warm-500/40">
             {isTurkish
