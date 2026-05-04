@@ -44,14 +44,20 @@ html {
   font-size: 105%;
 }
 
-
 body {
-  font-family: 'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-family:
+    'Space Grotesk',
+    -apple-system,
+    BlinkMacSystemFont,
+    'Segoe UI',
+    sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   background-color: #faf8f3;
-  color: #5a4a42;
-  transition: background-color 0.6s cubic-bezier(.4,0,.2,1), color 0.6s cubic-bezier(.4,0,.2,1);
+  color: #3d342e;
+  transition:
+    background-color 0.6s cubic-bezier(0.4, 0, 0.2, 1),
+    color 0.6s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .dark body,
@@ -87,21 +93,32 @@ html.dark body {
 }
 
 /* Smooth theme transition — structural elements only */
-body, header, nav, main, section, footer {
+body,
+header,
+nav,
+main,
+section,
+footer {
   transition-property: background-color, border-color, color;
   transition-duration: 0.5s;
-  transition-timing-function: cubic-bezier(.4,0,.2,1);
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 /* Interactive elements get a faster transition */
-a, button, input, textarea, label {
+a,
+button,
+input,
+textarea,
+label {
   transition-property: background-color, border-color, color, box-shadow;
   transition-duration: 0.2s;
-  transition-timing-function: cubic-bezier(.4,0,.2,1);
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 @media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after {
+  *,
+  *::before,
+  *::after {
     animation-duration: 0.2s !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.2s !important;
@@ -118,7 +135,12 @@ svg path,
   transition-duration: 0s !important;
 }
 
-h1, h2, h3, h4, h5, h6 {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
   font-family: 'Archivo', system-ui, sans-serif;
 }
 
@@ -194,8 +216,27 @@ a {
   background-color: #262626;
 }
 
+/* Keep the primary CTA warm in dark mode — the warm-* CSS vars otherwise
+   resolve to gray, dropping brand identity at the most prominent button. */
+.dark .btn-primary {
+  background-color: #f97316;
+  color: #ffffff;
+}
+.dark .btn-primary:hover {
+  background-color: #ea580c;
+}
+
 .btn-outline {
   @apply px-6 py-3 rounded-lg font-semibold transition-all duration-300 ease-out border-2 border-warm-500 text-warm-600 hover:bg-warm-500 hover:text-white;
+}
+
+.dark .btn-outline {
+  border-color: #ff9a5c;
+  color: #ffb380;
+}
+.dark .btn-outline:hover {
+  background-color: #ff9a5c;
+  color: #0a0a0a;
 }
 
 /* Container styling */
@@ -215,8 +256,21 @@ a {
 }
 
 @keyframes gradient-x {
-  0%, 100% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
+  0%,
+  100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+/* Section title — dark mode override.
+   The default gradient (orange → brown → sand) disappears against dark
+   backgrounds, so swap to lighter warm stops that retain brand identity. */
+.dark .section-title {
+  background: linear-gradient(270deg, #ff9a5c, #ffb380, #ede6db, #ff9a5c);
+  background-size: 300% 300%;
 }
 
 .section-subtitle {
@@ -225,6 +279,81 @@ a {
 
 .dark .section-subtitle {
   @apply text-dark-200;
+}
+
+/* ---------------------------------------------------------------------------
+ * Typography scale — semantic tokens.
+ * Replaces ad-hoc text-[N]px values and disjointed responsive jumps.
+ * ------------------------------------------------------------------------- */
+.text-display {
+  @apply text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight leading-[1.05];
+  font-family: 'Archivo', system-ui, sans-serif;
+}
+
+.text-h1 {
+  @apply text-4xl md:text-5xl font-bold tracking-tight leading-[1.1];
+  font-family: 'Archivo', system-ui, sans-serif;
+}
+
+.text-h2 {
+  @apply text-2xl md:text-3xl font-bold tracking-tight leading-tight;
+  font-family: 'Archivo', system-ui, sans-serif;
+}
+
+.text-h3 {
+  @apply text-xl md:text-2xl font-semibold leading-snug;
+  font-family: 'Archivo', system-ui, sans-serif;
+}
+
+.text-h4 {
+  @apply text-lg font-semibold leading-snug;
+  font-family: 'Archivo', system-ui, sans-serif;
+}
+
+.text-body-lg {
+  @apply text-lg leading-relaxed;
+}
+
+.text-body {
+  @apply text-base leading-relaxed;
+}
+
+.text-body-sm {
+  @apply text-sm leading-normal;
+}
+
+.text-caption {
+  @apply text-xs font-medium uppercase tracking-wider;
+}
+
+/* ---------------------------------------------------------------------------
+ * Card elevation — 3-tier system.
+ * flat: list items, low-emphasis content
+ * raised: standard content cards
+ * prominent: featured / hero cards
+ * ------------------------------------------------------------------------- */
+.card-flat {
+  @apply rounded-2xl border border-sand-200/60 bg-transparent;
+}
+
+.dark .card-flat {
+  @apply border-zinc-800/60;
+}
+
+.card-raised {
+  @apply rounded-2xl border border-sand-200/50 bg-white/60 backdrop-blur-md;
+}
+
+.dark .card-raised {
+  @apply border-zinc-800/50 bg-zinc-900/50;
+}
+
+.card-prominent {
+  @apply rounded-3xl border border-accent-500/20 bg-white/80 backdrop-blur-md shadow-warm-soft;
+}
+
+.dark .card-prominent {
+  @apply border-accent-500/15 bg-zinc-900/70;
 }
 
 /* Card hover effects */
@@ -237,14 +366,37 @@ a {
   @apply bg-gradient-to-r from-warm-600 to-sand-600 bg-clip-text text-transparent;
 }
 
+/* In dark mode the warm-* CSS vars invert to grayscale, so the gradient
+   becomes a flat gray. Use literal warm hex values to keep the accent. */
+.dark .gradient-text {
+  background-image: linear-gradient(to right, #ff9a5c, #ede6db);
+  -webkit-background-clip: text;
+  background-clip: text;
+}
+
+/* Three-stop heading gradient used by section titles (ScrollFloat). */
+.heading-gradient {
+  @apply bg-gradient-to-r from-warm-600 via-warm-500 to-sand-500 bg-clip-text text-transparent;
+}
+
+.dark .heading-gradient {
+  background-image: linear-gradient(to right, #ff9a5c, #ffb380, #ede6db);
+  -webkit-background-clip: text;
+  background-clip: text;
+}
+
 /* Wave separator animation */
 .wave-separator {
   animation: wave-shift 8s linear infinite;
 }
 
 @keyframes wave-shift {
-  0% { transform: translateX(0); }
-  100% { transform: translateX(-50%); }
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
 }
 
 /* Perspective container for 3D card effects */
@@ -260,7 +412,10 @@ a {
 
 /* Dark mode transition for all elements */
 .dark-transition {
-  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+  transition:
+    background-color 0.3s ease,
+    color 0.3s ease,
+    border-color 0.3s ease;
 }
 
 /* Gradient border glow on card hover */
@@ -273,8 +428,15 @@ a {
   inset: -1px;
   border-radius: inherit;
   padding: 1px;
-  background: linear-gradient(135deg, rgba(240,125,45,0.35) 0%, rgba(201,184,160,0.15) 50%, rgba(240,125,45,0.10) 100%);
-  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  background: linear-gradient(
+    135deg,
+    rgba(240, 125, 45, 0.35) 0%,
+    rgba(201, 184, 160, 0.15) 50%,
+    rgba(240, 125, 45, 0.1) 100%
+  );
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
   -webkit-mask-composite: xor;
   mask-composite: exclude;
   opacity: 0;
@@ -286,12 +448,18 @@ a {
   opacity: 1;
 }
 .dark .card-border-glow::before {
-  background: linear-gradient(135deg, rgba(255,154,92,0.40) 0%, rgba(100,116,139,0.15) 50%, rgba(255,154,92,0.15) 100%);
+  background: linear-gradient(
+    135deg,
+    rgba(255, 154, 92, 0.4) 0%,
+    rgba(100, 116, 139, 0.15) 50%,
+    rgba(255, 154, 92, 0.15) 100%
+  );
 }
 
-
 /* Remove mobile tap delay */
-button, a, [role="button"] {
+button,
+a,
+[role='button'] {
   touch-action: manipulation;
 }
 
@@ -306,3 +474,80 @@ button, a, [role="button"] {
   outline-color: #ff9a5c;
 }
 
+/* Print stylesheet — clean CV-style output */
+@media print {
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+    box-shadow: none !important;
+    text-shadow: none !important;
+  }
+
+  html,
+  body,
+  .dark body {
+    background: #ffffff !important;
+    color: #111111 !important;
+  }
+
+  nav,
+  header nav,
+  .navbar,
+  footer,
+  .scroll-progress,
+  [role='dialog'],
+  canvas,
+  video,
+  audio,
+  iframe,
+  .skip-to-main,
+  [data-print-hide] {
+    display: none !important;
+  }
+
+  main,
+  section {
+    background: transparent !important;
+    page-break-inside: avoid;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    color: #000000 !important;
+    -webkit-text-fill-color: #000000 !important;
+    background: none !important;
+    page-break-after: avoid;
+  }
+
+  a {
+    color: #000000 !important;
+    text-decoration: underline;
+  }
+
+  a[href^='http']::after {
+    content: ' (' attr(href) ')';
+    font-size: 90%;
+  }
+
+  img {
+    max-width: 100% !important;
+    page-break-inside: avoid;
+  }
+
+  .gradient-text,
+  .section-title {
+    background: none !important;
+    -webkit-text-fill-color: #000000 !important;
+    color: #000000 !important;
+  }
+
+  @page {
+    margin: 1.5cm;
+  }
+}

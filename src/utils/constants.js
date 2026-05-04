@@ -1,6 +1,7 @@
 // Site metadata
 export const SITE_TITLE = 'Mert Soylu | Portfolio';
-export const SITE_DESCRIPTION = 'Computer Programming Student & Developer - Web Development, Android Development, Cybersecurity, Data Science and Deep Learning';
+export const SITE_DESCRIPTION =
+  'Computer Programming Student & Developer - Web Development, Android Development, Cybersecurity, Data Science and Deep Learning';
 
 // Personal information
 export const PERSONAL_INFO = {
@@ -82,6 +83,13 @@ export const HERO_ROLES = {
   en: ['React Developer', 'Mobile App Builder', 'Security-Minded', 'Adaptable Learner'],
 };
 
+export const CV_LABEL = {
+  tr: 'CV İndir',
+  en: 'Download CV',
+};
+
+export const CV_PATH = '/cv.pdf';
+
 export const SKILLS_DESCRIPTIONS = {
   web: {
     icon: 'HiCode',
@@ -91,6 +99,7 @@ export const SKILLS_DESCRIPTIONS = {
       en: 'Building fast, responsive web apps with React and Tailwind CSS. Beautiful design, clean code. Lighthouse 90+, accessible.',
     },
     technologies: ['React', 'JavaScript', 'Tailwind CSS', 'HTML/CSS'],
+    proficiency: 80,
     link: '/web',
   },
   android: {
@@ -101,6 +110,7 @@ export const SKILLS_DESCRIPTIONS = {
       en: 'Creating mobile apps with clean architecture. Fast load times, seamless experiences, code built to last.',
     },
     technologies: ['Kotlin', 'React Native', 'Android Studio', 'Mobile UI/UX'],
+    proficiency: 65,
     link: '/android',
   },
   security: {
@@ -111,6 +121,7 @@ export const SKILLS_DESCRIPTIONS = {
       en: 'I prioritize secure coding and data protection. Think like an attacker, code like a defender.',
     },
     technologies: ['Python', 'Network Security', 'Encryption', 'Secure Coding'],
+    proficiency: 60,
     link: '/cybersecurity',
   },
   datascience: {
@@ -121,7 +132,97 @@ export const SKILLS_DESCRIPTIONS = {
       en: 'Learning Python, NumPy, Pandas with strong fundamentals. Building projects to deepen real-world knowledge.',
     },
     technologies: ['Python', 'NumPy', 'Pandas', 'Deep Learning'],
+    proficiency: 40,
     link: '/data-science',
+  },
+};
+
+export const CERTIFICATES = [
+  {
+    id: 'intro-cybersecurity',
+    title: { tr: 'Siber Güvenliğe Giriş', en: 'Introduction to Cybersecurity' },
+    issuer: 'Cisco Networking Academy',
+    date: '2024',
+    fileUrl: '/certificates/Introduction_to_Cybersecurity_certificate.pdf',
+    skills: ['Network Security', 'Threat Analysis', 'Cyber Defense'],
+  },
+];
+
+const SITE_URL = 'https://mertsoylu.dev';
+const DEFAULT_OG_IMAGE = `${SITE_URL}/og-image.png`;
+
+export const SEO_META = {
+  '/': {
+    tr: {
+      title: 'Mert Soylu | Geliştirici Portfolyosu',
+      description: 'Bilgisayar Programcılığı öğrencisi. Web, mobil, siber güvenlik ve veri bilimi.',
+    },
+    en: {
+      title: 'Mert Soylu | Developer Portfolio',
+      description: 'Computer Programming student focused on web, mobile, cybersecurity and data science.',
+    },
+    canonical: `${SITE_URL}/`,
+    ogImage: DEFAULT_OG_IMAGE,
+  },
+  '/web': {
+    tr: {
+      title: 'Web Geliştirme | Mert Soylu',
+      description: 'React, Tailwind CSS ve Vite ile yapılan hızlı, erişilebilir web projeleri.',
+    },
+    en: {
+      title: 'Web Development | Mert Soylu',
+      description: 'Fast, accessible web projects built with React, Tailwind CSS, and Vite.',
+    },
+    canonical: `${SITE_URL}/web`,
+    ogImage: `${SITE_URL}/og-web.png`,
+  },
+  '/android': {
+    tr: {
+      title: 'Android Geliştirme | Mert Soylu',
+      description: 'Kotlin ve temiz mimari ile yapılan Android uygulamaları.',
+    },
+    en: {
+      title: 'Android Development | Mert Soylu',
+      description: 'Android apps built with Kotlin and clean architecture.',
+    },
+    canonical: `${SITE_URL}/android`,
+    ogImage: `${SITE_URL}/og-android.png`,
+  },
+  '/cybersecurity': {
+    tr: {
+      title: 'Siber Güvenlik | Mert Soylu',
+      description: 'Güvenli kod yazma, ağ güvenliği ve savunma odaklı çalışmalar.',
+    },
+    en: {
+      title: 'Cybersecurity | Mert Soylu',
+      description: 'Secure coding, network security, and defense-oriented projects.',
+    },
+    canonical: `${SITE_URL}/cybersecurity`,
+    ogImage: `${SITE_URL}/og-cyber.png`,
+  },
+  '/data-science': {
+    tr: {
+      title: 'Veri Bilimi ve Derin Öğrenme | Mert Soylu',
+      description: 'Python, NumPy, Pandas ile veri bilimi ve derin öğrenme öğrenme yolculuğu.',
+    },
+    en: {
+      title: 'Data Science & Deep Learning | Mert Soylu',
+      description: 'Data science and deep learning journey with Python, NumPy, and Pandas.',
+    },
+    canonical: `${SITE_URL}/data-science`,
+    ogImage: `${SITE_URL}/og-data.png`,
+  },
+  '/404': {
+    tr: {
+      title: 'Sayfa Bulunamadı | Mert Soylu',
+      description: 'Aradığınız sayfa mevcut değil.',
+    },
+    en: {
+      title: 'Page Not Found | Mert Soylu',
+      description: "The page you're looking for doesn't exist.",
+    },
+    canonical: `${SITE_URL}/404`,
+    ogImage: DEFAULT_OG_IMAGE,
   },
 };
 

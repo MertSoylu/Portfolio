@@ -1,5 +1,6 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { createPortal } from 'react-dom';
+import { useSearchParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { HiStar, HiCode, HiExternalLink, HiRefresh, HiX } from 'react-icons/hi';
 import {
@@ -47,7 +48,9 @@ const ProjectDetailsSection = ({ project, isTurkish, getLanguageColor }) => {
     const parsedDate = new Date(dateValue);
     if (Number.isNaN(parsedDate.getTime())) return isTurkish ? 'Belirtilmemiş' : 'Not available';
     return parsedDate.toLocaleDateString(isTurkish ? 'tr-TR' : 'en-US', {
-      year: 'numeric', month: 'short', day: 'numeric',
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
     });
   };
 
@@ -64,37 +67,58 @@ const ProjectDetailsSection = ({ project, isTurkish, getLanguageColor }) => {
       </div>
       <div className="grid sm:grid-cols-2 gap-3">
         <div className="rounded-xl border border-sand-200 dark:border-dark-400 bg-white/70 dark:bg-dark-600/50 p-4">
-          <p className="text-xs font-semibold uppercase tracking-wide text-sand-500 dark:text-dark-300">{isTurkish ? 'Dil' : 'Language'}</p>
+          <p className="text-xs font-semibold uppercase tracking-wide text-sand-500 dark:text-dark-300">
+            {isTurkish ? 'Dil' : 'Language'}
+          </p>
           {project.language ? (
-            <span className={`inline-flex mt-2 px-3 py-1 rounded-full text-xs font-semibold bg-gradient-to-r ${getLanguageColor(project.language)} text-white`}>
+            <span
+              className={`inline-flex mt-2 px-3 py-1 rounded-full text-xs font-semibold bg-gradient-to-r ${getLanguageColor(project.language)} text-white`}
+            >
               {project.language}
             </span>
           ) : (
-            <p className="mt-2 text-sm font-medium text-sand-800 dark:text-dark-100">{isTurkish ? 'Belirtilmemiş' : 'Not available'}</p>
+            <p className="mt-2 text-sm font-medium text-sand-800 dark:text-dark-100">
+              {isTurkish ? 'Belirtilmemiş' : 'Not available'}
+            </p>
           )}
         </div>
         <div className="rounded-xl border border-sand-200 dark:border-dark-400 bg-white/70 dark:bg-dark-600/50 p-4">
-          <p className="text-xs font-semibold uppercase tracking-wide text-sand-500 dark:text-dark-300">Stars</p>
+          <p className="text-xs font-semibold uppercase tracking-wide text-sand-500 dark:text-dark-300">
+            Stars
+          </p>
           <div className="mt-2 flex items-center gap-2 text-sm font-semibold text-sand-800 dark:text-dark-100">
             <HiStar className="text-warm-500" />
             <span>{project.stargazers_count ?? 0}</span>
           </div>
         </div>
         <div className="rounded-xl border border-sand-200 dark:border-dark-400 bg-white/70 dark:bg-dark-600/50 p-4">
-          <p className="text-xs font-semibold uppercase tracking-wide text-sand-500 dark:text-dark-300">{isTurkish ? 'Fork Sayısı' : 'Forks'}</p>
-          <p className="mt-2 text-sm font-semibold text-sand-800 dark:text-dark-100">{project.forks_count ?? 0}</p>
+          <p className="text-xs font-semibold uppercase tracking-wide text-sand-500 dark:text-dark-300">
+            {isTurkish ? 'Fork Sayısı' : 'Forks'}
+          </p>
+          <p className="mt-2 text-sm font-semibold text-sand-800 dark:text-dark-100">
+            {project.forks_count ?? 0}
+          </p>
         </div>
         <div className="rounded-xl border border-sand-200 dark:border-dark-400 bg-white/70 dark:bg-dark-600/50 p-4">
-          <p className="text-xs font-semibold uppercase tracking-wide text-sand-500 dark:text-dark-300">{isTurkish ? 'Son Güncelleme' : 'Last Updated'}</p>
-          <p className="mt-2 text-sm font-semibold text-sand-800 dark:text-dark-100">{formatDate(project.updated_at)}</p>
+          <p className="text-xs font-semibold uppercase tracking-wide text-sand-500 dark:text-dark-300">
+            {isTurkish ? 'Son Güncelleme' : 'Last Updated'}
+          </p>
+          <p className="mt-2 text-sm font-semibold text-sand-800 dark:text-dark-100">
+            {formatDate(project.updated_at)}
+          </p>
         </div>
       </div>
       {topics.length > 0 && (
         <div className="rounded-xl border border-sand-200 dark:border-dark-400 bg-white/70 dark:bg-dark-600/50 p-4">
-          <p className="text-xs font-semibold uppercase tracking-wide text-sand-500 dark:text-dark-300 mb-3">Topics</p>
+          <p className="text-xs font-semibold uppercase tracking-wide text-sand-500 dark:text-dark-300 mb-3">
+            Topics
+          </p>
           <div className="flex flex-wrap gap-2">
             {topics.map((topic) => (
-              <span key={topic} className="px-2.5 py-1 rounded-full text-xs font-medium bg-sand-200/70 dark:bg-dark-500/70 text-sand-700 dark:text-dark-100">
+              <span
+                key={topic}
+                className="px-2.5 py-1 rounded-full text-xs font-medium bg-sand-200/70 dark:bg-dark-500/70 text-sand-700 dark:text-dark-100"
+              >
                 {topic}
               </span>
             ))}
@@ -105,28 +129,84 @@ const ProjectDetailsSection = ({ project, isTurkish, getLanguageColor }) => {
   );
 };
 
-const ProjectModal = ({ project, onClose, isTurkish, getLanguageColor, readmeState, activeModalTab, onTabChange, onRetryReadme }) => {
+const ProjectModal = ({
+  project,
+  onClose,
+  isTurkish,
+  getLanguageColor,
+  readmeState,
+  activeModalTab,
+  onTabChange,
+  onRetryReadme,
+}) => {
+  const titleId = 'project-modal-title';
+  const dialogRef = useRef(null);
+
+  useEffect(() => {
+    const node = dialogRef.current;
+    if (!node) return undefined;
+
+    const getFocusable = () =>
+      Array.from(
+        node.querySelectorAll(
+          'a[href], button:not([disabled]), textarea:not([disabled]), input:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])',
+        ),
+      ).filter((el) => !el.hasAttribute('inert') && el.offsetParent !== null);
+
+    const focusables = getFocusable();
+    const firstFocusable = focusables[0];
+    if (firstFocusable) firstFocusable.focus();
+
+    const handleKeyDown = (event) => {
+      if (event.key !== 'Tab') return;
+      const elements = getFocusable();
+      if (elements.length === 0) return;
+      const first = elements[0];
+      const last = elements[elements.length - 1];
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
+      }
+    };
+
+    node.addEventListener('keydown', handleKeyDown);
+    return () => node.removeEventListener('keydown', handleKeyDown);
+  }, []);
+
   if (typeof document === 'undefined') return null;
 
   const isReadmeUnavailable = readmeState.status === 'error' || readmeState.status === 'empty';
-  const projectIdentity = project.full_name || (project.owner && project.repo ? `${project.owner}/${project.repo}` : null);
+  const projectIdentity =
+    project.full_name || (project.owner && project.repo ? `${project.owner}/${project.repo}` : null);
 
   const renderReadmePanel = () => {
     if (readmeState.status === 'loading' || readmeState.status === 'idle') {
       return (
         <div className="flex flex-col items-center justify-center py-14 text-center">
           <div className="w-10 h-10 border-2 border-warm-300 border-t-warm-600 rounded-full animate-spin mb-4" />
-          <p className="text-sm text-sand-600 dark:text-dark-200">{isTurkish ? 'README yükleniyor...' : 'Loading README...'}</p>
+          <p className="text-sm text-sand-600 dark:text-dark-200">
+            {isTurkish ? 'README yükleniyor...' : 'Loading README...'}
+          </p>
         </div>
       );
     }
     if (readmeState.status === 'error') {
       return (
         <div className="rounded-xl border border-red-300 dark:border-red-500/70 bg-red-50/70 dark:bg-red-900/30 p-4">
-          <p className="text-sm text-red-700 dark:text-red-200 mb-3">{isTurkish ? 'README yüklenemedi.' : 'README could not be loaded.'}</p>
+          <p className="text-sm text-red-700 dark:text-red-200 mb-3">
+            {isTurkish ? 'README yüklenemedi.' : 'README could not be loaded.'}
+          </p>
           <p className="text-xs text-red-700/90 dark:text-red-200/90 mb-4">{readmeState.errorMessage}</p>
-          <button type="button" onClick={onRetryReadme} className="inline-flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-semibold bg-red-100 dark:bg-red-800/40 border border-red-300 dark:border-red-600 hover:bg-red-200 dark:hover:bg-red-700/40 text-red-700 dark:text-red-200 transition-colors">
-            <HiRefresh className="w-4 h-4" />{isTurkish ? 'README Tekrar Dene' : 'Retry README'}
+          <button
+            type="button"
+            onClick={onRetryReadme}
+            className="inline-flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-semibold bg-red-100 dark:bg-red-800/40 border border-red-300 dark:border-red-600 hover:bg-red-200 dark:hover:bg-red-700/40 text-red-700 dark:text-red-200 transition-colors"
+          >
+            <HiRefresh className="w-4 h-4" />
+            {isTurkish ? 'README Tekrar Dene' : 'Retry README'}
           </button>
         </div>
       );
@@ -142,32 +222,79 @@ const ProjectModal = ({ project, onClose, isTurkish, getLanguageColor, readmeSta
     }
     return (
       <div className="rounded-xl border border-sand-200 dark:border-dark-400 bg-white/70 dark:bg-dark-600/50 p-4">
-        <pre className="whitespace-pre-wrap break-words text-sm leading-relaxed font-sans text-sand-700 dark:text-dark-100">{readmeState.content}</pre>
+        <pre className="whitespace-pre-wrap break-words text-sm leading-relaxed font-sans text-sand-700 dark:text-dark-100">
+          {readmeState.content}
+        </pre>
       </div>
     );
   };
 
-  const tabButtonClass = (isActive) => `px-4 py-2 rounded-lg text-sm font-semibold transition-colors ${
-    isActive ? 'bg-warm-500 text-white shadow-sm' : 'text-sand-700 dark:text-dark-200 hover:text-warm-600 dark:hover:text-warm-400 hover:bg-sand-100 dark:hover:bg-dark-600'
-  }`;
+  const tabButtonClass = (isActive) =>
+    `px-4 py-2 rounded-lg text-sm font-semibold transition-colors ${
+      isActive
+        ? 'bg-warm-500 text-white shadow-sm'
+        : 'text-sand-700 dark:text-dark-200 hover:text-warm-600 dark:hover:text-warm-400 hover:bg-sand-100 dark:hover:bg-dark-600'
+    }`;
 
   return createPortal(
-    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-[1200] flex items-center justify-center p-4 bg-black/45 backdrop-blur-sm" onClick={onClose}>
-      <motion.div initial={{ scale: 0.95, opacity: 0, y: 24 }} animate={{ scale: 1, opacity: 1, y: 0 }} exit={{ scale: 0.95, opacity: 0, y: 24 }} transition={{ type: 'spring', stiffness: 280, damping: 26 }} className="relative w-full max-w-4xl max-h-[90vh] bg-sand-50 dark:bg-dark-700 border border-sand-200 dark:border-dark-400 rounded-2xl shadow-2xl overflow-hidden flex flex-col" onClick={(e) => e.stopPropagation()}>
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      className="fixed inset-0 z-[1200] flex items-center justify-center p-4 bg-black/45 backdrop-blur-sm"
+      onClick={onClose}
+    >
+      <motion.div
+        ref={dialogRef}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby={titleId}
+        initial={{ scale: 0.95, opacity: 0, y: 24 }}
+        animate={{ scale: 1, opacity: 1, y: 0 }}
+        exit={{ scale: 0.95, opacity: 0, y: 24 }}
+        transition={{ type: 'spring', stiffness: 280, damping: 26 }}
+        className="relative w-full max-w-4xl max-h-[90vh] bg-sand-50 dark:bg-dark-700 border border-sand-200 dark:border-dark-400 rounded-2xl shadow-2xl overflow-hidden flex flex-col"
+        onClick={(e) => e.stopPropagation()}
+      >
         <div className="px-6 py-5 border-b border-sand-200 dark:border-dark-400">
-          <button type="button" onClick={onClose} className="absolute top-4 right-4 p-1.5 rounded-lg text-sand-500 hover:text-sand-700 dark:text-dark-200 dark:hover:text-dark-50 hover:bg-sand-100 dark:hover:bg-dark-600 transition-colors" aria-label={isTurkish ? 'Modalı kapat' : 'Close modal'}>
+          <button
+            type="button"
+            onClick={onClose}
+            className="absolute top-4 right-4 p-1.5 rounded-lg text-sand-500 hover:text-sand-700 dark:text-dark-200 dark:hover:text-dark-50 hover:bg-sand-100 dark:hover:bg-dark-600 transition-colors"
+            aria-label={isTurkish ? 'Modalı kapat' : 'Close modal'}
+          >
             <HiX className="w-5 h-5" />
           </button>
           {project.language && (
-            <span className={`inline-flex px-3 py-1 text-xs font-semibold rounded-full mb-3 bg-gradient-to-r ${getLanguageColor(project.language)} text-white`}>{project.language}</span>
+            <span
+              className={`inline-flex px-3 py-1 text-xs font-semibold rounded-full mb-3 bg-gradient-to-r ${getLanguageColor(project.language)} text-white`}
+            >
+              {project.language}
+            </span>
           )}
-          <h3 className="text-2xl font-bold text-sand-900 dark:text-dark-50 pr-10">{project.name}</h3>
-          {projectIdentity && <p className="mt-1 text-xs text-sand-500 dark:text-dark-300">{projectIdentity}</p>}
+          <h3 id={titleId} className="text-2xl font-bold text-sand-900 dark:text-dark-50 pr-10">
+            {project.name}
+          </h3>
+          {projectIdentity && (
+            <p className="mt-1 text-xs text-sand-500 dark:text-dark-300">{projectIdentity}</p>
+          )}
         </div>
         <div className="px-6 pt-4 border-b border-sand-200 dark:border-dark-400">
           <div className="inline-flex gap-2 p-1 bg-sand-100/80 dark:bg-dark-600/80 rounded-xl">
-            <button type="button" className={tabButtonClass(activeModalTab === 'readme')} onClick={() => onTabChange('readme')}>README</button>
-            <button type="button" className={tabButtonClass(activeModalTab === 'details')} onClick={() => onTabChange('details')}>{isTurkish ? 'Detay' : 'Details'}</button>
+            <button
+              type="button"
+              className={tabButtonClass(activeModalTab === 'readme')}
+              onClick={() => onTabChange('readme')}
+            >
+              README
+            </button>
+            <button
+              type="button"
+              className={tabButtonClass(activeModalTab === 'details')}
+              onClick={() => onTabChange('details')}
+            >
+              {isTurkish ? 'Detay' : 'Details'}
+            </button>
           </div>
         </div>
         <div className="px-6 py-5 overflow-y-auto">
@@ -177,30 +304,58 @@ const ProjectModal = ({ project, onClose, isTurkish, getLanguageColor, readmeSta
               {isReadmeUnavailable && (
                 <div className="mt-6 pt-6 border-t border-sand-200 dark:border-dark-400">
                   <div className="flex flex-wrap items-center justify-between gap-3 mb-3">
-                    <h4 className="text-sm font-semibold text-sand-800 dark:text-dark-100">{isTurkish ? 'Detaylar (yedek görünüm)' : 'Details (fallback)'}</h4>
-                    <button type="button" onClick={() => onTabChange('details')} className="text-xs font-semibold text-warm-600 dark:text-warm-400 hover:text-warm-700 dark:hover:text-warm-300">
+                    <h4 className="text-sm font-semibold text-sand-800 dark:text-dark-100">
+                      {isTurkish ? 'Detaylar (yedek görünüm)' : 'Details (fallback)'}
+                    </h4>
+                    <button
+                      type="button"
+                      onClick={() => onTabChange('details')}
+                      className="text-xs font-semibold text-warm-600 dark:text-warm-400 hover:text-warm-700 dark:hover:text-warm-300"
+                    >
                       {isTurkish ? 'Detay sekmesini aç' : 'Open details tab'}
                     </button>
                   </div>
-                  <ProjectDetailsSection project={project} isTurkish={isTurkish} getLanguageColor={getLanguageColor} />
+                  <ProjectDetailsSection
+                    project={project}
+                    isTurkish={isTurkish}
+                    getLanguageColor={getLanguageColor}
+                  />
                 </div>
               )}
             </>
           ) : (
-            <ProjectDetailsSection project={project} isTurkish={isTurkish} getLanguageColor={getLanguageColor} />
+            <ProjectDetailsSection
+              project={project}
+              isTurkish={isTurkish}
+              getLanguageColor={getLanguageColor}
+            />
           )}
         </div>
         <div className="px-6 py-4 border-t border-sand-200 dark:border-dark-400 flex flex-wrap gap-3">
-          <motion.a href={project.html_url} target="_blank" rel="noopener noreferrer" className="btn-primary inline-flex items-center gap-2" whileHover={{ scale: 1.04, y: -2 }} whileTap={{ scale: 0.97 }}>
-            <HiExternalLink className="w-4 h-4" />GitHub
+          <motion.a
+            href={project.html_url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="btn-primary inline-flex items-center gap-2"
+            whileHover={{ scale: 1.04, y: -2 }}
+            whileTap={{ scale: 0.97 }}
+          >
+            <HiExternalLink className="w-4 h-4" />
+            GitHub
           </motion.a>
-          <motion.button type="button" onClick={onClose} className="btn-secondary" whileHover={{ scale: 1.04, y: -2 }} whileTap={{ scale: 0.97 }}>
+          <motion.button
+            type="button"
+            onClick={onClose}
+            className="btn-secondary"
+            whileHover={{ scale: 1.04, y: -2 }}
+            whileTap={{ scale: 0.97 }}
+          >
             {isTurkish ? 'Kapat' : 'Close'}
           </motion.button>
         </div>
       </motion.div>
     </motion.div>,
-    document.body
+    document.body,
   );
 };
 
@@ -216,6 +371,9 @@ const Projects = () => {
   const [activeModalTab, setActiveModalTab] = useState('readme');
   const [readmeState, setReadmeState] = useState({ ...INITIAL_README_STATE });
   const [readmeRetryCount, setReadmeRetryCount] = useState(0);
+  const lastTriggerRef = useRef(null);
+  const [searchParams, setSearchParams] = useSearchParams();
+  const deepLinkAppliedRef = useRef(false);
 
   const githubProfileUrl = getGitHubProfileUrl();
   const githubUsername = getGitHubUsername();
@@ -237,7 +395,9 @@ const Projects = () => {
     }
   }, []);
 
-  useEffect(() => { getProjects(); }, [getProjects]);
+  useEffect(() => {
+    getProjects();
+  }, [getProjects]);
 
   // Stale-while-revalidate: update UI when fresh data arrives in background
   useEffect(() => {
@@ -253,15 +413,62 @@ const Projects = () => {
     setExpandedProject(null);
     setActiveModalTab('readme');
     setReadmeState({ ...INITIAL_README_STATE });
-  }, []);
+    setSearchParams(
+      (prev) => {
+        const next = new URLSearchParams(prev);
+        next.delete('project');
+        return next;
+      },
+      { replace: true },
+    );
+    if (lastTriggerRef.current && typeof lastTriggerRef.current.focus === 'function') {
+      lastTriggerRef.current.focus();
+    }
+  }, [setSearchParams]);
 
-  const openProjectModal = useCallback((project) => {
-    setExpandedProject(project);
-    setActiveModalTab('readme');
-    setReadmeState({ ...INITIAL_README_STATE });
-  }, []);
+  const openProjectModal = useCallback(
+    (project) => {
+      if (typeof document !== 'undefined') {
+        lastTriggerRef.current = document.activeElement;
+      }
+      setExpandedProject(project);
+      setActiveModalTab('readme');
+      setReadmeState({ ...INITIAL_README_STATE });
+      const projectKey = project?.name || project?.id;
+      if (projectKey) {
+        setSearchParams(
+          (prev) => {
+            const next = new URLSearchParams(prev);
+            next.set('project', String(projectKey));
+            return next;
+          },
+          { replace: false },
+        );
+      }
+    },
+    [setSearchParams],
+  );
 
-  const retryReadme = useCallback(() => { setReadmeRetryCount((prev) => prev + 1); }, []);
+  useEffect(() => {
+    if (deepLinkAppliedRef.current) return;
+    if (loading || projects.length === 0) return;
+    const projectKey = searchParams.get('project');
+    if (!projectKey) {
+      deepLinkAppliedRef.current = true;
+      return;
+    }
+    const match = projects.find((p) => String(p.name) === projectKey || String(p.id) === projectKey);
+    if (match) {
+      setExpandedProject(match);
+      setActiveModalTab('readme');
+      setReadmeState({ ...INITIAL_README_STATE });
+    }
+    deepLinkAppliedRef.current = true;
+  }, [loading, projects, searchParams]);
+
+  const retryReadme = useCallback(() => {
+    setReadmeRetryCount((prev) => prev + 1);
+  }, []);
 
   useEffect(() => {
     if (!expandedProject) return undefined;
@@ -283,18 +490,31 @@ const Projects = () => {
         setReadmeState({ status: 'empty', content: '', errorMessage: '' });
       } catch (err) {
         if (isCancelled) return;
-        setReadmeState({ status: 'error', content: '', errorMessage: err instanceof Error ? err.message : (isTurkish ? 'README yüklenirken hata oluştu.' : 'Failed to load README.') });
+        setReadmeState({
+          status: 'error',
+          content: '',
+          errorMessage:
+            err instanceof Error
+              ? err.message
+              : isTurkish
+                ? 'README yüklenirken hata oluştu.'
+                : 'Failed to load README.',
+        });
       }
     };
     loadReadme();
-    return () => { isCancelled = true; };
+    return () => {
+      isCancelled = true;
+    };
   }, [expandedProject, readmeRetryCount, isTurkish]);
 
   useEffect(() => {
     if (!expandedProject) return undefined;
     const previousOverflow = document.body.style.overflow;
     document.body.style.overflow = 'hidden';
-    const handleEscape = (event) => { if (event.key === 'Escape') closeProjectModal(); };
+    const handleEscape = (event) => {
+      if (event.key === 'Escape') closeProjectModal();
+    };
     window.addEventListener('keydown', handleEscape);
     return () => {
       window.removeEventListener('keydown', handleEscape);
@@ -310,7 +530,13 @@ const Projects = () => {
     const name = (project.name || '').toLowerCase();
 
     if (androidLangs.includes(project.language)) return 'Android';
-    if (topics.some((t) => securityTopics.includes(t)) || name.includes('scan') || name.includes('ctf') || name.includes('hack')) return 'Security';
+    if (
+      topics.some((t) => securityTopics.includes(t)) ||
+      name.includes('scan') ||
+      name.includes('ctf') ||
+      name.includes('hack')
+    )
+      return 'Security';
     if (project.language === 'Python') return 'Security';
     if (webLangs.includes(project.language)) return 'Web';
     return 'Other';
@@ -338,12 +564,11 @@ const Projects = () => {
     Security: isTurkish ? 'Güvenlik' : 'Security',
   };
 
-  const filteredProjects = activeFilter === 'All'
-    ? projects
-    : projects.filter((p) => getProjectCategory(p) === activeFilter);
+  const filteredProjects =
+    activeFilter === 'All' ? projects : projects.filter((p) => getProjectCategory(p) === activeFilter);
 
   return (
-    <section id="projects" className="py-12 px-4 relative">
+    <section id="projects" className="py-20 md:py-28 px-4 relative">
       <AnimatePresence>
         {expandedProject && (
           <ProjectModal
@@ -364,7 +589,7 @@ const Projects = () => {
         <div className="text-center mb-10">
           <ScrollFloat
             containerClassName="overflow-hidden"
-            textClassName="text-3xl sm:text-4xl md:text-5xl font-bold bg-gradient-to-r from-warm-600 via-warm-500 to-sand-500 bg-clip-text text-transparent"
+            textClassName="text-3xl sm:text-4xl md:text-5xl font-bold heading-gradient"
             animationDuration={1}
             ease="back.inOut(2)"
             scrollStart="center bottom+=50%"
@@ -375,7 +600,7 @@ const Projects = () => {
           </ScrollFloat>
           <ScrollReveal
             containerClassName="mt-4"
-            textClassName="text-lg text-sand-700 dark:text-dark-200 font-normal"
+            textClassName="text-body-lg text-sand-700 dark:text-zinc-300 font-normal"
             enableBlur={true}
             baseOpacity={0.75}
             baseRotation={3}
@@ -399,14 +624,14 @@ const Projects = () => {
                 onClick={() => setActiveFilter(cat)}
                 className={`relative px-4 py-2 min-h-[44px] rounded-full text-sm font-medium border transition-colors duration-200 cursor-pointer flex items-center ${
                   activeFilter === cat
-                    ? 'border-warm-500 shadow-md text-white'
-                    : 'bg-white/40 dark:bg-black/60 text-sand-700 dark:text-zinc-300 border-sand-200 dark:border-zinc-700 hover:border-warm-500/50 hover:text-warm-600 dark:hover:text-warm-400'
+                    ? 'border-accent-500 shadow-md text-white'
+                    : 'bg-white/40 dark:bg-zinc-900/60 text-sand-700 dark:text-zinc-300 border-sand-200 dark:border-zinc-700 hover:border-accent-500/50 hover:text-accent-700 dark:hover:text-accent-300'
                 }`}
               >
                 {activeFilter === cat && (
                   <motion.div
                     layoutId="activeFilterPill"
-                    className="absolute inset-0 bg-warm-500 rounded-full -z-10"
+                    className="absolute inset-0 bg-accent-500 rounded-full -z-10"
                     transition={{ type: 'spring', stiffness: 380, damping: 30 }}
                   />
                 )}
@@ -418,11 +643,28 @@ const Projects = () => {
 
         {/* Error state */}
         {!loading && error && (
-      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="bg-amber-50 dark:bg-zinc-900/80 border border-amber-300 dark:border-zinc-700 text-amber-800 dark:text-zinc-200 px-4 py-3 rounded-lg text-center mb-8">
-            {error === 'empty' ? (isTurkish ? 'Herkese açık repo bulunamadı.' : 'No public repositories found.') : error}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="bg-amber-50 dark:bg-zinc-900/80 border border-amber-300 dark:border-zinc-700 text-amber-800 dark:text-zinc-200 px-4 py-3 rounded-lg text-center mb-8"
+          >
+            {error === 'empty'
+              ? isTurkish
+                ? 'Herkese açık repo bulunamadı.'
+                : 'No public repositories found.'
+              : error}
             {error !== 'empty' && (
-              <motion.button onClick={() => { clearRateLimitState(); getProjects(); }} className="mt-3 inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-amber-100 dark:bg-zinc-800/90 border border-amber-300 dark:border-zinc-700 text-amber-800 dark:text-zinc-200 text-sm font-medium hover:bg-amber-200 dark:hover:bg-zinc-700/90 transition-colors cursor-pointer" whileHover={{ scale: 1.04, y: -2 }} whileTap={{ scale: 0.97 }}>
-                <HiRefresh className="w-4 h-4" />{isTurkish ? 'Tekrar Dene' : 'Try Again'}
+              <motion.button
+                onClick={() => {
+                  clearRateLimitState();
+                  getProjects();
+                }}
+                className="mt-3 inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-amber-100 dark:bg-zinc-800/90 border border-amber-300 dark:border-zinc-700 text-amber-800 dark:text-zinc-200 text-sm font-medium hover:bg-amber-200 dark:hover:bg-zinc-700/90 transition-colors cursor-pointer"
+                whileHover={{ scale: 1.04, y: -2 }}
+                whileTap={{ scale: 0.97 }}
+              >
+                <HiRefresh className="w-4 h-4" />
+                {isTurkish ? 'Tekrar Dene' : 'Try Again'}
               </motion.button>
             )}
           </motion.div>
@@ -431,7 +673,9 @@ const Projects = () => {
         {/* Skeleton loading */}
         {loading && projects.length === 0 && (
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {[...Array(6)].map((_, i) => <ProjectSkeleton key={i} />)}
+            {[...Array(6)].map((_, i) => (
+              <ProjectSkeleton key={i} />
+            ))}
           </div>
         )}
 
@@ -454,48 +698,59 @@ const Projects = () => {
                 itemClassName="!h-auto !my-4 !p-0 !rounded-2xl !shadow-none"
               >
                 <div
-                  className="bg-white/80 dark:bg-black/70 backdrop-blur-md border border-sand-200 dark:border-zinc-700 rounded-2xl p-6 cursor-pointer hover:border-warm-500/50 transition-colors"
+                  role="button"
+                  tabIndex={0}
+                  aria-label={isTurkish ? `${project.name} detaylarını aç` : `Open ${project.name} details`}
+                  className="card-raised p-6 cursor-pointer hover:border-accent-500/50 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-accent-500"
                   onClick={() => openProjectModal(project)}
+                  onKeyDown={(event) => {
+                    if (event.key === 'Enter' || event.key === ' ') {
+                      event.preventDefault();
+                      openProjectModal(project);
+                    }
+                  }}
                 >
                   <div className="flex items-start justify-between gap-4 mb-3">
                     <div className="flex items-center gap-3">
                       {project.language && (
-                        <span className={`inline-flex px-3 py-1 rounded-full text-xs font-semibold bg-gradient-to-r ${getLanguageColor(project.language)} text-white`}>
+                        <span
+                          className={`inline-flex px-3 py-1 rounded-full text-xs font-semibold bg-gradient-to-r ${getLanguageColor(project.language)} text-white`}
+                        >
                           {project.language}
                         </span>
                       )}
-                      <h3 className="text-xl font-bold text-sand-900 dark:text-zinc-100">
-                        {project.name}
-                      </h3>
+                      <h3 className="text-h4 text-sand-900 dark:text-zinc-100">{project.name}</h3>
                     </div>
-                    <div className="flex items-center gap-3 text-sm text-sand-500 dark:text-zinc-400 shrink-0">
+                    <div className="flex items-center gap-3 text-sm text-sand-600 dark:text-zinc-400 shrink-0">
                       {project.stargazers_count > 0 && (
                         <div className="flex items-center gap-1">
-                          <HiStar className="text-warm-500" />
+                          <HiStar className="text-accent-500" />
                           <span>{project.stargazers_count}</span>
                         </div>
                       )}
-                      {project.forks_count > 0 && (
-                        <span>{project.forks_count} forks</span>
-                      )}
+                      {project.forks_count > 0 && <span>{project.forks_count} forks</span>}
                     </div>
                   </div>
-                  <p className="text-sand-600 dark:text-zinc-300 text-sm mb-4 line-clamp-2">
+                  <p className="text-body-sm text-sand-700 dark:text-zinc-300 mb-4 line-clamp-2">
                     {project.description || (isTurkish ? 'Açıklama yok' : 'No description available')}
                   </p>
                   <div className="flex items-center justify-between">
                     <div className="flex flex-wrap gap-1.5">
-                      {Array.isArray(project.topics) && project.topics.slice(0, 4).map((topic) => (
-                        <span key={topic} className="px-2 py-0.5 rounded-full text-[11px] font-medium bg-sand-200/70 dark:bg-zinc-800/80 text-sand-600 dark:text-zinc-300">
-                          {topic}
-                        </span>
-                      ))}
+                      {Array.isArray(project.topics) &&
+                        project.topics.slice(0, 4).map((topic) => (
+                          <span
+                            key={topic}
+                            className="px-2 py-0.5 rounded-full text-xs font-medium bg-sand-200/70 dark:bg-zinc-800/80 text-sand-700 dark:text-zinc-300"
+                          >
+                            {topic}
+                          </span>
+                        ))}
                     </div>
                     <motion.a
                       href={project.html_url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-flex items-center gap-1.5 text-sm font-medium text-warm-600 dark:text-warm-400 hover:text-warm-700"
+                      className="inline-flex items-center gap-1.5 text-sm font-semibold text-accent-600 dark:text-accent-400 hover:text-accent-700 dark:hover:text-accent-300"
                       whileHover={{ scale: 1.05 }}
                       onClick={(e) => e.stopPropagation()}
                     >
@@ -509,10 +764,18 @@ const Projects = () => {
         )}
 
         {!loading && filteredProjects.length === 0 && !error && (
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-center text-sand-600 dark:text-zinc-300 py-12">
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="text-center text-sand-600 dark:text-zinc-300 py-12"
+          >
             {activeFilter !== 'All'
-              ? (isTurkish ? `"${activeFilter}" dilinde proje bulunamadı.` : `No projects found in ${activeFilter}.`)
-              : (isTurkish ? 'Gösterilecek proje yok.' : 'No projects to display.')}
+              ? isTurkish
+                ? `"${activeFilter}" dilinde proje bulunamadı.`
+                : `No projects found in ${activeFilter}.`
+              : isTurkish
+                ? 'Gösterilecek proje yok.'
+                : 'No projects to display.'}
           </motion.div>
         )}
 

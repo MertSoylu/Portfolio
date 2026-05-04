@@ -1,16 +1,20 @@
 import React, { useEffect, useState, lazy, Suspense } from 'react';
 import { Routes, Route, useLocation } from 'react-router-dom';
-import { AnimatePresence, motion } from 'framer-motion';
+import { AnimatePresence, motion, MotionConfig, useReducedMotion } from 'framer-motion';
 import { DarkModeProvider, useDarkMode } from './context/DarkModeContext';
 import { LanguageProvider } from './context/LanguageContext';
 import Navbar from './components/Navbar';
 import Hero from './components/Hero';
 import About from './components/About';
+import Certificates from './components/Certificates';
 import Projects from './components/Projects';
 import Contact from './components/Contact';
 import Footer from './components/Footer';
-import CustomCursor from './components/CustomCursor';
 import LoadingSpinner from './components/LoadingSpinner';
+import ErrorBoundary from './components/ErrorBoundary';
+import PageMeta from './components/PageMeta';
+import CommandPaletteProvider from './components/CommandPalette';
+import { Toaster } from 'react-hot-toast';
 import { FluidParticlesBackground } from '@/components/ui/fluid-particles-background';
 import WebDevPage from './pages/WebDevPage';
 import DataSciencePage from './pages/DataSciencePage';
@@ -46,9 +50,12 @@ const SectionDivider = () => (
 
 const HomePage = () => (
   <>
+    <PageMeta route="/" />
     <Hero />
     <SectionDivider />
     <About />
+    <SectionDivider />
+    <Certificates />
     <SectionDivider />
     <Projects />
     <SectionDivider />
@@ -68,9 +75,12 @@ const ROUTE_DIRECTIONS = {
 const ROUTE_OVERLAYS = {
   '/': 'from-white/68 via-white/52 to-white/68 dark:from-black/84 dark:via-zinc-950/72 dark:to-black/84',
   '/web': 'from-white/66 via-white/50 to-white/66 dark:from-black/80 dark:via-zinc-950/68 dark:to-black/80',
-  '/android': 'from-white/60 via-white/42 to-white/60 dark:from-black/76 dark:via-zinc-950/62 dark:to-black/76',
-  '/cybersecurity': 'from-white/76 via-white/62 to-white/76 dark:from-black/88 dark:via-zinc-950/78 dark:to-black/88',
-  '/data-science': 'from-white/67 via-white/52 to-white/67 dark:from-black/82 dark:via-zinc-950/70 dark:to-black/82',
+  '/android':
+    'from-white/60 via-white/42 to-white/60 dark:from-black/76 dark:via-zinc-950/62 dark:to-black/76',
+  '/cybersecurity':
+    'from-white/76 via-white/62 to-white/76 dark:from-black/88 dark:via-zinc-950/78 dark:to-black/88',
+  '/data-science':
+    'from-white/67 via-white/52 to-white/67 dark:from-black/82 dark:via-zinc-950/70 dark:to-black/82',
 };
 
 const ROUTE_PARTICLES = {
@@ -108,7 +118,21 @@ const getClipPath = (direction, state) => {
 };
 
 const PageTransition = ({ children, direction = 'fade' }) => {
+  const prefersReducedMotion = useReducedMotion();
   const isFade = direction === 'fade';
+
+  if (prefersReducedMotion) {
+    return (
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        transition={{ duration: 0.15 }}
+      >
+        {children}
+      </motion.div>
+    );
+  }
 
   return (
     <motion.div
@@ -203,18 +227,65 @@ const AppContent = () => {
         >
           Skip to main content
         </a>
-        <CustomCursor isDark={isDark} />
         <Navbar />
         <ScrollToTop />
         <main id="main">
           <AnimatePresence mode="wait">
             <Routes location={location} key={location.pathname}>
-              <Route path="/" element={<PageTransition direction="fade"><HomePage /></PageTransition>} />
-              <Route path="/android" element={<Suspense fallback={<LoadingSpinner />}><PageTransition direction="left"><AndroidPage /></PageTransition></Suspense>} />
-              <Route path="/web" element={<PageTransition direction="right"><WebDevPage /></PageTransition>} />
-              <Route path="/cybersecurity" element={<Suspense fallback={<LoadingSpinner />}><PageTransition direction="up"><CyberSecurityPage /></PageTransition></Suspense>} />
-              <Route path="/data-science" element={<PageTransition direction="left"><DataSciencePage /></PageTransition>} />
-              <Route path="*" element={<Suspense fallback={<LoadingSpinner />}><PageTransition direction="fade"><NotFoundPage /></PageTransition></Suspense>} />
+              <Route
+                path="/"
+                element={
+                  <PageTransition direction="fade">
+                    <HomePage />
+                  </PageTransition>
+                }
+              />
+              <Route
+                path="/android"
+                element={
+                  <Suspense fallback={<LoadingSpinner />}>
+                    <PageTransition direction="left">
+                      <AndroidPage />
+                    </PageTransition>
+                  </Suspense>
+                }
+              />
+              <Route
+                path="/web"
+                element={
+                  <PageTransition direction="right">
+                    <WebDevPage />
+                  </PageTransition>
+                }
+              />
+              <Route
+                path="/cybersecurity"
+                element={
+                  <Suspense fallback={<LoadingSpinner />}>
+                    <PageTransition direction="up">
+                      <CyberSecurityPage />
+                    </PageTransition>
+                  </Suspense>
+                }
+              />
+              <Route
+                path="/data-science"
+                element={
+                  <PageTransition direction="left">
+                    <DataSciencePage />
+                  </PageTransition>
+                }
+              />
+              <Route
+                path="*"
+                element={
+                  <Suspense fallback={<LoadingSpinner />}>
+                    <PageTransition direction="fade">
+                      <NotFoundPage />
+                    </PageTransition>
+                  </Suspense>
+                }
+              />
             </Routes>
           </AnimatePresence>
         </main>
@@ -281,12 +352,31 @@ const DeferredAnalytics = () => {
 
 function App() {
   return (
-    <DarkModeProvider>
-      <LanguageProvider>
-        <AppContent />
-        <DeferredAnalytics />
-      </LanguageProvider>
-    </DarkModeProvider>
+    <ErrorBoundary>
+      <MotionConfig reducedMotion="user">
+        <DarkModeProvider>
+          <LanguageProvider>
+            <CommandPaletteProvider>
+              <AppContent />
+              <Toaster
+                position="top-center"
+                toastOptions={{
+                  duration: 3000,
+                  style: {
+                    background: 'rgba(20, 20, 20, 0.92)',
+                    color: '#fafafa',
+                    border: '1px solid rgba(240, 125, 45, 0.4)',
+                    borderRadius: '0.75rem',
+                    fontSize: '0.875rem',
+                  },
+                }}
+              />
+            </CommandPaletteProvider>
+            <DeferredAnalytics />
+          </LanguageProvider>
+        </DarkModeProvider>
+      </MotionConfig>
+    </ErrorBoundary>
   );
 }
 

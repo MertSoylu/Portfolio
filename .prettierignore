@@ -1,0 +1,13 @@
+node_modules
+dist
+build
+coverage
+.next
+.vercel
+.netlify
+public/cv.pdf
+public/certificates
+package-lock.json
+*.min.js
+*.min.css
+report.json

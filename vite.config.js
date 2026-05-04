@@ -1,9 +1,60 @@
-import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react'
-import { fileURLToPath, URL } from 'node:url'
+import { defineConfig } from 'vite';
+import react from '@vitejs/plugin-react';
+import { fileURLToPath, URL } from 'node:url';
+import { visualizer } from 'rollup-plugin-visualizer';
+import { VitePWA } from 'vite-plugin-pwa';
 
-export default defineConfig({
-  plugins: [react()],
+export default defineConfig(({ mode }) => ({
+  plugins: [
+    react(),
+    VitePWA({
+      registerType: 'autoUpdate',
+      injectRegister: 'auto',
+      includeAssets: ['favicon.svg', 'robots.txt', 'cv.pdf'],
+      manifest: false,
+      manifestFilename: 'manifest.webmanifest',
+      workbox: {
+        globPatterns: ['**/*.{js,css,html,svg,woff2}'],
+        navigateFallback: '/index.html',
+        navigateFallbackDenylist: [/^\/api\//, /^\/cv\.pdf$/, /^\/certificates\//],
+        runtimeCaching: [
+          {
+            urlPattern: ({ url }) => url.origin === 'https://res.cloudinary.com',
+            handler: 'StaleWhileRevalidate',
+            options: {
+              cacheName: 'cloudinary-images',
+              expiration: { maxEntries: 60, maxAgeSeconds: 60 * 60 * 24 * 30 },
+            },
+          },
+          {
+            urlPattern: ({ url }) => url.origin === 'https://api.github.com',
+            handler: 'NetworkFirst',
+            options: {
+              cacheName: 'github-api',
+              networkTimeoutSeconds: 6,
+              expiration: { maxEntries: 30, maxAgeSeconds: 60 * 60 },
+            },
+          },
+          {
+            urlPattern: ({ url }) =>
+              url.origin === 'https://fonts.googleapis.com' || url.origin === 'https://fonts.gstatic.com',
+            handler: 'StaleWhileRevalidate',
+            options: {
+              cacheName: 'google-fonts',
+              expiration: { maxEntries: 20, maxAgeSeconds: 60 * 60 * 24 * 365 },
+            },
+          },
+        ],
+      },
+    }),
+    mode === 'analyze' &&
+      visualizer({
+        filename: 'dist/stats.html',
+        open: true,
+        gzipSize: true,
+        brotliSize: true,
+      }),
+  ].filter(Boolean),
   resolve: {
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url)),
@@ -19,33 +70,22 @@ export default defineConfig({
     rollupOptions: {
       output: {
         manualChunks: (id) => {
-          if (id.includes('node_modules')) {
-            if (id.includes('react') || id.includes('react-dom') || id.includes('react-router')) {
-              return 'vendor-react';
-            }
-            if (id.includes('framer-motion')) {
-              return 'vendor-motion';
-            }
-            if (id.includes('react-icons')) {
-              return 'vendor-icons';
-            }
-            if (id.includes('ogl')) {
-              return 'vendor-ogl';
-            }
-            if (id.includes('gsap')) {
-              return 'vendor-gsap';
-            }
-            if (id.includes('lenis')) {
-              return 'vendor-lenis';
-            }
-            if (id.includes('three') || id.includes('@react-three')) {
-              return 'vendor-three';
-            }
-            if (id.includes('vercel')) {
-              return 'vendor-vercel';
-            }
-            return 'vendor-common';
+          if (!id.includes('node_modules')) return;
+          if (/[\\/]node_modules[\\/]react-icons[\\/]/.test(id)) return 'vendor-icons';
+          if (/[\\/]node_modules[\\/]framer-motion[\\/]/.test(id)) return 'vendor-motion';
+          if (/[\\/]node_modules[\\/]ogl[\\/]/.test(id)) return 'vendor-ogl';
+          if (/[\\/]node_modules[\\/]gsap[\\/]/.test(id)) return 'vendor-gsap';
+          if (/[\\/]node_modules[\\/]lenis[\\/]/.test(id)) return 'vendor-lenis';
+          if (/[\\/]node_modules[\\/](three|@react-three)[\\/]/.test(id)) return 'vendor-three';
+          if (/[\\/]node_modules[\\/]@vercel[\\/]/.test(id)) return 'vendor-vercel';
+          if (
+            /[\\/]node_modules[\\/](react|react-dom|react-router|react-router-dom|scheduler|@remix-run|use-sync-external-store)[\\/]/.test(
+              id,
+            )
+          ) {
+            return 'vendor-react';
           }
+          return 'vendor-common';
         },
       },
     },
@@ -56,4 +96,4 @@ export default defineConfig({
   optimizeDeps: {
     include: ['react', 'react-dom', 'react-router-dom', 'framer-motion'],
   },
-})
+}));

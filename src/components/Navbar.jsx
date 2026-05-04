@@ -26,15 +26,18 @@ const Navbar = () => {
     { label: 'LinkedIn', link: 'https://www.linkedin.com/in/mert-soylu-b8b6a1341/' },
   ];
 
-  const handleItemClick = useCallback((index) => {
-    const sectionId = SECTION_IDS[index];
-    if (!isHomePage) {
-      navigate(`/#${sectionId}`);
-    } else {
-      const el = document.getElementById(sectionId);
-      if (el) el.scrollIntoView({ behavior: 'smooth' });
-    }
-  }, [isHomePage, navigate]);
+  const handleItemClick = useCallback(
+    (index) => {
+      const sectionId = SECTION_IDS[index];
+      if (!isHomePage) {
+        navigate(`/#${sectionId}`);
+      } else {
+        const el = document.getElementById(sectionId);
+        if (el) el.scrollIntoView({ behavior: 'smooth' });
+      }
+    },
+    [isHomePage, navigate],
+  );
 
   const headerControls = (
     <>
@@ -48,11 +51,23 @@ const Navbar = () => {
       >
         <AnimatePresence mode="wait" initial={false}>
           {isDark ? (
-            <motion.span key="sun" initial={{ rotate: -90, opacity: 0, scale: 0 }} animate={{ rotate: 0, opacity: 1, scale: 1 }} exit={{ rotate: 90, opacity: 0, scale: 0 }} transition={{ duration: 0.25 }}>
+            <motion.span
+              key="sun"
+              initial={{ rotate: -90, opacity: 0, scale: 0 }}
+              animate={{ rotate: 0, opacity: 1, scale: 1 }}
+              exit={{ rotate: 90, opacity: 0, scale: 0 }}
+              transition={{ duration: 0.25 }}
+            >
               <HiSun className="w-4 h-4" />
             </motion.span>
           ) : (
-            <motion.span key="moon" initial={{ rotate: 90, opacity: 0, scale: 0 }} animate={{ rotate: 0, opacity: 1, scale: 1 }} exit={{ rotate: -90, opacity: 0, scale: 0 }} transition={{ duration: 0.25 }}>
+            <motion.span
+              key="moon"
+              initial={{ rotate: 90, opacity: 0, scale: 0 }}
+              animate={{ rotate: 0, opacity: 1, scale: 1 }}
+              exit={{ rotate: -90, opacity: 0, scale: 0 }}
+              transition={{ duration: 0.25 }}
+            >
               <HiMoon className="w-4 h-4" />
             </motion.span>
           )}
@@ -69,13 +84,30 @@ const Navbar = () => {
       >
         <AnimatePresence mode="wait" initial={false}>
           {isTurkish ? (
-            <motion.span key="tr" initial={{ rotate: -90, opacity: 0, scale: 0 }} animate={{ rotate: 0, opacity: 1, scale: 1 }} exit={{ rotate: 90, opacity: 0, scale: 0 }} transition={{ duration: 0.25 }} className="text-[10px] font-bold">TR</motion.span>
+            <motion.span
+              key="tr"
+              initial={{ rotate: -90, opacity: 0, scale: 0 }}
+              animate={{ rotate: 0, opacity: 1, scale: 1 }}
+              exit={{ rotate: 90, opacity: 0, scale: 0 }}
+              transition={{ duration: 0.25 }}
+              className="text-[10px] font-bold"
+            >
+              TR
+            </motion.span>
           ) : (
-            <motion.span key="en" initial={{ rotate: 90, opacity: 0, scale: 0 }} animate={{ rotate: 0, opacity: 1, scale: 1 }} exit={{ rotate: -90, opacity: 0, scale: 0 }} transition={{ duration: 0.25 }} className="text-[10px] font-bold">EN</motion.span>
+            <motion.span
+              key="en"
+              initial={{ rotate: 90, opacity: 0, scale: 0 }}
+              animate={{ rotate: 0, opacity: 1, scale: 1 }}
+              exit={{ rotate: -90, opacity: 0, scale: 0 }}
+              transition={{ duration: 0.25 }}
+              className="text-[10px] font-bold"
+            >
+              EN
+            </motion.span>
           )}
         </AnimatePresence>
       </motion.button>
-
     </>
   );
 
@@ -90,12 +122,16 @@ const Navbar = () => {
       logoUrl="/favicon.svg"
       headerContent={headerControls}
       onItemClick={handleItemClick}
-      colors={isDark ? ['rgba(8,8,8,0.72)', 'rgba(0,0,0,0.82)'] : ['rgba(245,240,232,0.58)', 'rgba(250,248,243,0.64)']}
+      colors={
+        isDark
+          ? ['rgba(8,8,8,0.72)', 'rgba(0,0,0,0.82)']
+          : ['rgba(245,240,232,0.58)', 'rgba(250,248,243,0.64)']
+      }
       panelBg={isDark ? 'rgba(0,0,0,0.84)' : 'rgba(250,248,243,0.68)'}
-      panelTextColor={isDark ? '#e2e8f0' : '#5a4a42'}
+      panelTextColor={isDark ? '#e2e8f0' : '#3d342e'}
       accentColor={isDark ? '#ff9a5c' : '#f07d2d'}
-      menuButtonColor={isDark ? '#e2e8f0' : '#5a4a42'}
-      openMenuButtonColor={isDark ? '#e2e8f0' : '#5a4a42'}
+      menuButtonColor={isDark ? '#e2e8f0' : '#3d342e'}
+      openMenuButtonColor={isDark ? '#e2e8f0' : '#3d342e'}
       changeMenuColorOnOpen={false}
     />
   );

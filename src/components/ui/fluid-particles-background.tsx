@@ -132,12 +132,20 @@ export const FluidParticlesBackground = ({
     const ctx = canvas.getContext("2d", { alpha: true });
     if (!ctx) return;
 
+    const reducedMotionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
+
     const resizeCanvas = () => {
       canvas.width = window.innerWidth;
       canvas.height = window.innerHeight;
     };
 
     resizeCanvas();
+
+    const renderStaticBackground = () => {
+      const isDark = document.documentElement.classList.contains("dark");
+      ctx.fillStyle = isDark ? "#000000" : "#ffffff";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+    };
 
     const particles: Particle[] = Array.from({ length: particleCount }, () => ({
       x: Math.random() * canvas.width,
@@ -149,6 +157,8 @@ export const FluidParticlesBackground = ({
     }));
 
     let rafId = 0;
+    let isPaused = document.hidden || reducedMotionQuery.matches;
+
     const animate = () => {
       const isDark = document.documentElement.classList.contains("dark");
       const scheme = isDark ? COLOR_SCHEME.dark : COLOR_SCHEME.light;
@@ -193,19 +203,73 @@ export const FluidParticlesBackground = ({
         ctx.fill();
       }
 
+      if (!isPaused) {
+        rafId = window.requestAnimationFrame(animate);
+      }
+    };
+
+    const start = () => {
+      if (rafId) return;
+      isPaused = false;
       rafId = window.requestAnimationFrame(animate);
     };
 
-    animate();
+    const stop = () => {
+      isPaused = true;
+      if (rafId) {
+        window.cancelAnimationFrame(rafId);
+        rafId = 0;
+      }
+    };
+
+    if (reducedMotionQuery.matches) {
+      renderStaticBackground();
+    } else if (!document.hidden) {
+      start();
+    } else {
+      renderStaticBackground();
+    }
+
+    const handleVisibilityChange = () => {
+      if (reducedMotionQuery.matches) return;
+      if (document.hidden) {
+        stop();
+      } else {
+        start();
+      }
+    };
+
+    const handleMotionPreferenceChange = (event: MediaQueryListEvent) => {
+      if (event.matches) {
+        stop();
+        renderStaticBackground();
+      } else if (!document.hidden) {
+        start();
+      }
+    };
 
     const handleResize = () => {
       resizeCanvas();
+      if (reducedMotionQuery.matches) renderStaticBackground();
     };
 
     window.addEventListener("resize", handleResize);
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+    if (reducedMotionQuery.addEventListener) {
+      reducedMotionQuery.addEventListener("change", handleMotionPreferenceChange);
+    } else {
+      reducedMotionQuery.addListener(handleMotionPreferenceChange);
+    }
+
     return () => {
-      window.cancelAnimationFrame(rafId);
+      stop();
       window.removeEventListener("resize", handleResize);
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+      if (reducedMotionQuery.removeEventListener) {
+        reducedMotionQuery.removeEventListener("change", handleMotionPreferenceChange);
+      } else {
+        reducedMotionQuery.removeListener(handleMotionPreferenceChange);
+      }
     };
   }, [maxParticleSize, minParticleSize, noise, noiseIntensity, particleCount]);
 

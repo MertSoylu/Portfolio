@@ -1,9 +1,6 @@
 /** @type {import('tailwindcss').Config} */
 export default {
-  content: [
-    "./index.html",
-    "./src/**/*.{js,jsx,ts,tsx}",
-  ],
+  content: ['./index.html', './src/**/*.{js,jsx,ts,tsx}'],
   darkMode: 'class',
   theme: {
     extend: {
@@ -47,19 +44,34 @@ export default {
           700: '#1a1a1a',
           800: '#0f0f0f',
           900: '#050505',
-        }
+        },
+        // Stable warm orange — does NOT invert in dark mode (unlike `warm`).
+        // Use for accents that should keep brand identity across themes:
+        // eyebrow/kicker text, badges, hover emphasis, section title in dark.
+        accent: {
+          50: '#fff7ed',
+          100: '#ffedd5',
+          200: '#fed7aa',
+          300: '#fdba74',
+          400: '#fb923c',
+          500: '#f97316',
+          600: '#ea580c',
+          700: '#c2410c',
+          800: '#9a3412',
+          900: '#7c2d12',
+        },
       },
       animation: {
-        'floating': 'floating 6s ease-in-out infinite',
-        'drift': 'drift 20s linear infinite',
+        floating: 'floating 6s ease-in-out infinite',
+        drift: 'drift 20s linear infinite',
         'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
-        'shimmer': 'shimmer 2s infinite',
-        'slideInUp': 'slideInUp 0.6s ease-out',
-        'slideInDown': 'slideInDown 0.6s ease-out',
-        'fadeIn': 'fadeIn 0.6s ease-out',
+        shimmer: 'shimmer 2s infinite',
+        slideInUp: 'slideInUp 0.6s ease-out',
+        slideInDown: 'slideInDown 0.6s ease-out',
+        fadeIn: 'fadeIn 0.6s ease-out',
         'gradient-x': 'gradient-x 3s ease infinite',
         'wave-shift': 'wave-shift 8s linear infinite',
-        'blink': 'blink 1s step-end infinite',
+        blink: 'blink 1s step-end infinite',
         'badge-pulse': 'badge-pulse 2s ease-in-out infinite',
         'glitch-after': 'glitch var(--after-duration) infinite linear alternate-reverse',
         'glitch-before': 'glitch var(--before-duration) infinite linear alternate-reverse',
@@ -142,16 +154,20 @@ export default {
       },
       boxShadow: {
         'glow-sm': '0 0 8px 0px rgba(240,125,45,0.25)',
-        'glow': '0 0 20px 0px rgba(240,125,45,0.30)',
+        glow: '0 0 20px 0px rgba(240,125,45,0.30)',
         'glow-lg': '0 0 40px 4px rgba(240,125,45,0.25)',
         'inner-glow': 'inset 0 1px 0 0 rgba(240,125,45,0.15), inset 0 0 20px 0 rgba(240,125,45,0.05)',
+        soft: '0 4px 24px -8px rgba(15, 15, 15, 0.08), 0 2px 8px -4px rgba(15, 15, 15, 0.04)',
+        elevation: '0 16px 40px -16px rgba(15, 15, 15, 0.12), 0 4px 16px -8px rgba(15, 15, 15, 0.08)',
+        'warm-soft': '0 8px 32px -12px rgba(249, 115, 22, 0.20)',
+        'warm-prominent': '0 16px 48px -16px rgba(249, 115, 22, 0.28)',
       },
       backgroundImage: {
         'gradient-sand': 'linear-gradient(135deg, #faf8f3 0%, #ede6db 100%)',
         'gradient-warm': 'linear-gradient(135deg, #fff8f0 0%, #ffe8d6 100%)',
         'radial-warm': 'radial-gradient(ellipse at center, rgba(240,125,45,0.08) 0%, transparent 70%)',
-      }
+      },
     },
   },
   plugins: [],
-}
+};

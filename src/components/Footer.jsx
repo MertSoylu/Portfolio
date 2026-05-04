@@ -18,17 +18,10 @@ const footerColumn = {
   },
 };
 
-/* TODO(human): Add the linkUnderline variant here for quick link hover animation.
-   Pattern: scaleX from 0→1 on hover via variant propagation from parent motion.a.
-   const linkUnderline = {
-     initial: { scaleX: 0, originX: 0 },
-     hover: { scaleX: 1 },
-   };
-   Then convert each <a> in the quick links list to a <motion.a> with
-   whileHover="hover" initial="initial", and add a sibling <motion.span
-   variants={linkUnderline} transition={{ duration: 0.25, ease: 'easeOut' }}
-   className="h-px bg-warm-600 dark:bg-warm-400 w-full" /> inside it.
-*/
+const linkUnderline = {
+  initial: { scaleX: 0, originX: 0 },
+  hover: { scaleX: 1 },
+};
 
 /* ── Animated wave SVG separator ── */
 const WaveSeparator = () => (
@@ -99,13 +92,17 @@ const Footer = () => {
             <motion.div variants={footerColumn}>
               <h3 className="text-2xl font-bold gradient-text mb-2">Mert Soylu</h3>
               <p className="text-sand-600 dark:text-dark-200 text-sm">
-                {isTurkish ? 'Bilgisayar Programcılığı Öğrencisi & Geliştirici' : 'Computer Programming Student & Developer'}
+                {isTurkish
+                  ? 'Bilgisayar Programcılığı Öğrencisi & Geliştirici'
+                  : 'Computer Programming Student & Developer'}
               </p>
             </motion.div>
 
             {/* Quick Links */}
             <motion.div variants={footerColumn}>
-              <h4 className="font-semibold text-sand-900 dark:text-dark-50 mb-4">{isTurkish ? 'Hızlı Linkler' : 'Quick Links'}</h4>
+              <h4 className="font-semibold text-sand-900 dark:text-dark-50 mb-4">
+                {isTurkish ? 'Hızlı Linkler' : 'Quick Links'}
+              </h4>
               <ul className="space-y-2">
                 {[
                   { name: isTurkish ? 'Hakkımda' : 'About', href: '#about' },
@@ -113,16 +110,19 @@ const Footer = () => {
                   { name: isTurkish ? 'İletişim' : 'Contact', href: '#contact' },
                 ].map((link) => (
                   <li key={link.name}>
-                    {/* TODO(human): Convert this <a> to a <motion.a> with hover underline animation.
-                        Use whileHover="hover" initial="initial" on the parent motion.a,
-                        and add a <motion.span variants={linkUnderline} ...> sibling for the underline.
-                        See the linkUnderline variant defined above this component. */}
-                    <a
+                    <motion.a
                       href={link.href}
-                      className="text-sand-600 dark:text-dark-200 hover:text-warm-600 dark:hover:text-warm-400 transition-colors text-sm py-1.5 inline-block"
+                      whileHover="hover"
+                      initial="initial"
+                      className="relative inline-block text-sand-600 dark:text-dark-200 hover:text-accent-700 dark:hover:text-accent-300 transition-colors text-sm py-1.5"
                     >
                       {link.name}
-                    </a>
+                      <motion.span
+                        variants={linkUnderline}
+                        transition={{ duration: 0.25, ease: 'easeOut' }}
+                        className="absolute bottom-0 left-0 h-px w-full bg-accent-600 dark:bg-accent-400"
+                      />
+                    </motion.a>
                   </li>
                 ))}
               </ul>
@@ -130,7 +130,9 @@ const Footer = () => {
 
             {/* Social Links */}
             <motion.div variants={footerColumn}>
-              <h4 className="font-semibold text-sand-900 dark:text-dark-50 mb-4">{isTurkish ? 'Bağlantılar' : 'Connect'}</h4>
+              <h4 className="font-semibold text-sand-900 dark:text-dark-50 mb-4">
+                {isTurkish ? 'Bağlantılar' : 'Connect'}
+              </h4>
               <div className="flex gap-4">
                 {socialLinks.map((link) => (
                   <motion.a
@@ -138,7 +140,7 @@ const Footer = () => {
                     href={link.href}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="w-11 h-11 flex items-center justify-center rounded-lg text-sand-600 dark:text-dark-200 hover:text-warm-600 dark:hover:text-warm-400 hover:bg-sand-200/50 dark:hover:bg-dark-500/50 transition-colors"
+                    className="w-11 h-11 flex items-center justify-center rounded-lg text-sand-600 dark:text-dark-200 hover:text-accent-700 dark:hover:text-accent-300 hover:bg-sand-200/50 dark:hover:bg-dark-500/50 transition-colors"
                     whileHover={{ scale: 1.1 }}
                     whileTap={{ scale: 0.92 }}
                     title={link.name}
@@ -172,10 +174,14 @@ const Footer = () => {
             className="flex flex-col md:flex-row justify-between items-center text-center md:text-left"
           >
             <p className="text-sm text-sand-600 dark:text-dark-200">
-              {isTurkish ? `© ${currentYear} Mert Soylu. Tüm hakları saklıdır.` : `© ${currentYear} Mert Soylu. All rights reserved.`}
+              {isTurkish
+                ? `© ${currentYear} Mert Soylu. Tüm hakları saklıdır.`
+                : `© ${currentYear} Mert Soylu. All rights reserved.`}
             </p>
             <p className="text-sm text-sand-600 dark:text-dark-200 mt-4 md:mt-0">
-              {isTurkish ? 'React, Tailwind CSS ve Framer Motion ile geliştirildi' : 'Built with React, Tailwind CSS & Framer Motion'}
+              {isTurkish
+                ? 'React, Tailwind CSS ve Framer Motion ile geliştirildi'
+                : 'Built with React, Tailwind CSS & Framer Motion'}
             </p>
           </motion.div>
         </div>

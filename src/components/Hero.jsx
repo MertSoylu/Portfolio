@@ -1,12 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, useScroll, useTransform, useMotionValue, useSpring } from 'framer-motion';
-import { HiArrowRight, HiCode, HiShieldCheck, HiChip } from 'react-icons/hi';
+import { HiArrowRight, HiCode, HiShieldCheck, HiChip, HiDownload } from 'react-icons/hi';
 import { HiDevicePhoneMobile } from 'react-icons/hi2';
 import { Link } from 'react-router-dom';
 import { fetchGitHubRepos } from '../utils/githubApi';
 import { useLanguage } from '../context/LanguageContext';
 import { useDarkMode } from '../context/DarkModeContext';
-import { HERO_ROLES } from '../utils/constants';
+import { HERO_ROLES, CV_LABEL, CV_PATH } from '../utils/constants';
 import { MorphingRoles } from './SplitFlapText';
 import TextPressure from './TextPressure';
 
@@ -23,7 +23,10 @@ const useMagneticButton = (strength = 0.35) => {
     x.set((e.clientX - (rect.left + rect.width / 2)) * strength);
     y.set((e.clientY - (rect.top + rect.height / 2)) * strength);
   };
-  const onMouseLeave = () => { x.set(0); y.set(0); };
+  const onMouseLeave = () => {
+    x.set(0);
+    y.set(0);
+  };
 
   return { ref, style: { x: springX, y: springY }, onMouseMove, onMouseLeave };
 };
@@ -67,7 +70,10 @@ const ZoneCard = ({ icon, title, link, color, delay }) => {
         transition={{ duration: 0.8, delay, ease: [0.22, 1, 0.36, 1] }}
         whileHover={{ y: -8, scale: 1.02 }}
         onMouseEnter={() => setHovered(true)}
-        onMouseLeave={(e) => { setHovered(false); tilt.onMouseLeave(); }}
+        onMouseLeave={(e) => {
+          setHovered(false);
+          tilt.onMouseLeave();
+        }}
         onMouseMove={tilt.onMouseMove}
         style={{
           rotateX: tilt.springRotateX,
@@ -85,7 +91,10 @@ const ZoneCard = ({ icon, title, link, color, delay }) => {
           animate={hovered ? { opacity: 0.6, scale: 1.05 } : { opacity: 0.3, scale: 1 }}
           transition={{ duration: 0.3 }}
         />
-        <div className="relative z-10 flex flex-col items-center text-center" style={{ transform: 'translateZ(20px)' }}>
+        <div
+          className="relative z-10 flex flex-col items-center text-center"
+          style={{ transform: 'translateZ(20px)' }}
+        >
           <motion.div
             className="mb-2 flex h-9 w-9 items-center justify-center rounded-lg border border-white/20 bg-white/30 text-warm-600 dark:border-dark-300/20 dark:bg-dark-500/30 dark:text-warm-400 sm:mb-4 sm:h-12 sm:w-12 sm:rounded-xl"
             animate={hovered ? { rotate: [0, -10, 10, 0], scale: 1.1 } : { rotate: 0, scale: 1 }}
@@ -94,7 +103,9 @@ const ZoneCard = ({ icon, title, link, color, delay }) => {
           >
             {icon}
           </motion.div>
-          <h3 className="mb-2 whitespace-nowrap px-1 text-[13px] font-bold text-sand-900 dark:text-dark-50 sm:mb-4 sm:text-lg">{title}</h3>
+          <h3 className="mb-2 whitespace-nowrap px-1 text-sm font-bold text-sand-900 dark:text-zinc-50 sm:mb-4 sm:text-lg">
+            {title}
+          </h3>
           <motion.span
             className="hidden sm:inline-flex items-center gap-1 text-sm font-semibold text-warm-600 dark:text-warm-400"
             animate={hovered ? { x: 4 } : { x: 0 }}
@@ -140,6 +151,7 @@ const Hero = () => {
 
   const magBtn1 = useMagneticButton();
   const magBtn2 = useMagneticButton();
+  const magBtn3 = useMagneticButton();
 
   const roles = isTurkish ? HERO_ROLES.tr : HERO_ROLES.en;
 
@@ -195,11 +207,21 @@ const Hero = () => {
       onMouseLeave={onHeroMouseLeave}
       style={{ perspective: '1200px' }}
     >
-      <motion.div style={{ y, opacity, scale, rotateX: springHeroRX, rotateY: springHeroRY, transformStyle: 'preserve-3d' }} className="w-full flex flex-col items-center z-10 relative">
+      <motion.div
+        style={{
+          y,
+          opacity,
+          scale,
+          rotateX: springHeroRX,
+          rotateY: springHeroRY,
+          transformStyle: 'preserve-3d',
+        }}
+        className="w-full flex flex-col items-center z-10 relative"
+      >
         <div className="text-center max-w-3xl mx-auto w-full">
           {/* Greeting */}
           <motion.p
-            className="text-lg md:text-xl text-sand-600 dark:text-dark-200 mb-4"
+            className="text-body-lg text-sand-700 dark:text-zinc-300 mb-4"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.6, delay: 0.2 }}
@@ -208,7 +230,10 @@ const Hero = () => {
           </motion.p>
 
           {/* Name — TextPressure */}
-          <div className="mb-6 w-full h-[80px] sm:h-[120px] md:h-[160px] lg:h-[200px]" style={{ transform: 'translateZ(40px)', transformStyle: 'preserve-3d' }}>
+          <div
+            className="mb-6 w-full h-[80px] sm:h-[120px] md:h-[160px] lg:h-[200px]"
+            style={{ transform: 'translateZ(40px)', transformStyle: 'preserve-3d' }}
+          >
             <TextPressure
               text="Mert Soylu"
               fontFamily="Compressa VF"
@@ -283,6 +308,19 @@ const Hero = () => {
             >
               {isTurkish ? 'İletişime Geç' : 'Get In Touch'}
             </motion.a>
+            <motion.a
+              ref={magBtn3.ref}
+              style={magBtn3.style}
+              onMouseMove={magBtn3.onMouseMove}
+              onMouseLeave={magBtn3.onMouseLeave}
+              href={CV_PATH}
+              download
+              className="btn-secondary flex items-center gap-2 group"
+              whileTap={{ scale: 0.97 }}
+            >
+              <HiDownload className="w-4 h-4" />
+              {isTurkish ? CV_LABEL.tr : CV_LABEL.en}
+            </motion.a>
           </motion.div>
 
           {/* Zone Cards */}
@@ -307,7 +345,9 @@ const Hero = () => {
           >
             {repoCount && (
               <>
-                <span className="font-semibold">{repoCount}+ {isTurkish ? 'Proje' : 'Projects'}</span>
+                <span className="font-semibold">
+                  {repoCount}+ {isTurkish ? 'Proje' : 'Projects'}
+                </span>
                 <span className="opacity-30">·</span>
               </>
             )}
