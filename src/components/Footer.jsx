@@ -92,9 +92,7 @@ const Footer = () => {
             <motion.div variants={footerColumn}>
               <h3 className="text-2xl font-bold gradient-text mb-2">Mert Soylu</h3>
               <p className="text-sand-600 dark:text-dark-200 text-sm">
-                {isTurkish
-                  ? 'Bilgisayar Programcılığı Öğrencisi & Geliştirici'
-                  : 'Computer Programming Student & Developer'}
+                {isTurkish ? 'Full-Stack Developer & AI Developer' : 'Full-Stack Developer & AI Developer'}
               </p>
             </motion.div>
 

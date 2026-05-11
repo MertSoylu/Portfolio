@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { HiDeviceMobile, HiStar, HiHeart, HiTrendingUp } from 'react-icons/hi';
+import { HiDeviceMobile, HiStar, HiHeart, HiTrendingUp, HiBookOpen } from 'react-icons/hi';
+import { Link } from 'react-router-dom';
 import { useLanguage } from '../context/LanguageContext';
 import SitePreview from '../components/SitePreview';
 import FadeContent from '../components/FadeContent';
@@ -141,19 +142,28 @@ const AndroidPage = () => {
                 ))}
               </div>
 
-              <button
-                onClick={() => setExpanded((prev) => !prev)}
-                className="flex items-center gap-1 text-xs font-semibold text-sand-600 dark:text-zinc-400 hover:text-accent-700 dark:hover:text-accent-300 transition-colors"
-              >
-                <motion.span
-                  animate={{ rotate: expanded ? 90 : 0 }}
-                  transition={{ duration: 0.2 }}
-                  className="inline-block"
+              <div className="flex items-center gap-3">
+                <button
+                  onClick={() => setExpanded((prev) => !prev)}
+                  className="flex items-center gap-1 text-xs font-semibold text-sand-600 dark:text-zinc-400 hover:text-accent-700 dark:hover:text-accent-300 transition-colors"
                 >
-                  ▸
-                </motion.span>
-                {expanded ? (isTurkish ? 'Kapat' : 'Close') : isTurkish ? 'Daha fazla oku' : 'Read more'}
-              </button>
+                  <motion.span
+                    animate={{ rotate: expanded ? 90 : 0 }}
+                    transition={{ duration: 0.2 }}
+                    className="inline-block"
+                  >
+                    ▸
+                  </motion.span>
+                  {expanded ? (isTurkish ? 'Kapat' : 'Close') : isTurkish ? 'Daha fazla oku' : 'Read more'}
+                </button>
+                <Link
+                  to="/case-study/walkkittie"
+                  className="inline-flex items-center gap-1 text-xs font-semibold text-accent-600 dark:text-accent-400 hover:text-accent-700 dark:hover:text-accent-300 transition-colors"
+                >
+                  <HiBookOpen className="w-3.5 h-3.5" />
+                  {isTurkish ? 'Case Study' : 'Case Study'}
+                </Link>
+              </div>
             </div>
           </div>
 

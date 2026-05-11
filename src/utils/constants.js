@@ -1,12 +1,12 @@
 // Site metadata
-export const SITE_TITLE = 'Mert Soylu | Portfolio';
+export const SITE_TITLE = 'Mert Soylu | Full-Stack Developer & AI Developer';
 export const SITE_DESCRIPTION =
-  'Computer Programming Student & Developer - Web Development, Android Development, Cybersecurity, Data Science and Deep Learning';
+  'Full-Stack Developer & AI Developer - Web Development, Android Development, Cybersecurity, Data Science and Deep Learning';
 
 // Personal information
 export const PERSONAL_INFO = {
   name: 'Mert Soylu',
-  title: 'Computer Programming Student',
+  title: 'Full-Stack Developer & AI Developer',
   university: 'Kütahya Dumlupınar University',
   email: 's6ylumert@gmail.com',
   github: 'https://github.com/MertSoylu',
@@ -79,8 +79,8 @@ export const SECTIONS = {
 };
 
 export const HERO_ROLES = {
-  tr: ['React Developer', 'Mobil Uygulama Geliştirici', 'Güvenlik Odaklı', 'Hızlı Öğrenen'],
-  en: ['React Developer', 'Mobile App Builder', 'Security-Minded', 'Adaptable Learner'],
+  tr: ['React Developer', 'Full-Stack Developer', 'AI Developer', 'Security-Minded'],
+  en: ['React Developer', 'Full-Stack Developer', 'AI Developer', 'Security-Minded'],
 };
 
 export const CV_LABEL = {
@@ -154,12 +154,13 @@ const DEFAULT_OG_IMAGE = `${SITE_URL}/og-image.png`;
 export const SEO_META = {
   '/': {
     tr: {
-      title: 'Mert Soylu | Geliştirici Portfolyosu',
-      description: 'Bilgisayar Programcılığı öğrencisi. Web, mobil, siber güvenlik ve veri bilimi.',
+      title: 'Mert Soylu | Full-Stack Developer & AI Developer',
+      description: 'Full-Stack Developer & AI Developer. Web, mobil, siber güvenlik ve yapay zeka projeleri.',
     },
     en: {
-      title: 'Mert Soylu | Developer Portfolio',
-      description: 'Computer Programming student focused on web, mobile, cybersecurity and data science.',
+      title: 'Mert Soylu | Full-Stack Developer & AI Developer',
+      description:
+        'Full-Stack Developer & AI Developer building projects in web, mobile, cybersecurity, and AI.',
     },
     canonical: `${SITE_URL}/`,
     ogImage: DEFAULT_OG_IMAGE,
@@ -202,12 +203,12 @@ export const SEO_META = {
   },
   '/data-science': {
     tr: {
-      title: 'Veri Bilimi ve Derin Öğrenme | Mert Soylu',
-      description: 'Python, NumPy, Pandas ile veri bilimi ve derin öğrenme öğrenme yolculuğu.',
+      title: 'AI & Veri Bilimi | Mert Soylu',
+      description: 'Yapay zeka, derin öğrenme ve veri bilimi öğrenme yolculuğu.',
     },
     en: {
-      title: 'Data Science & Deep Learning | Mert Soylu',
-      description: 'Data science and deep learning journey with Python, NumPy, and Pandas.',
+      title: 'AI & Data Science | Mert Soylu',
+      description: 'AI, deep learning, and data science learning journey.',
     },
     canonical: `${SITE_URL}/data-science`,
     ogImage: `${SITE_URL}/og-data.png`,

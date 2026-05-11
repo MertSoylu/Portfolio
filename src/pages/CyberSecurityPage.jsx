@@ -9,6 +9,7 @@ import {
   HiDownload,
   HiExternalLink,
 } from 'react-icons/hi';
+import { Link } from 'react-router-dom';
 import { useLanguage } from '../context/LanguageContext';
 import { useDarkMode } from '../context/DarkModeContext';
 import SitePreview from '../components/SitePreview';
@@ -269,6 +270,13 @@ const CyberSecurityPage = () => {
                         ),
                       )}
                     </div>
+                    <Link
+                      to="/case-study/msscan"
+                      className="inline-flex items-center gap-1 text-xs font-semibold text-accent-600 dark:text-accent-400 hover:text-accent-700 dark:hover:text-accent-300 transition-colors mt-3"
+                    >
+                      <HiBookOpen className="w-3.5 h-3.5" />
+                      {isTurkish ? 'Case Study' : 'Case Study'}
+                    </Link>
                   </div>
                 </div>
               </div>

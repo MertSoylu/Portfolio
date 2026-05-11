@@ -18,6 +18,11 @@ import { Toaster } from 'react-hot-toast';
 import { FluidParticlesBackground } from '@/components/ui/fluid-particles-background';
 import WebDevPage from './pages/WebDevPage';
 import DataSciencePage from './pages/DataSciencePage';
+import MnemosyneCaseStudy from './pages/case-studies/MnemosyneCaseStudy';
+import TypeSprintCaseStudy from './pages/case-studies/TypeSprintCaseStudy';
+import DertHaritasiCaseStudy from './pages/case-studies/DertHaritasiCaseStudy';
+import WalkKittieCaseStudy from './pages/case-studies/WalkKittieCaseStudy';
+import MsscanCaseStudy from './pages/case-studies/MsscanCaseStudy';
 
 const lazyWithRetry = (importer, cacheKey) =>
   lazy(async () => {
@@ -70,6 +75,11 @@ const ROUTE_DIRECTIONS = {
   '/web': 'right',
   '/cybersecurity': 'up',
   '/data-science': 'left',
+  '/case-study/mnemosyne': 'right',
+  '/case-study/typesprint': 'right',
+  '/case-study/dert-haritasi': 'right',
+  '/case-study/walkkittie': 'left',
+  '/case-study/msscan': 'up',
 };
 
 const ROUTE_OVERLAYS = {
@@ -81,6 +91,16 @@ const ROUTE_OVERLAYS = {
     'from-white/76 via-white/62 to-white/76 dark:from-black/88 dark:via-zinc-950/78 dark:to-black/88',
   '/data-science':
     'from-white/67 via-white/52 to-white/67 dark:from-black/82 dark:via-zinc-950/70 dark:to-black/82',
+  '/case-study/mnemosyne':
+    'from-white/65 via-white/48 to-white/65 dark:from-black/78 dark:via-zinc-950/66 dark:to-black/78',
+  '/case-study/typesprint':
+    'from-white/65 via-white/48 to-white/65 dark:from-black/78 dark:via-zinc-950/66 dark:to-black/78',
+  '/case-study/dert-haritasi':
+    'from-white/65 via-white/48 to-white/65 dark:from-black/78 dark:via-zinc-950/66 dark:to-black/78',
+  '/case-study/walkkittie':
+    'from-white/62 via-white/45 to-white/62 dark:from-black/75 dark:via-zinc-950/60 dark:to-black/75',
+  '/case-study/msscan':
+    'from-white/70 via-white/55 to-white/70 dark:from-black/85 dark:via-zinc-950/75 dark:to-black/85',
 };
 
 const ROUTE_PARTICLES = {
@@ -89,6 +109,11 @@ const ROUTE_PARTICLES = {
   '/android': { particleCount: 900, noiseIntensity: 0.0023 },
   '/cybersecurity': { particleCount: 1150, noiseIntensity: 0.0028 },
   '/data-science': { particleCount: 720, noiseIntensity: 0.0018 },
+  '/case-study/mnemosyne': { particleCount: 820, noiseIntensity: 0.0022 },
+  '/case-study/typesprint': { particleCount: 820, noiseIntensity: 0.0022 },
+  '/case-study/dert-haritasi': { particleCount: 820, noiseIntensity: 0.0022 },
+  '/case-study/walkkittie': { particleCount: 880, noiseIntensity: 0.0024 },
+  '/case-study/msscan': { particleCount: 1050, noiseIntensity: 0.0027 },
 };
 
 const getClipPath = (direction, state) => {
@@ -273,6 +298,46 @@ const AppContent = () => {
                 element={
                   <PageTransition direction="left">
                     <DataSciencePage />
+                  </PageTransition>
+                }
+              />
+              <Route
+                path="/case-study/mnemosyne"
+                element={
+                  <PageTransition direction="right">
+                    <MnemosyneCaseStudy />
+                  </PageTransition>
+                }
+              />
+              <Route
+                path="/case-study/typesprint"
+                element={
+                  <PageTransition direction="right">
+                    <TypeSprintCaseStudy />
+                  </PageTransition>
+                }
+              />
+              <Route
+                path="/case-study/dert-haritasi"
+                element={
+                  <PageTransition direction="right">
+                    <DertHaritasiCaseStudy />
+                  </PageTransition>
+                }
+              />
+              <Route
+                path="/case-study/walkkittie"
+                element={
+                  <PageTransition direction="left">
+                    <WalkKittieCaseStudy />
+                  </PageTransition>
+                }
+              />
+              <Route
+                path="/case-study/msscan"
+                element={
+                  <PageTransition direction="up">
+                    <MsscanCaseStudy />
                   </PageTransition>
                 }
               />

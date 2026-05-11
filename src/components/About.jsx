@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { motion, useInView } from 'framer-motion';
 import { HiCode, HiShieldCheck, HiArrowRight } from 'react-icons/hi';
 import { HiAcademicCap, HiChip } from 'react-icons/hi';
@@ -7,7 +7,6 @@ import { fetchGitHubRepos } from '../utils/githubApi';
 import { useLanguage } from '../context/LanguageContext';
 import { SKILLS_DESCRIPTIONS } from '../utils/constants';
 import ScrollFloat from './ScrollFloat';
-import ScrollReveal from './ScrollReveal';
 import SpotlightCard from './SpotlightCard';
 import { useDarkMode } from '../context/DarkModeContext';
 
@@ -45,6 +44,11 @@ const About = () => {
   const { isTurkish } = useLanguage();
   const { isDark } = useDarkMode();
   const [repoCount, setRepoCount] = useState(0);
+
+  const githubChartUrl = useMemo(() => {
+    const date = new Date().toISOString().split('T')[0];
+    return `https://ghchart.rshah.org/f07d2d/MertSoylu?t=${date}`;
+  }, []);
 
   useEffect(() => {
     fetchGitHubRepos()
@@ -114,18 +118,6 @@ const About = () => {
           >
             {isTurkish ? 'Hakkımda' : 'About Me'}
           </ScrollFloat>
-          <ScrollReveal
-            containerClassName="mt-4"
-            textClassName="text-body-lg text-sand-700 dark:text-zinc-300 font-normal"
-            enableBlur={true}
-            baseOpacity={0.75}
-            baseRotation={3}
-            blurStrength={1.5}
-          >
-            {isTurkish
-              ? 'Tutkulu geliştirici ve ömür boyu öğrenen'
-              : 'Passionate developer and lifelong learner'}
-          </ScrollReveal>
         </div>
 
         {/* Main about content */}
@@ -137,22 +129,22 @@ const About = () => {
           transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
         >
           <h3 className="text-h2 text-sand-900 dark:text-zinc-50 mb-6 text-center">
-            {isTurkish ? 'Bilgisayar Programcılığı Öğrencisi' : 'Computer Programming Student'}
+            {isTurkish ? 'Full-Stack Developer & AI Developer' : 'Full-Stack Developer & AI Developer'}
           </h3>
           <p className="text-body-lg text-sand-700 dark:text-zinc-300 mb-4 text-center">
             {isTurkish
-              ? 'Bilgisayar Programcılığı öğrencisiyim. Web, mobil, güvenlikte odaklı. Teknolojileri keşfederek öğreniyorum, öğrendiklerimi uygulamaya dönüştürüyorum.'
-              : 'Computer Programming student focused on web, mobile, and security. I learn by exploring, and turn what I learn into working applications.'}
+              ? 'Full-Stack Developer ve AI Developer olarak web, mobil ve güvenlik alanlarında projeler geliştiriyorum. Teknolojileri keşfederek öğreniyor, öğrendiklerimi ürüne dönüştürüyorum.'
+              : 'Full-Stack Developer & AI Developer building projects across web, mobile, and security. I learn by exploring, and turn what I learn into shipped products.'}
           </p>
           <p className="text-body-lg text-sand-700 dark:text-zinc-300 mb-4 pl-4 border-l-2 border-accent-500/40">
             {isTurkish
-              ? 'Teknolojiye olan ilgim sistemlerin nasıl çalıştığını merak etmemle başladı. Zamanla bu merak, gerçek hayattaki problemleri çözen faydalı uygulamalar geliştirme hedefine dönüştü.'
-              : 'My interest in tech started simply by wondering how systems work behind the scenes. Over time, it grew into a focused goal to build useful applications that solve real-world problems.'}
+              ? 'Yazılımın en değerli yanı, karmaşık bir problemi basit, kullanılabilir bir çözüme dönüştürebilmesi. Bu yüzden her projeye sadece "kod yazmak" değil, "gerçek bir sorunu çözmek" gözüyle bakıyorum.'
+              : 'What I value most in software is its ability to turn complex problems into simple, usable solutions. That\'s why I approach every project not just as "writing code," but as solving a real problem.'}
           </p>
           <p className="text-body-lg text-sand-700 dark:text-zinc-300 pl-4 border-l-2 border-accent-500/20">
             {isTurkish
-              ? 'Kod yazmaktan arta kalan zamanlarımda ise yeni teknolojileri incelemeyi ve açık kaynaklı projelere destek olmayı seviyorum.'
-              : "When I'm away from the keyboard, I enjoy exploring new technologies and contributing to open-source projects."}
+              ? 'Boş zamanlarımda öğrendiğim yeni teknolojileri küçük ama tamamlanmış side projelerde deniyorum. Açık kaynak topluluğundan faydalandığım kadar, fayda sağlamaya da çalışıyorum.'
+              : 'In my free time, I experiment with new technologies through small but complete side projects. I try to give back to the open-source community as much as I benefit from it.'}
           </p>
         </motion.div>
 
@@ -181,7 +173,7 @@ const About = () => {
           </h4>
           <div className="card-raised p-4 overflow-x-auto">
             <img
-              src="https://ghchart.rshah.org/f07d2d/MertSoylu"
+              src={githubChartUrl}
               alt={isTurkish ? 'Mert Soylu GitHub katkı grafiği' : 'Mert Soylu GitHub contribution chart'}
               loading="lazy"
               decoding="async"

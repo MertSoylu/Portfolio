@@ -266,13 +266,15 @@ const Hero = () => {
             </motion.div>
           </div>
 
-          {/* University line */}
+          {/* Position & University line */}
           <motion.div
             className="text-sand-500 dark:text-dark-300 mb-8"
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 1.0, duration: 0.5 }}
           >
+            {isTurkish ? 'Full-Stack Developer & AI Developer' : 'Full-Stack Developer & AI Developer'}
+            <span className="mx-2 opacity-40">·</span>
             {isTurkish ? 'Bilgisayar Programcılığı' : 'Computer Programming'}
             <span className="mx-2 opacity-40">·</span>
             <span className="font-semibold">DPU</span>
@@ -358,7 +360,9 @@ const Hero = () => {
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75" />
                 <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500" />
               </span>
-              {isTurkish ? 'İşe Açık' : 'Open to Work'}
+              {isTurkish
+                ? 'Full-Stack & AI Developer pozisyonlarına açık'
+                : 'Open to Full-Stack & AI Developer roles'}
             </span>
           </motion.div>
         </div>

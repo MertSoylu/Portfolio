@@ -356,8 +356,8 @@ const Contact = () => {
           <FadeContent duration={800} ease="power3.out" threshold={0.2} blur={true}>
             <p className="text-body text-sand-700 dark:text-zinc-300">
               {isTurkish
-                ? 'Yeni projelere ve işbirliğine açığım. Full-time, freelance, mentorship—ne istiyorsan söyle.'
-                : "Open to new projects and collaboration. Full-time roles, freelance work, mentorship. Tell me what you're building."}
+                ? 'Full-Stack Developer ve AI Developer pozisyonlarına açığım. Remote, hibrit veya ofis tabanlı çalışmaya hazırım.'
+                : 'Open to Full-Stack Developer and AI Developer roles. Available for remote, hybrid, or on-site work.'}
             </p>
           </FadeContent>
         </div>

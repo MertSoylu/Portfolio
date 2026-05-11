@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { HiExternalLink, HiGlobe } from 'react-icons/hi';
+import { HiExternalLink, HiGlobe, HiBookOpen } from 'react-icons/hi';
+import { Link } from 'react-router-dom';
 import { useLanguage } from '../context/LanguageContext';
 import { useDarkMode } from '../context/DarkModeContext';
 import SitePreview from '../components/SitePreview';
@@ -25,6 +26,7 @@ const WebDevPage = () => {
   const projects = [
     {
       id: 'mnemosyne',
+      caseStudyPath: '/case-study/mnemosyne',
       title: 'Mnemosyne',
       url: 'https://m-nemosyne.live',
       previewImage: 'https://image.thum.io/get/width/1600/https://m-nemosyne.live',
@@ -59,6 +61,7 @@ const WebDevPage = () => {
     },
     {
       id: 'typesprint',
+      caseStudyPath: '/case-study/typesprint',
       title: 'TypeSprint',
       url: 'https://typesprint.online',
       gradient: 'from-zinc-700 to-black',
@@ -92,6 +95,7 @@ const WebDevPage = () => {
     },
     {
       id: 'dert-haritasi',
+      caseStudyPath: '/case-study/dert-haritasi',
       title: isTurkish ? 'Dert Haritası' : 'Dert Haritası (Complaint Map)',
       url: 'https://dert-haritasi.vercel.app',
       gradient: 'from-emerald-500 to-teal-600',
@@ -233,25 +237,36 @@ const WebDevPage = () => {
                       ))}
                     </div>
 
-                    <button
-                      onClick={() => toggleExpanded(project.id)}
-                      className="flex items-center gap-1 text-xs font-semibold text-sand-600 dark:text-zinc-400 hover:text-accent-700 dark:hover:text-accent-300 transition-colors"
-                    >
-                      <motion.span
-                        animate={{ rotate: expandedIds.has(project.id) ? 90 : 0 }}
-                        transition={{ duration: 0.2 }}
-                        className="inline-block"
+                    <div className="flex items-center gap-3">
+                      <button
+                        onClick={() => toggleExpanded(project.id)}
+                        className="flex items-center gap-1 text-xs font-semibold text-sand-600 dark:text-zinc-400 hover:text-accent-700 dark:hover:text-accent-300 transition-colors"
                       >
-                        ▸
-                      </motion.span>
-                      {expandedIds.has(project.id)
-                        ? isTurkish
-                          ? 'Kapat'
-                          : 'Close'
-                        : isTurkish
-                          ? 'Daha fazla oku'
-                          : 'Read more'}
-                    </button>
+                        <motion.span
+                          animate={{ rotate: expandedIds.has(project.id) ? 90 : 0 }}
+                          transition={{ duration: 0.2 }}
+                          className="inline-block"
+                        >
+                          ▸
+                        </motion.span>
+                        {expandedIds.has(project.id)
+                          ? isTurkish
+                            ? 'Kapat'
+                            : 'Close'
+                          : isTurkish
+                            ? 'Daha fazla oku'
+                            : 'Read more'}
+                      </button>
+                      {project.caseStudyPath && (
+                        <Link
+                          to={project.caseStudyPath}
+                          className="inline-flex items-center gap-1 text-xs font-semibold text-accent-600 dark:text-accent-400 hover:text-accent-700 dark:hover:text-accent-300 transition-colors"
+                        >
+                          <HiBookOpen className="w-3.5 h-3.5" />
+                          {isTurkish ? 'Case Study' : 'Case Study'}
+                        </Link>
+                      )}
+                    </div>
                   </div>
                 </div>
 
