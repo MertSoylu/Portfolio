@@ -1,64 +1,48 @@
-import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { HiDeviceMobile, HiStar, HiHeart, HiTrendingUp, HiBookOpen } from 'react-icons/hi';
+import React from 'react';
+import { motion } from 'framer-motion';
+import { HiBookOpen, HiDeviceMobile, HiExternalLink, HiHeart, HiTrendingUp } from 'react-icons/hi';
 import { Link } from 'react-router-dom';
 import { useLanguage } from '../context/LanguageContext';
 import SitePreview from '../components/SitePreview';
-import FadeContent from '../components/FadeContent';
 import SpecialtyPageLayout from '../components/SpecialtyPageLayout';
 
 const AndroidPage = () => {
   const { isTurkish } = useLanguage();
-  const [expanded, setExpanded] = useState(false);
-  const googlePlayBadgeSrc = isTurkish
-    ? 'https://play.google.com/intl/en_us/badges/static/images/badges/tr_badge_web_generic.png'
-    : 'https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png';
-
   const playUrl = 'https://play.google.com/store/apps/details?id=com.mert.paticat';
 
   const features = isTurkish
     ? [
         {
-          icon: <HiTrendingUp className="w-6 h-6" />,
-          title: 'Adım Sayacı',
-          desc: 'Günlük adımlarını otomatik olarak takip et',
+          icon: <HiTrendingUp className="h-5 w-5" />,
+          title: 'Adım takibi',
+          desc: 'Günlük hareketi uygulama içinde takip edilebilir hale getirir.',
         },
         {
-          icon: <HiHeart className="w-6 h-6" />,
-          title: 'Sanal Kedi Bakımı',
-          desc: 'Adımlarını mama puanına çevir ve kedini besle',
+          icon: <HiHeart className="h-5 w-5" />,
+          title: 'Sanal kedi',
+          desc: 'Adımları oyun motivasyonuna bağlayan bakım sistemi.',
         },
         {
-          icon: <HiStar className="w-6 h-6" />,
-          title: 'Oyun Odası',
-          desc: 'Kedinle eğlenceli oyunlar oyna ve bağını güçlendir',
-        },
-        {
-          icon: <HiDeviceMobile className="w-6 h-6" />,
-          title: 'Su Takibi',
-          desc: 'Günlük su tüketimini izle ve hedefine ulaş',
+          icon: <HiDeviceMobile className="h-5 w-5" />,
+          title: 'Native Android',
+          desc: 'Kotlin, Jetpack Compose ve Material 3 ile yayınlandı.',
         },
       ]
     : [
         {
-          icon: <HiTrendingUp className="w-6 h-6" />,
-          title: 'Step Counter',
-          desc: 'Automatically track your daily steps',
+          icon: <HiTrendingUp className="h-5 w-5" />,
+          title: 'Step tracking',
+          desc: 'Turns daily movement into visible in-app progress.',
         },
         {
-          icon: <HiHeart className="w-6 h-6" />,
-          title: 'Virtual Cat Care',
-          desc: 'Convert steps into food points and feed your cat',
+          icon: <HiHeart className="h-5 w-5" />,
+          title: 'Virtual cat',
+          desc: 'Connects walking behavior to a pet-care motivation loop.',
         },
         {
-          icon: <HiStar className="w-6 h-6" />,
-          title: 'Game Room',
-          desc: 'Play fun games with your cat and strengthen your bond',
-        },
-        {
-          icon: <HiDeviceMobile className="w-6 h-6" />,
-          title: 'Water Tracking',
-          desc: 'Monitor daily water intake and reach your goals',
+          icon: <HiDeviceMobile className="h-5 w-5" />,
+          title: 'Native Android',
+          desc: 'Published with Kotlin, Jetpack Compose, and Material 3.',
         },
       ];
 
@@ -66,127 +50,83 @@ const AndroidPage = () => {
     <SpecialtyPageLayout
       routePath="/android"
       accent="emerald"
-      eyebrow={isTurkish ? 'Android Geliştirme' : 'Android Development'}
-      eyebrowIcon={<HiDeviceMobile className="w-4 h-4" />}
-      title={isTurkish ? 'Mobil Uygulama Projelerim' : 'Mobile App Projects'}
+      eyebrow={isTurkish ? 'Android geliştirme' : 'Android development'}
+      eyebrowIcon={<HiDeviceMobile className="h-4 w-4" />}
+      title={isTurkish ? 'Google Play’de yayınlanan mobil iş' : 'Published mobile work on Google Play'}
       subtitle={
         isTurkish
-          ? 'Kotlin ve React Native kullanarak modern, kullanıcı odaklı Android uygulamaları geliştiriyorum. Temiz mimari ve sezgisel arayüz tasarımı önceliğimdir.'
-          : 'I build modern, user-focused Android applications using Kotlin and React Native. Clean architecture and intuitive UI design are my priorities.'
+          ? 'WalkKittie, sağlık takibini oyunlaştıran native Android ürünüm. Odak; sade akış, motivasyon ve günlük kullanım.'
+          : 'WalkKittie is my native Android product that gamifies health tracking. Focus: simple flow, motivation, and daily use.'
+      }
+      sideNode={
+        <SitePreview
+          title="WalkKittie"
+          url={playUrl}
+          type="mobile"
+          variant="mobile"
+          expandable={false}
+          showActions={false}
+        />
       }
     >
-      <FadeContent duration={700} blur threshold={0.1}>
-        <div className="card-raised p-6 sm:p-8 overflow-hidden">
-          <div className="flex gap-4 items-start">
-            <div className="flex-shrink-0 w-28 h-20 rounded-xl overflow-hidden bg-gradient-to-r from-accent-500 to-orange-500 p-0.5">
-              <div className="w-full h-full rounded-[10px] overflow-hidden bg-white dark:bg-zinc-900">
-                <SitePreview
-                  url={playUrl}
-                  type="mobile"
-                  title="WalkKittie (PatiCat)"
-                  gradient="from-accent-500 to-orange-500"
-                  expandable={false}
-                />
-              </div>
-            </div>
-
-            <div className="flex-1 min-w-0">
-              <div className="flex items-start justify-between gap-3 mb-2">
-                <div>
-                  <h2 className="text-h4 text-sand-900 dark:text-zinc-50 leading-tight">
-                    WalkKittie (PatiCat)
-                  </h2>
-                  <p className="text-caption text-sand-600 dark:text-zinc-400 mt-1">play.google.com</p>
-                </div>
-                <motion.a
-                  href={playUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  whileHover={{ scale: 1.04, y: -1 }}
-                  whileTap={{ scale: 0.97 }}
-                  className="inline-flex flex-shrink-0"
-                  aria-label={isTurkish ? "Google Play'den indir" : 'Get it on Google Play'}
-                >
-                  <img
-                    src={googlePlayBadgeSrc}
-                    alt={isTurkish ? "Google Play'den al" : 'Get it on Google Play'}
-                    width="646"
-                    height="250"
-                    className="h-8 w-auto"
-                    loading="lazy"
-                    decoding="async"
-                    fetchPriority="low"
-                    referrerPolicy="no-referrer"
-                    onError={(event) => {
-                      event.currentTarget.src =
-                        'https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png';
-                    }}
-                  />
-                </motion.a>
-              </div>
-
-              <p className="text-body-sm text-sand-700 dark:text-zinc-300 mb-3 line-clamp-2">
-                {isTurkish
-                  ? 'WalkKittie, günlük yürüyüşlerinizi sanal bir evcil hayvan besleme deneyimiyle birleştirerek daha eğlenceli hale getiren bir sağlık uygulamasıdır. Attığınız her adım mama puanına dönüşür.'
-                  : 'WalkKittie is a health app that makes your daily walks more enjoyable by combining them with a virtual pet experience. Every step you take is converted into food points.'}
-              </p>
-
-              <div className="flex flex-wrap gap-2 mb-3">
-                {features.map((feat) => (
-                  <span
-                    key={feat.title}
-                    className="px-2.5 py-1 text-xs font-medium rounded-full border bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border-emerald-500/20"
-                  >
-                    {feat.title}
-                  </span>
-                ))}
-              </div>
-
-              <div className="flex items-center gap-3">
-                <button
-                  onClick={() => setExpanded((prev) => !prev)}
-                  className="flex items-center gap-1 text-xs font-semibold text-sand-600 dark:text-zinc-400 hover:text-accent-700 dark:hover:text-accent-300 transition-colors"
-                >
-                  <motion.span
-                    animate={{ rotate: expanded ? 90 : 0 }}
-                    transition={{ duration: 0.2 }}
-                    className="inline-block"
-                  >
-                    ▸
-                  </motion.span>
-                  {expanded ? (isTurkish ? 'Kapat' : 'Close') : isTurkish ? 'Daha fazla oku' : 'Read more'}
-                </button>
-                <Link
-                  to="/case-study/walkkittie"
-                  className="inline-flex items-center gap-1 text-xs font-semibold text-accent-600 dark:text-accent-400 hover:text-accent-700 dark:hover:text-accent-300 transition-colors"
-                >
-                  <HiBookOpen className="w-3.5 h-3.5" />
-                  {isTurkish ? 'Case Study' : 'Case Study'}
-                </Link>
-              </div>
-            </div>
-          </div>
-
-          <AnimatePresence>
-            {expanded && (
-              <motion.div
-                key="details"
-                initial={{ height: 0, opacity: 0 }}
-                animate={{ height: 'auto', opacity: 1 }}
-                exit={{ height: 0, opacity: 0 }}
-                transition={{ duration: 0.3, ease: 'easeInOut' }}
-                className="overflow-hidden"
+      <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_340px]">
+        <motion.article
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: '-40px' }}
+          transition={{ duration: 0.55 }}
+          className="card-prominent p-6 sm:p-8"
+        >
+          <p className="mb-2 text-caption text-emerald-700 dark:text-emerald-200">WalkKittie</p>
+          <h2 className="mb-4 text-h2 text-ink-900 dark:text-white">
+            {isTurkish ? 'Yürü, puan kazan, kedine bak.' : 'Walk, earn points, care for your cat.'}
+          </h2>
+          <p className="mb-5 text-body text-ink-600 dark:text-ink-200">
+            {isTurkish
+              ? 'Uygulama adım takibi, su tüketimi, sanal evcil hayvan bakımı ve küçük oyun akışlarını tek bir günlük rutin içinde birleştiriyor. Amacı sağlık uygulamasını soğuk bir sayaç olmaktan çıkarıp daha sıcak bir motivasyon sistemine çevirmek.'
+              : 'The app combines step tracking, water intake, virtual pet care, and small game flows into one daily routine. Its goal is to make health tracking feel less mechanical and more motivating.'}
+          </p>
+          <div className="mb-6 flex flex-wrap gap-2">
+            {['Kotlin', 'Jetpack Compose', 'Material 3', 'Google Play'].map((tag) => (
+              <span
+                key={tag}
+                className="rounded-lg border border-ink-200/70 bg-white/50 px-2.5 py-1 text-xs font-bold text-ink-600 dark:border-white/10 dark:bg-white/10 dark:text-ink-200"
               >
-                <p className="mt-4 pt-4 border-t border-sand-200/60 dark:border-zinc-800/60 text-body-sm text-sand-700 dark:text-zinc-300">
-                  {isTurkish
-                    ? 'Sadece yürüyüş değil, günlük su tüketimi takibi ve detaylı istatistiklerle de sağlıklı alışkanlıklar kazanmanızı destekler. Karmaşık ayarlarla uğraşmanıza gerek yoktur; tek yapmanız gereken yürümek, kedinizle ilgilenmek ve sağlıklı kalmaktır.'
-                    : 'Beyond walking, it supports you in building healthy habits through daily water tracking and detailed statistics. There are no complicated settings to deal with—just walk, take care of your cat, and stay healthy.'}
-                </p>
-              </motion.div>
-            )}
-          </AnimatePresence>
+                {tag}
+              </span>
+            ))}
+          </div>
+          <div className="flex flex-wrap gap-3">
+            <a href={playUrl} target="_blank" rel="noopener noreferrer" className="btn-primary">
+              <HiExternalLink className="h-4 w-4" />
+              Google Play
+            </a>
+            <Link to="/case-study/walkkittie" className="btn-secondary">
+              <HiBookOpen className="h-4 w-4" />
+              Case Study
+            </Link>
+          </div>
+        </motion.article>
+
+        <div className="grid gap-3">
+          {features.map((feature, index) => (
+            <motion.div
+              key={feature.title}
+              initial={{ opacity: 0, x: 24 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true, margin: '-40px' }}
+              transition={{ duration: 0.5, delay: index * 0.08 }}
+              className="card-raised p-5"
+            >
+              <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-lg border border-emerald-300/50 bg-emerald-50 text-emerald-700 dark:border-emerald-300/20 dark:bg-emerald-300/10 dark:text-emerald-200">
+                {feature.icon}
+              </div>
+              <h3 className="mb-2 text-h4 text-ink-900 dark:text-white">{feature.title}</h3>
+              <p className="text-body-sm text-ink-600 dark:text-ink-200">{feature.desc}</p>
+            </motion.div>
+          ))}
         </div>
-      </FadeContent>
+      </div>
     </SpecialtyPageLayout>
   );
 };

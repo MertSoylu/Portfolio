@@ -11,14 +11,14 @@ const LoadingSpinner = () => {
       <div className="relative w-16 h-16">
         {/* Outer ring - rotating */}
         <motion.div
-          className="absolute inset-0 rounded-full border-2 border-sand-200 dark:border-dark-500"
-          style={{ borderTopColor: '#f07d2d', borderRightColor: '#ff9a5c' }}
+          className="absolute inset-0 rounded-full border-2 border-ink-200 dark:border-white/10"
+          style={{ borderTopColor: '#06b6d4', borderRightColor: '#ff4f46' }}
           animate={{ rotate: 360 }}
           transition={{ duration: 1.2, repeat: Infinity, ease: 'linear' }}
         />
         {/* Inner pulsing glow */}
         <motion.div
-          className="absolute inset-2 rounded-full bg-warm-500/10 dark:bg-warm-500/5"
+          className="absolute inset-2 rounded-full bg-cyan-500/10 dark:bg-cyan-300/10"
           animate={{ scale: [1, 1.15, 1], opacity: [0.5, 0.8, 0.5] }}
           transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
         />
@@ -33,7 +33,7 @@ const LoadingSpinner = () => {
       </div>
       {/* Loading text */}
       <motion.p
-        className="text-sand-500 dark:text-dark-300 text-sm"
+        className="text-ink-500 dark:text-ink-300 text-sm"
         animate={{ opacity: [0.5, 1, 0.5] }}
         transition={{ duration: 1.5, repeat: Infinity }}
       >

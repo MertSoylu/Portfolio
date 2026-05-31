@@ -21,13 +21,11 @@ const RenderResults = () => {
       items={results}
       onRender={({ item, active }) =>
         typeof item === 'string' ? (
-          <div className="px-4 py-2 text-caption text-sand-600 dark:text-zinc-500">{item}</div>
+          <div className="px-4 py-2 text-caption text-ink-500 dark:text-ink-300">{item}</div>
         ) : (
           <div
-            className={`flex items-center justify-between gap-3 px-4 py-3 cursor-pointer rounded-xl ${
-              active
-                ? 'bg-accent-500/15 text-accent-700 dark:text-accent-300'
-                : 'text-sand-700 dark:text-zinc-200'
+            className={`flex items-center justify-between gap-3 px-4 py-3 cursor-pointer rounded-lg ${
+              active ? 'bg-cyan-500/20 text-cyan-800 dark:text-cyan-100' : 'text-ink-700 dark:text-ink-100'
             }`}
           >
             <div className="flex items-center gap-3">
@@ -35,7 +33,7 @@ const RenderResults = () => {
               <div>
                 <div className="text-sm font-semibold">{item.name}</div>
                 {item.subtitle ? (
-                  <div className="text-xs text-sand-600 dark:text-zinc-400">{item.subtitle}</div>
+                  <div className="text-xs text-ink-500 dark:text-ink-300">{item.subtitle}</div>
                 ) : null}
               </div>
             </div>
@@ -44,7 +42,7 @@ const RenderResults = () => {
                 {item.shortcut.map((sc) => (
                   <kbd
                     key={sc}
-                    className="px-1.5 py-0.5 text-xs font-medium rounded bg-sand-200 dark:bg-zinc-800 text-sand-700 dark:text-zinc-200"
+                    className="rounded border border-ink-200/70 bg-white/70 px-1.5 py-0.5 text-xs font-bold text-ink-600 dark:border-white/10 dark:bg-white/10 dark:text-ink-200"
                   >
                     {sc}
                   </kbd>
@@ -168,8 +166,8 @@ const InnerKBar = ({ actions, children }) => (
     {children}
     <KBarPortal>
       <KBarPositioner className="z-[2000] bg-black/40 backdrop-blur-sm">
-        <KBarAnimator className="w-full max-w-xl bg-white dark:bg-zinc-900 border border-sand-200 dark:border-zinc-700 rounded-2xl shadow-elevation overflow-hidden">
-          <KBarSearch className="w-full px-5 py-4 bg-transparent text-base text-sand-900 dark:text-zinc-100 placeholder-sand-500 dark:placeholder-zinc-500 outline-none border-b border-sand-200 dark:border-zinc-800" />
+        <KBarAnimator className="w-full max-w-xl overflow-hidden rounded-lg border border-ink-200/70 bg-white shadow-elevation dark:border-white/10 dark:bg-ink-900">
+          <KBarSearch className="w-full border-b border-ink-200/70 bg-transparent px-5 py-4 text-base text-ink-900 outline-none placeholder-ink-400 dark:border-white/10 dark:text-white dark:placeholder-ink-400" />
           <div className="p-2 max-h-96 overflow-y-auto">
             <RenderResults />
           </div>

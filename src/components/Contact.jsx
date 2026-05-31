@@ -2,15 +2,12 @@ import React, { useRef, useState } from 'react';
 import emailjs from '@emailjs/browser';
 import { motion } from 'framer-motion';
 import toast from 'react-hot-toast';
-import { HiMail, HiArrowRight, HiCheckCircle, HiXCircle, HiDownload } from 'react-icons/hi';
-import { FiMapPin, FiLinkedin } from 'react-icons/fi';
+import { HiArrowRight, HiCheckCircle, HiDownload, HiMail, HiXCircle } from 'react-icons/hi';
+import { FiGithub, FiLinkedin, FiMapPin } from 'react-icons/fi';
 import { useLanguage } from '../context/LanguageContext';
-import { useDarkMode } from '../context/DarkModeContext';
 import { CV_LABEL, CV_PATH } from '../utils/constants';
 import ScrollFloat from './ScrollFloat';
-import ScrollReveal from './ScrollReveal';
 import FadeContent from './FadeContent';
-import ElectricBorder from './ElectricBorder';
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const MIN_NAME_LENGTH = 2;
@@ -22,52 +19,44 @@ const validateField = (name, value, isTurkish) => {
   switch (name) {
     case 'from_name':
       if (!trimmed) return isTurkish ? 'İsim zorunlu.' : 'Name is required.';
-      if (trimmed.length < MIN_NAME_LENGTH) {
+      if (trimmed.length < MIN_NAME_LENGTH)
         return isTurkish ? 'En az 2 karakter olmalı.' : 'Must be at least 2 characters.';
-      }
       return '';
     case 'from_email':
       if (!trimmed) return isTurkish ? 'E-posta zorunlu.' : 'Email is required.';
-      if (!EMAIL_REGEX.test(trimmed)) {
-        return isTurkish ? 'Geçerli bir e-posta gir.' : 'Enter a valid email.';
-      }
+      if (!EMAIL_REGEX.test(trimmed)) return isTurkish ? 'Geçerli e-posta gir.' : 'Enter a valid email.';
       return '';
     case 'subject':
       if (!trimmed) return isTurkish ? 'Konu zorunlu.' : 'Subject is required.';
-      if (trimmed.length < MIN_SUBJECT_LENGTH) {
+      if (trimmed.length < MIN_SUBJECT_LENGTH)
         return isTurkish ? 'En az 3 karakter olmalı.' : 'Must be at least 3 characters.';
-      }
       return '';
     case 'message':
       if (!trimmed) return isTurkish ? 'Mesaj zorunlu.' : 'Message is required.';
-      if (trimmed.length < MIN_MESSAGE_LENGTH) {
+      if (trimmed.length < MIN_MESSAGE_LENGTH)
         return isTurkish ? 'En az 10 karakter olmalı.' : 'Must be at least 10 characters.';
-      }
       return '';
     default:
       return '';
   }
 };
 
-const ContactForm = ({ isTurkish, isDark }) => {
+const ContactForm = ({ isTurkish }) => {
   const formRef = useRef(null);
-  const [status, setStatus] = useState('idle'); // idle | sending | success | error
+  const [status, setStatus] = useState('idle');
   const [errors, setErrors] = useState({});
   const [touched, setTouched] = useState({});
 
   const handleBlur = (event) => {
     const { name, value } = event.target;
     setTouched((prev) => ({ ...prev, [name]: true }));
-    const error = validateField(name, value, isTurkish);
-    setErrors((prev) => ({ ...prev, [name]: error }));
+    setErrors((prev) => ({ ...prev, [name]: validateField(name, value, isTurkish) }));
   };
 
   const handleChange = (event) => {
     const { name, value } = event.target;
-    if (touched[name]) {
-      const error = validateField(name, value, isTurkish);
-      setErrors((prev) => ({ ...prev, [name]: error }));
-    }
+    if (!touched[name]) return;
+    setErrors((prev) => ({ ...prev, [name]: validateField(name, value, isTurkish) }));
   };
 
   const validateAll = () => {
@@ -83,8 +72,8 @@ const ContactForm = ({ isTurkish, isDark }) => {
     return Object.keys(nextErrors).length === 0;
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const handleSubmit = async (event) => {
+    event.preventDefault();
     const honeypot = formRef.current?.elements?.namedItem('website')?.value;
     if (honeypot) {
       setStatus('success');
@@ -103,7 +92,7 @@ const ContactForm = ({ isTurkish, isDark }) => {
         { publicKey: import.meta.env.VITE_EMAILJS_PUBLIC_KEY },
       );
       setStatus('success');
-      toast.success(isTurkish ? 'Mesaj iletildi!' : 'Message sent!');
+      toast.success(isTurkish ? 'Mesaj iletildi.' : 'Message sent.');
       formRef.current?.reset();
       setErrors({});
       setTouched({});
@@ -113,58 +102,63 @@ const ContactForm = ({ isTurkish, isDark }) => {
     }
   };
 
-  const baseInput = `w-full px-3.5 sm:px-4 py-2.5 sm:py-3 rounded-lg sm:rounded-xl bg-white/60 dark:bg-black/70 border text-sand-900 dark:text-zinc-100 placeholder-sand-400 dark:placeholder-zinc-500 focus:outline-none transition-colors text-sm`;
+  const baseInput =
+    'w-full rounded-lg border bg-white/75 px-4 py-3 text-sm text-ink-900 placeholder-ink-400 outline-none backdrop-blur-xl dark:bg-white/10 dark:text-white dark:placeholder-ink-400';
   const inputClass = (field) => {
     const showError = touched[field] && errors[field];
     return `${baseInput} ${
       showError
-        ? 'border-red-400 dark:border-red-500/70 focus:border-red-500'
-        : 'border-sand-200 dark:border-zinc-700 focus:border-warm-500 dark:focus:border-warm-400'
+        ? 'border-accent-400 focus:border-accent-500'
+        : 'border-ink-200/70 focus:border-cyan-400 dark:border-white/10 dark:focus:border-cyan-300'
     }`;
   };
   const renderError = (field) =>
     touched[field] && errors[field] ? (
-      <p className="mt-1 text-xs text-red-600 dark:text-red-400" role="alert">
+      <p className="mt-1 text-xs font-semibold text-accent-600 dark:text-accent-200" role="alert">
         {errors[field]}
       </p>
     ) : null;
 
   return (
-    <FadeContent duration={700} delay={200} threshold={0.1} blur>
-      <form ref={formRef} onSubmit={handleSubmit} className="card-raised p-6 sm:p-8 space-y-4">
+    <FadeContent duration={700} delay={120} threshold={0.1} blur>
+      <form ref={formRef} onSubmit={handleSubmit} className="card-prominent space-y-4 p-6 sm:p-8">
         <input
           type="text"
           name="website"
           tabIndex={-1}
           autoComplete="off"
           aria-hidden="true"
-          className="absolute -left-[9999px] top-auto w-px h-px opacity-0 pointer-events-none"
+          className="absolute -left-[9999px] top-auto h-px w-px opacity-0"
         />
-        <h3 className="text-h4 text-sand-900 dark:text-zinc-50 mb-4">
-          {isTurkish ? 'Mesaj Gönder' : 'Send a Message'}
-        </h3>
+        <div>
+          <p className="mb-2 text-caption text-cyan-700 dark:text-cyan-200">
+            {isTurkish ? 'Direkt mesaj' : 'Direct message'}
+          </p>
+          <h3 className="text-h3 text-ink-900 dark:text-white">
+            {isTurkish ? 'Birlikte konuşalım' : 'Let’s talk'}
+          </h3>
+        </div>
 
-        <div className="grid sm:grid-cols-2 gap-3 sm:gap-4">
+        <div className="grid gap-3 sm:grid-cols-2">
           <div>
-            <label htmlFor="from_name" className="block text-caption text-sand-700 dark:text-zinc-400 mb-2">
-              {isTurkish ? 'Adın' : 'Your Name'}
+            <label htmlFor="from_name" className="mb-2 block text-caption text-ink-500 dark:text-ink-300">
+              {isTurkish ? 'Ad' : 'Name'}
             </label>
             <input
               id="from_name"
               type="text"
               name="from_name"
               required
-              placeholder={isTurkish ? 'Adın Soyadın' : 'John Doe'}
+              placeholder={isTurkish ? 'Adın Soyadın' : 'Your name'}
               className={inputClass('from_name')}
               onBlur={handleBlur}
               onChange={handleChange}
               aria-invalid={Boolean(touched.from_name && errors.from_name)}
-              aria-describedby={touched.from_name && errors.from_name ? 'from_name-error' : undefined}
             />
             {renderError('from_name')}
           </div>
           <div>
-            <label htmlFor="from_email" className="block text-caption text-sand-700 dark:text-zinc-400 mb-2">
+            <label htmlFor="from_email" className="mb-2 block text-caption text-ink-500 dark:text-ink-300">
               {isTurkish ? 'E-posta' : 'Email'}
             </label>
             <input
@@ -177,14 +171,13 @@ const ContactForm = ({ isTurkish, isDark }) => {
               onBlur={handleBlur}
               onChange={handleChange}
               aria-invalid={Boolean(touched.from_email && errors.from_email)}
-              aria-describedby={touched.from_email && errors.from_email ? 'from_email-error' : undefined}
             />
             {renderError('from_email')}
           </div>
         </div>
 
         <div>
-          <label htmlFor="subject" className="block text-caption text-sand-700 dark:text-zinc-400 mb-2">
+          <label htmlFor="subject" className="mb-2 block text-caption text-ink-500 dark:text-ink-300">
             {isTurkish ? 'Konu' : 'Subject'}
           </label>
           <input
@@ -192,7 +185,7 @@ const ContactForm = ({ isTurkish, isDark }) => {
             type="text"
             name="subject"
             required
-            placeholder={isTurkish ? 'Mesajının konusu' : 'What is this about?'}
+            placeholder={isTurkish ? 'Ne hakkında?' : 'What is this about?'}
             className={inputClass('subject')}
             onBlur={handleBlur}
             onChange={handleChange}
@@ -202,15 +195,15 @@ const ContactForm = ({ isTurkish, isDark }) => {
         </div>
 
         <div>
-          <label htmlFor="message" className="block text-caption text-sand-700 dark:text-zinc-400 mb-2">
+          <label htmlFor="message" className="mb-2 block text-caption text-ink-500 dark:text-ink-300">
             {isTurkish ? 'Mesaj' : 'Message'}
           </label>
           <textarea
             id="message"
             name="message"
             required
-            rows={4}
-            placeholder={isTurkish ? 'Mesajını buraya yaz...' : 'Write your message here...'}
+            rows={5}
+            placeholder={isTurkish ? 'Mesajını yaz...' : 'Write your message...'}
             className={`${inputClass('message')} resize-none`}
             onBlur={handleBlur}
             onChange={handleChange}
@@ -219,51 +212,48 @@ const ContactForm = ({ isTurkish, isDark }) => {
           {renderError('message')}
         </div>
 
-        {/* Status feedback */}
         {status === 'success' && (
           <motion.div
             initial={{ opacity: 0, y: -8 }}
             animate={{ opacity: 1, y: 0 }}
-            className="flex items-center gap-2 text-sm text-green-600 dark:text-green-400 bg-green-50 dark:bg-green-900/30 border border-green-200 dark:border-green-700 rounded-lg sm:rounded-xl px-3 sm:px-4 py-2.5 sm:py-3"
+            className="flex items-center gap-2 rounded-lg border border-emerald-300/50 bg-emerald-50 px-4 py-3 text-sm font-semibold text-emerald-700 dark:border-emerald-300/20 dark:bg-emerald-300/10 dark:text-emerald-200"
           >
-            <HiCheckCircle className="w-5 h-5 flex-shrink-0" />
+            <HiCheckCircle className="h-5 w-5" />
             {isTurkish
-              ? 'Mesajın iletildi! En kısa sürede döneceğim.'
-              : "Message sent! I'll get back to you soon."}
+              ? 'Mesajın iletildi. En kısa sürede döneceğim.'
+              : 'Message sent. I will get back to you soon.'}
           </motion.div>
         )}
         {status === 'error' && (
           <motion.div
             initial={{ opacity: 0, y: -8 }}
             animate={{ opacity: 1, y: 0 }}
-            className="flex items-center gap-2 text-sm text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-700 rounded-lg sm:rounded-xl px-3 sm:px-4 py-2.5 sm:py-3"
+            className="flex items-center gap-2 rounded-lg border border-accent-300/50 bg-accent-50 px-4 py-3 text-sm font-semibold text-accent-700 dark:border-accent-300/20 dark:bg-accent-300/10 dark:text-accent-200"
           >
-            <HiXCircle className="w-5 h-5 flex-shrink-0" />
+            <HiXCircle className="h-5 w-5" />
             {isTurkish
-              ? 'Bir hata oluştu. Lütfen e-posta ile ulaş.'
-              : 'Something went wrong. Please email me directly.'}
+              ? 'Bir hata oluştu. E-posta ile ulaşabilirsin.'
+              : 'Something went wrong. You can email me directly.'}
           </motion.div>
         )}
 
         <motion.button
           type="submit"
           disabled={status === 'sending'}
-          className="w-full btn-primary flex items-center justify-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed"
-          whileHover={
-            status !== 'sending' ? { scale: 1.02, boxShadow: '0 8px 30px rgba(240, 125, 45, 0.35)' } : {}
-          }
+          className="btn-primary w-full disabled:cursor-not-allowed disabled:opacity-60"
+          whileHover={status !== 'sending' ? { scale: 1.02 } : {}}
           whileTap={status !== 'sending' ? { scale: 0.98 } : {}}
         >
           {status === 'sending' ? (
             <>
-              <span className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin" />
+              <span className="h-4 w-4 rounded-full border-2 border-white/40 border-t-white animate-spin" />
               {isTurkish ? 'Gönderiliyor...' : 'Sending...'}
             </>
           ) : (
             <>
-              <HiMail className="w-5 h-5" />
-              {isTurkish ? 'Gönder' : 'Send Message'}
-              <HiArrowRight className="w-4 h-4" />
+              <HiMail className="h-5 w-5" />
+              {isTurkish ? 'Gönder' : 'Send message'}
+              <HiArrowRight className="h-4 w-4" />
             </>
           )}
         </motion.button>
@@ -274,40 +264,34 @@ const ContactForm = ({ isTurkish, isDark }) => {
 
 const Contact = () => {
   const { isTurkish } = useLanguage();
-  const { isDark } = useDarkMode();
 
   const contactInfo = [
     {
-      icon: <HiMail className="w-6 h-6" />,
+      icon: <HiMail className="h-5 w-5" />,
       label: isTurkish ? 'E-posta' : 'Email',
       value: 's6ylumert@gmail.com',
       href: 'mailto:s6ylumert@gmail.com',
     },
     {
-      icon: <FiLinkedin className="w-6 h-6" />,
+      icon: <FiLinkedin className="h-5 w-5" />,
       label: 'LinkedIn',
       value: 'mert-soylu',
       href: 'https://www.linkedin.com/in/mert-soylu-b8b6a1341/',
     },
     {
-      icon: <FiMapPin className="w-6 h-6" />,
+      icon: <FiGithub className="h-5 w-5" />,
+      label: 'GitHub',
+      value: 'MertSoylu',
+      href: 'https://github.com/MertSoylu',
+    },
+    {
+      icon: <FiMapPin className="h-5 w-5" />,
       label: isTurkish ? 'Konum' : 'Location',
       value: 'İzmir, Turkey',
       href: null,
     },
     {
-      icon: (
-        <span className="relative flex h-3 w-3">
-          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75" />
-          <span className="relative inline-flex rounded-full h-3 w-3 bg-green-500" />
-        </span>
-      ),
-      label: isTurkish ? 'Müsaitlik' : 'Available',
-      value: isTurkish ? 'Yeni fırsatlara açık' : 'For opportunities',
-      href: null,
-    },
-    {
-      icon: <HiDownload className="w-6 h-6" />,
+      icon: <HiDownload className="h-5 w-5" />,
       label: 'CV',
       value: isTurkish ? CV_LABEL.tr : CV_LABEL.en,
       href: CV_PATH,
@@ -315,92 +299,73 @@ const Contact = () => {
     },
   ];
 
-  const electricColor = isDark ? '#ff9a5c' : '#f07d2d';
-
   return (
-    <section id="contact" className="py-20 md:py-28 px-4 relative overflow-hidden">
-      {/* Ambient orbs */}
-      <div className="absolute inset-0 pointer-events-none overflow-hidden">
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 -translate-x-16 w-[20rem] h-[20rem] sm:w-[32rem] sm:h-[32rem] rounded-full bg-warm-500/10 dark:bg-warm-500/12 blur-[80px]" />
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 translate-x-24 translate-y-16 w-64 h-64 rounded-full bg-sand-400/15 dark:bg-warm-400/8 blur-[60px]" />
-      </div>
-
-      <div className="max-w-6xl mx-auto relative">
-        {/* Section header */}
-        <div className="text-center mb-8">
+    <section id="contact" className="relative px-4 py-20 md:py-28">
+      <div className="mx-auto max-w-6xl">
+        <div className="mb-12 text-center">
           <ScrollFloat
             containerClassName="overflow-hidden"
-            textClassName="text-3xl sm:text-4xl md:text-5xl font-bold heading-gradient"
+            textClassName="section-title"
             animationDuration={1}
             ease="back.inOut(2)"
             scrollStart="center bottom+=50%"
             scrollEnd="bottom bottom-=40%"
             stagger={0.03}
           >
-            {isTurkish ? 'İletişime Geç' : 'Get In Touch'}
+            {isTurkish ? 'İletişim' : 'Contact'}
           </ScrollFloat>
-          <ScrollReveal
-            containerClassName="mt-4"
-            textClassName="text-body-lg text-sand-700 dark:text-zinc-300 font-normal"
-            enableBlur={true}
-            baseOpacity={0.75}
-            baseRotation={3}
-            blurStrength={1.5}
-          >
-            {isTurkish ? 'Bağlantı kuralım ve fikirlerini konuşalım' : "Let's connect and discuss your ideas"}
-          </ScrollReveal>
+          <p className="mx-auto mt-4 max-w-2xl text-body-lg text-ink-600 dark:text-ink-200">
+            {isTurkish
+              ? 'Full-stack, Android veya AI odaklı işler için kısa bir mesaj yeterli.'
+              : 'A short message is enough for full-stack, Android, or AI-focused opportunities.'}
+          </p>
         </div>
 
-        {/* Availability blurb */}
-        <div className="text-center mb-12 max-w-xl mx-auto">
-          <FadeContent duration={800} ease="power3.out" threshold={0.2} blur={true}>
-            <p className="text-body text-sand-700 dark:text-zinc-300">
-              {isTurkish
-                ? 'Full-Stack Developer ve AI Developer pozisyonlarına açığım. Remote, hibrit veya ofis tabanlı çalışmaya hazırım.'
-                : 'Open to Full-Stack Developer and AI Developer roles. Available for remote, hybrid, or on-site work.'}
-            </p>
-          </FadeContent>
-        </div>
-
-        {/* Contact form + info side by side */}
-        <div className="grid lg:grid-cols-2 gap-6 sm:gap-10 items-start">
-          <ContactForm isTurkish={isTurkish} isDark={isDark} />
-
-          {/* Info cards */}
-          <div className="grid md:grid-cols-2 gap-3 sm:gap-4">
-            {contactInfo.map((info, index) => (
-              <FadeContent
-                key={index}
-                duration={700}
-                ease="power3.out"
-                delay={index * 120}
-                threshold={0.15}
-                blur={true}
-              >
-                <ElectricBorder color={electricColor} speed={0.5} chaos={0.08} borderRadius={16}>
-                  <div className="bg-white/40 dark:bg-zinc-900/60 backdrop-blur-md p-6 rounded-2xl text-center h-full flex flex-col items-center justify-center">
-                    <div className="w-12 h-12 rounded-xl bg-accent-500/10 border border-accent-500/20 text-accent-600 dark:text-accent-400 mx-auto mb-4 flex items-center justify-center">
-                      {info.icon}
+        <div className="grid gap-6 lg:grid-cols-[0.85fr_1.15fr]">
+          <FadeContent duration={700} threshold={0.1} blur>
+            <div className="card-raised h-full p-6 sm:p-8">
+              <p className="mb-2 text-caption text-cyan-700 dark:text-cyan-200">
+                {isTurkish ? 'Bağlantılar' : 'Links'}
+              </p>
+              <h3 className="mb-5 text-h3 text-ink-900 dark:text-white">
+                {isTurkish ? 'Ulaşılabilir kanallar' : 'Available channels'}
+              </h3>
+              <div className="space-y-3">
+                {contactInfo.map((item) => {
+                  const content = (
+                    <div className="flex items-center gap-4 rounded-lg border border-ink-200/70 bg-white/50 p-4 dark:border-white/10 dark:bg-white/10">
+                      <span className="flex h-10 w-10 items-center justify-center rounded-lg border border-cyan-300/40 bg-cyan-50 text-cyan-700 dark:border-cyan-300/20 dark:bg-cyan-300/10 dark:text-cyan-200">
+                        {item.icon}
+                      </span>
+                      <div className="min-w-0">
+                        <p className="text-caption text-ink-500 dark:text-ink-300">{item.label}</p>
+                        <p className="break-all text-sm font-extrabold text-ink-900 dark:text-white">
+                          {item.value}
+                        </p>
+                      </div>
                     </div>
-                    <h4 className="text-caption text-sand-700 dark:text-zinc-400 mb-2">{info.label}</h4>
-                    {info.href ? (
-                      <a
-                        href={info.href}
-                        {...(info.download
-                          ? { download: true }
-                          : { target: '_blank', rel: 'noopener noreferrer' })}
-                        className="text-accent-600 hover:text-accent-700 dark:text-accent-300 dark:hover:text-accent-200 font-semibold text-sm break-all"
-                      >
-                        {info.value}
-                      </a>
-                    ) : (
-                      <p className="text-body-sm text-sand-700 dark:text-zinc-300">{info.value}</p>
-                    )}
-                  </div>
-                </ElectricBorder>
-              </FadeContent>
-            ))}
-          </div>
+                  );
+
+                  return item.href ? (
+                    <a
+                      key={item.label}
+                      href={item.href}
+                      target={item.href.startsWith('http') ? '_blank' : undefined}
+                      rel={item.href.startsWith('http') ? 'noopener noreferrer' : undefined}
+                      download={item.download}
+                      className="block hover:-translate-y-1"
+                    >
+                      {content}
+                    </a>
+                  ) : (
+                    <div key={item.label}>{content}</div>
+                  );
+                })}
+              </div>
+            </div>
+          </FadeContent>
+
+          <ContactForm isTurkish={isTurkish} />
         </div>
       </div>
     </section>

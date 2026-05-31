@@ -43,7 +43,8 @@ const TextPressure = ({
   strokeWidth = 2,
   className = '',
 
-  minFontSize = 24
+  minFontSize = 24,
+  idleCenter = false,
 }) => {
   const containerRef = useRef(null);
   const titleRef = useRef(null);
@@ -58,12 +59,31 @@ const TextPressure = ({
 
   const chars = text.split('');
 
+  const resetCursorPosition = useCallback(() => {
+    const node = containerRef.current;
+    const isCoarsePointer = typeof window !== 'undefined' && window.matchMedia('(pointer: coarse)').matches;
+
+    if (node && (idleCenter || isCoarsePointer)) {
+      const rect = node.getBoundingClientRect();
+      const center = {
+        x: rect.left + rect.width / 2,
+        y: rect.top + rect.height / 2,
+      };
+      mouseRef.current = { ...center };
+      cursorRef.current = { ...center };
+      return;
+    }
+
+    mouseRef.current = { x: -99999, y: -99999 };
+    cursorRef.current = { x: -99999, y: -99999 };
+  }, [idleCenter]);
+
   useEffect(() => {
-    const handleMouseMove = e => {
+    const handleMouseMove = (e) => {
       cursorRef.current.x = e.clientX;
       cursorRef.current.y = e.clientY;
     };
-    const handleTouchMove = e => {
+    const handleTouchMove = (e) => {
       const t = e.touches[0];
       cursorRef.current.x = t.clientX;
       cursorRef.current.y = t.clientY;
@@ -72,21 +92,13 @@ const TextPressure = ({
     window.addEventListener('mousemove', handleMouseMove);
     window.addEventListener('touchmove', handleTouchMove, { passive: true });
 
-    if (containerRef.current) {
-      // Initialize mouse refs to off-screen position
-      // This ensures characters don't get distorted while waiting for first mousemove
-      // Once user moves mouse, cursorRef updates and animation takes over naturally
-      mouseRef.current.x = -99999;
-      mouseRef.current.y = -99999;
-      cursorRef.current.x = -99999;
-      cursorRef.current.y = -99999;
-    }
+    resetCursorPosition();
 
     return () => {
       window.removeEventListener('mousemove', handleMouseMove);
       window.removeEventListener('touchmove', handleTouchMove);
     };
-  }, []);
+  }, [resetCursorPosition]);
 
   const setSize = useCallback(() => {
     if (!containerRef.current || !titleRef.current) return;
@@ -129,13 +141,13 @@ const TextPressure = ({
         const titleRect = titleRef.current.getBoundingClientRect();
         const maxDist = titleRect.width / 2;
 
-        spansRef.current.forEach(span => {
+        spansRef.current.forEach((span) => {
           if (!span) return;
 
           const rect = span.getBoundingClientRect();
           const charCenter = {
             x: rect.x + rect.width / 2,
-            y: rect.y + rect.height / 2
+            y: rect.y + rect.height / 2,
           };
 
           const d = dist(mouseRef.current, charCenter);
@@ -191,9 +203,7 @@ const TextPressure = ({
   }, [fontFamily, fontUrl, textColor, strokeColor, strokeWidth]);
 
   return (
-    <div
-      ref={containerRef}
-      className="relative w-full h-full overflow-hidden bg-transparent">
+    <div ref={containerRef} className="relative w-full h-full overflow-hidden bg-transparent">
       {styleElement}
       <h1
         ref={titleRef}
@@ -208,14 +218,11 @@ const TextPressure = ({
           transformOrigin: 'center top',
           margin: 0,
           fontWeight: 100,
-          color: stroke ? undefined : textColor
-        }}>
+          color: stroke ? undefined : textColor,
+        }}
+      >
         {chars.map((char, i) => (
-          <span
-            key={i}
-            ref={el => (spansRef.current[i] = el)}
-            data-char={char}
-            className="inline-block">
+          <span key={i} ref={(el) => (spansRef.current[i] = el)} data-char={char} className="inline-block">
             {char}
           </span>
         ))}

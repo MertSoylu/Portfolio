@@ -95,8 +95,8 @@ export const SKILLS_DESCRIPTIONS = {
     icon: 'HiCode',
     title: { tr: 'Web Geliştirme', en: 'Web Development' },
     description: {
-      tr: 'React ve Tailwind CSS ile hızlı, responsive siteler yapıyorum. Tasarım güzel, kod temiz. Lighthouse 90+, erişilebilir.',
-      en: 'Building fast, responsive web apps with React and Tailwind CSS. Beautiful design, clean code. Lighthouse 90+, accessible.',
+      tr: 'React ve Tailwind ile ürün hissi olan, hızlı ve okunur web arayüzleri geliştiriyorum.',
+      en: 'Building fast, readable web interfaces with a product feel using React and Tailwind.',
     },
     technologies: ['React', 'JavaScript', 'Tailwind CSS', 'HTML/CSS'],
     proficiency: 80,
@@ -106,8 +106,8 @@ export const SKILLS_DESCRIPTIONS = {
     icon: 'HiAcademicCap',
     title: { tr: 'Android Geliştirme', en: 'Android Development' },
     description: {
-      tr: 'Temiz mimari ile mobil uygulamalar geliştiriyorum. Hızlı yükleme, kusursuz deneyim, bakım kolay.',
-      en: 'Creating mobile apps with clean architecture. Fast load times, seamless experiences, code built to last.',
+      tr: 'Native Android, Compose ve günlük kullanım akışlarına odaklanan mobil işler geliştiriyorum.',
+      en: 'Building mobile work around native Android, Compose, and daily-use flows.',
     },
     technologies: ['Kotlin', 'React Native', 'Android Studio', 'Mobile UI/UX'],
     proficiency: 65,
@@ -117,8 +117,8 @@ export const SKILLS_DESCRIPTIONS = {
     icon: 'HiShieldCheck',
     title: { tr: 'Siber Güvenlik', en: 'Cybersecurity' },
     description: {
-      tr: 'Güvenli kod yazma ve veri korumasını ciddiye alıyorum. Attacker gibi düşün, Defender gibi kod yaz.',
-      en: 'I prioritize secure coding and data protection. Think like an attacker, code like a defender.',
+      tr: 'Web güvenliği, güvenli kodlama ve otomasyon araçlarını pratik projelerle çalışıyorum.',
+      en: 'Practicing web security, secure coding, and automation tools through practical projects.',
     },
     technologies: ['Python', 'Network Security', 'Encryption', 'Secure Coding'],
     proficiency: 60,
@@ -128,8 +128,8 @@ export const SKILLS_DESCRIPTIONS = {
     icon: 'HiChip',
     title: { tr: 'Veri Bilimi ve Derin Öğrenme', en: 'Data Science & Deep Learning' },
     description: {
-      tr: 'Python, NumPy, Pandas öğreniyorum. Temel bilgiler sağlam, küçük projelerle pratik yapıyorum.',
-      en: 'Learning Python, NumPy, Pandas with strong fundamentals. Building projects to deepen real-world knowledge.',
+      tr: 'Veri bilimi ve derin öğrenme temellerini küçük deneylerle güçlendiriyorum.',
+      en: 'Building data science and deep learning fundamentals through small experiments.',
     },
     technologies: ['Python', 'NumPy', 'Pandas', 'Deep Learning'],
     proficiency: 40,

@@ -1,28 +1,16 @@
-import React, { useEffect, useState, lazy, Suspense } from 'react';
+import React, { useEffect, useMemo, useState, lazy, Suspense } from 'react';
 import { Routes, Route, useLocation } from 'react-router-dom';
 import { AnimatePresence, motion, MotionConfig, useReducedMotion } from 'framer-motion';
 import { DarkModeProvider, useDarkMode } from './context/DarkModeContext';
 import { LanguageProvider } from './context/LanguageContext';
 import Navbar from './components/Navbar';
 import Hero from './components/Hero';
-import About from './components/About';
-import Certificates from './components/Certificates';
-import Projects from './components/Projects';
-import Contact from './components/Contact';
 import Footer from './components/Footer';
 import LoadingSpinner from './components/LoadingSpinner';
 import ErrorBoundary from './components/ErrorBoundary';
 import PageMeta from './components/PageMeta';
 import CommandPaletteProvider from './components/CommandPalette';
 import { Toaster } from 'react-hot-toast';
-import { FluidParticlesBackground } from '@/components/ui/fluid-particles-background';
-import WebDevPage from './pages/WebDevPage';
-import DataSciencePage from './pages/DataSciencePage';
-import MnemosyneCaseStudy from './pages/case-studies/MnemosyneCaseStudy';
-import TypeSprintCaseStudy from './pages/case-studies/TypeSprintCaseStudy';
-import DertHaritasiCaseStudy from './pages/case-studies/DertHaritasiCaseStudy';
-import WalkKittieCaseStudy from './pages/case-studies/WalkKittieCaseStudy';
-import MsscanCaseStudy from './pages/case-studies/MsscanCaseStudy';
 
 const lazyWithRetry = (importer, cacheKey) =>
   lazy(async () => {
@@ -45,26 +33,59 @@ const lazyWithRetry = (importer, cacheKey) =>
     }
   });
 
+const LazyFluidParticlesBackground = lazyWithRetry(
+  () =>
+    import('@/components/ui/fluid-particles-background').then((module) => ({
+      default: module.FluidParticlesBackground,
+    })),
+  'lazy-retry-fluid-particles',
+);
+const WebDevPage = lazyWithRetry(() => import('./pages/WebDevPage'), 'lazy-retry-web');
 const AndroidPage = lazyWithRetry(() => import('./pages/AndroidPage'), 'lazy-retry-android');
 const CyberSecurityPage = lazyWithRetry(() => import('./pages/CyberSecurityPage'), 'lazy-retry-cyber');
+const DataSciencePage = lazyWithRetry(() => import('./pages/DataSciencePage'), 'lazy-retry-data');
+const About = lazyWithRetry(() => import('./components/About'), 'lazy-retry-about');
+const Certificates = lazyWithRetry(() => import('./components/Certificates'), 'lazy-retry-certificates');
+const Projects = lazyWithRetry(() => import('./components/Projects'), 'lazy-retry-projects');
+const Contact = lazyWithRetry(() => import('./components/Contact'), 'lazy-retry-contact');
+const MnemosyneCaseStudy = lazyWithRetry(
+  () => import('./pages/case-studies/MnemosyneCaseStudy'),
+  'lazy-retry-mnemosyne-case',
+);
+const TypeSprintCaseStudy = lazyWithRetry(
+  () => import('./pages/case-studies/TypeSprintCaseStudy'),
+  'lazy-retry-typesprint-case',
+);
+const WalkKittieCaseStudy = lazyWithRetry(
+  () => import('./pages/case-studies/WalkKittieCaseStudy'),
+  'lazy-retry-walkkittie-case',
+);
+const MsscanCaseStudy = lazyWithRetry(
+  () => import('./pages/case-studies/MsscanCaseStudy'),
+  'lazy-retry-msscan-case',
+);
 const NotFoundPage = lazyWithRetry(() => import('./pages/NotFoundPage'), 'lazy-retry-404');
 
 const SectionDivider = () => (
-  <div className="h-12 bg-gradient-to-b from-transparent via-sand-200/20 dark:via-dark-500/20 to-transparent" />
+  <div className="mx-auto flex h-14 w-full max-w-6xl items-center px-4">
+    <div className="studio-rule w-full" />
+  </div>
 );
 
 const HomePage = () => (
   <>
     <PageMeta route="/" />
     <Hero />
-    <SectionDivider />
-    <About />
-    <SectionDivider />
-    <Certificates />
-    <SectionDivider />
-    <Projects />
-    <SectionDivider />
-    <Contact />
+    <Suspense fallback={null}>
+      <SectionDivider />
+      <About />
+      <SectionDivider />
+      <Certificates />
+      <SectionDivider />
+      <Projects />
+      <SectionDivider />
+      <Contact />
+    </Suspense>
   </>
 );
 
@@ -77,30 +98,28 @@ const ROUTE_DIRECTIONS = {
   '/data-science': 'left',
   '/case-study/mnemosyne': 'right',
   '/case-study/typesprint': 'right',
-  '/case-study/dert-haritasi': 'right',
   '/case-study/walkkittie': 'left',
   '/case-study/msscan': 'up',
 };
 
 const ROUTE_OVERLAYS = {
-  '/': 'from-white/68 via-white/52 to-white/68 dark:from-black/84 dark:via-zinc-950/72 dark:to-black/84',
-  '/web': 'from-white/66 via-white/50 to-white/66 dark:from-black/80 dark:via-zinc-950/68 dark:to-black/80',
+  '/': 'from-white/75 via-cyan-50/50 to-white/75 dark:from-ink-900/90 dark:via-ink-800/75 dark:to-ink-900/90',
+  '/web':
+    'from-white/70 via-cyan-50/40 to-white/70 dark:from-ink-900/80 dark:via-ink-800/70 dark:to-ink-900/80',
   '/android':
-    'from-white/60 via-white/42 to-white/60 dark:from-black/76 dark:via-zinc-950/62 dark:to-black/76',
+    'from-white/70 via-emerald-50/40 to-white/70 dark:from-ink-900/80 dark:via-emerald-950/30 dark:to-ink-900/80',
   '/cybersecurity':
-    'from-white/76 via-white/62 to-white/76 dark:from-black/88 dark:via-zinc-950/78 dark:to-black/88',
+    'from-white/75 via-accent-50/40 to-white/75 dark:from-ink-900/90 dark:via-accent-950/25 dark:to-ink-900/90',
   '/data-science':
-    'from-white/67 via-white/52 to-white/67 dark:from-black/82 dark:via-zinc-950/70 dark:to-black/82',
+    'from-white/70 via-ink-50/40 to-white/70 dark:from-ink-900/90 dark:via-ink-800/70 dark:to-ink-900/90',
   '/case-study/mnemosyne':
-    'from-white/65 via-white/48 to-white/65 dark:from-black/78 dark:via-zinc-950/66 dark:to-black/78',
+    'from-white/70 via-cyan-50/40 to-white/70 dark:from-ink-900/80 dark:via-cyan-950/25 dark:to-ink-900/80',
   '/case-study/typesprint':
-    'from-white/65 via-white/48 to-white/65 dark:from-black/78 dark:via-zinc-950/66 dark:to-black/78',
-  '/case-study/dert-haritasi':
-    'from-white/65 via-white/48 to-white/65 dark:from-black/78 dark:via-zinc-950/66 dark:to-black/78',
+    'from-white/70 via-accent-50/40 to-white/70 dark:from-ink-900/80 dark:via-accent-950/20 dark:to-ink-900/80',
   '/case-study/walkkittie':
-    'from-white/62 via-white/45 to-white/62 dark:from-black/75 dark:via-zinc-950/60 dark:to-black/75',
+    'from-white/70 via-cyan-50/40 to-white/70 dark:from-ink-900/80 dark:via-cyan-950/20 dark:to-ink-900/80',
   '/case-study/msscan':
-    'from-white/70 via-white/55 to-white/70 dark:from-black/85 dark:via-zinc-950/75 dark:to-black/85',
+    'from-white/75 via-ink-50/40 to-white/75 dark:from-ink-900/90 dark:via-ink-800/75 dark:to-ink-900/90',
 };
 
 const ROUTE_PARTICLES = {
@@ -111,7 +130,6 @@ const ROUTE_PARTICLES = {
   '/data-science': { particleCount: 720, noiseIntensity: 0.0018 },
   '/case-study/mnemosyne': { particleCount: 820, noiseIntensity: 0.0022 },
   '/case-study/typesprint': { particleCount: 820, noiseIntensity: 0.0022 },
-  '/case-study/dert-haritasi': { particleCount: 820, noiseIntensity: 0.0022 },
   '/case-study/walkkittie': { particleCount: 880, noiseIntensity: 0.0024 },
   '/case-study/msscan': { particleCount: 1050, noiseIntensity: 0.0027 },
 };
@@ -164,18 +182,18 @@ const PageTransition = ({ children, direction = 'fade' }) => {
       initial={{
         opacity: 0,
         clipPath: getClipPath(direction, 'initial'),
-        ...(isFade && { y: 24, filter: 'blur(4px)', scale: 0.98 }),
+        ...(isFade && { y: 24, scale: 0.98 }),
       }}
       animate={{
         opacity: 1,
         clipPath: getClipPath(direction, 'animate'),
-        ...(isFade && { y: 0, filter: 'blur(0px)', scale: 1 }),
+        ...(isFade && { y: 0, scale: 1 }),
         transition: { duration: isFade ? 0.55 : 0.5, ease: [0.22, 1, 0.36, 1] },
       }}
       exit={{
         opacity: 0,
         clipPath: getClipPath(direction, 'exit'),
-        ...(isFade && { y: -16, filter: 'blur(2px)', scale: 1.01 }),
+        ...(isFade && { y: -16, scale: 1.01 }),
         transition: { duration: 0.3, ease: [0.55, 0, 1, 0.45] },
       }}
     >
@@ -184,43 +202,134 @@ const PageTransition = ({ children, direction = 'fade' }) => {
   );
 };
 
+const getHashTargetId = (hash) => {
+  if (!hash || hash === '#') return '';
+  try {
+    return decodeURIComponent(hash.slice(1));
+  } catch {
+    return hash.slice(1);
+  }
+};
+
+const scrollToHashTarget = (hash, behavior = 'smooth', attempts = 10) => {
+  const targetId = getHashTargetId(hash);
+  if (!targetId) return undefined;
+
+  let frameId = 0;
+  let timeoutId = 0;
+  const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const scrollBehavior = prefersReducedMotion ? 'auto' : behavior;
+
+  const run = (remaining) => {
+    const target = document.getElementById(targetId);
+    if (target) {
+      target.scrollIntoView({ behavior: scrollBehavior, block: 'start' });
+      return;
+    }
+
+    if (remaining <= 0) return;
+    timeoutId = window.setTimeout(() => {
+      frameId = window.requestAnimationFrame(() => run(remaining - 1));
+    }, 70);
+  };
+
+  frameId = window.requestAnimationFrame(() => run(attempts));
+
+  return () => {
+    window.cancelAnimationFrame(frameId);
+    window.clearTimeout(timeoutId);
+  };
+};
+
 /* Scroll to top or hash on route change */
 const ScrollToTop = () => {
   const { pathname, hash } = useLocation();
   const isInitialMount = React.useRef(true);
 
   useEffect(() => {
-    if (isInitialMount.current) {
-      isInitialMount.current = false;
-      document.documentElement.style.scrollBehavior = 'auto';
+    const isFirstRender = isInitialMount.current;
+    isInitialMount.current = false;
+
+    if (hash) {
+      return scrollToHashTarget(hash, isFirstRender ? 'auto' : 'smooth', isFirstRender ? 16 : 10);
+    }
+
+    if (isFirstRender) {
       window.scrollTo(0, 0);
-      requestAnimationFrame(() => {
-        window.scrollTo(0, 0);
-        document.documentElement.style.scrollBehavior = '';
-      });
       return;
     }
-    if (hash) {
-      setTimeout(() => {
-        const el = document.querySelector(hash);
-        if (el) el.scrollIntoView({ behavior: 'smooth' });
-      }, 100);
-    } else {
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
+
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   }, [pathname, hash]);
   return null;
+};
+
+const DeferredParticlesBackground = ({ particleCount, ...props }) => {
+  const prefersReducedMotion = useReducedMotion();
+  const [shouldRender, setShouldRender] = useState(false);
+
+  useEffect(() => {
+    if (prefersReducedMotion || particleCount <= 0) return undefined;
+
+    let cancelled = false;
+    let removeLoadListener = null;
+    let cancelScheduledLoad = null;
+
+    const enableParticles = () => {
+      if (!cancelled) setShouldRender(true);
+    };
+
+    const scheduleLoad = () => {
+      const timeoutId = window.setTimeout(enableParticles, 1800);
+      cancelScheduledLoad = () => window.clearTimeout(timeoutId);
+    };
+
+    if (document.readyState === 'complete') {
+      scheduleLoad();
+    } else {
+      const handleLoad = () => scheduleLoad();
+      window.addEventListener('load', handleLoad, { once: true });
+      removeLoadListener = () => window.removeEventListener('load', handleLoad);
+    }
+
+    return () => {
+      cancelled = true;
+      if (removeLoadListener) removeLoadListener();
+      if (cancelScheduledLoad) cancelScheduledLoad();
+    };
+  }, [particleCount, prefersReducedMotion]);
+
+  if (!shouldRender) return null;
+
+  return (
+    <Suspense fallback={null}>
+      <LazyFluidParticlesBackground particleCount={particleCount} {...props} />
+    </Suspense>
+  );
 };
 
 const AppContent = () => {
   const { isDark } = useDarkMode();
   const location = useLocation();
+  const prefersReducedMotion = useReducedMotion();
   const [isMobile, setIsMobile] = useState(false);
   const overlayClass = ROUTE_OVERLAYS[location.pathname] || ROUTE_OVERLAYS['/'];
+  const routeDirection = ROUTE_DIRECTIONS[location.pathname] || 'fade';
   const particleSettings = ROUTE_PARTICLES[location.pathname] || ROUTE_PARTICLES['/'];
-  const particleCount = isMobile
-    ? Math.max(350, Math.round(particleSettings.particleCount * 0.65))
-    : particleSettings.particleCount;
+  const particleCount = prefersReducedMotion
+    ? 0
+    : isMobile
+      ? Math.max(180, Math.min(220, Math.round(particleSettings.particleCount * 0.22)))
+      : particleSettings.particleCount;
+  const particleNoiseIntensity = prefersReducedMotion
+    ? 0
+    : isMobile
+      ? particleSettings.noiseIntensity * 0.75
+      : particleSettings.noiseIntensity;
+  const particleSize = useMemo(
+    () => (isMobile ? { min: 0.45, max: 1.05 } : { min: 0.5, max: 2 }),
+    [isMobile],
+  );
 
   useEffect(() => {
     const mediaQuery = window.matchMedia('(max-width: 767px)');
@@ -239,16 +348,17 @@ const AppContent = () => {
 
   return (
     <div className={`relative overflow-x-hidden transition-colors duration-300 ${isDark ? 'dark' : ''}`}>
-      <FluidParticlesBackground
+      <DeferredParticlesBackground
         particleCount={particleCount}
-        noiseIntensity={particleSettings.noiseIntensity}
+        noiseIntensity={particleNoiseIntensity}
+        particleSize={particleSize}
         className="pointer-events-none fixed inset-0 z-0 h-full bg-transparent dark:bg-transparent"
       />
       <div className={`pointer-events-none fixed inset-0 z-[1] bg-gradient-to-b ${overlayClass}`} />
       <div className="relative z-10">
         <a
           href="#main"
-          className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[9999] focus:px-4 focus:py-2 focus:bg-warm-600 focus:text-white focus:rounded-lg focus:shadow-lg"
+          className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[9999] focus:rounded-lg focus:bg-accent-500 focus:px-4 focus:py-2 focus:text-white focus:shadow-lg"
         >
           Skip to main content
         </a>
@@ -260,7 +370,7 @@ const AppContent = () => {
               <Route
                 path="/"
                 element={
-                  <PageTransition direction="fade">
+                  <PageTransition direction={routeDirection}>
                     <HomePage />
                   </PageTransition>
                 }
@@ -269,7 +379,7 @@ const AppContent = () => {
                 path="/android"
                 element={
                   <Suspense fallback={<LoadingSpinner />}>
-                    <PageTransition direction="left">
+                    <PageTransition direction={routeDirection}>
                       <AndroidPage />
                     </PageTransition>
                   </Suspense>
@@ -278,16 +388,18 @@ const AppContent = () => {
               <Route
                 path="/web"
                 element={
-                  <PageTransition direction="right">
-                    <WebDevPage />
-                  </PageTransition>
+                  <Suspense fallback={<LoadingSpinner />}>
+                    <PageTransition direction={routeDirection}>
+                      <WebDevPage />
+                    </PageTransition>
+                  </Suspense>
                 }
               />
               <Route
                 path="/cybersecurity"
                 element={
                   <Suspense fallback={<LoadingSpinner />}>
-                    <PageTransition direction="up">
+                    <PageTransition direction={routeDirection}>
                       <CyberSecurityPage />
                     </PageTransition>
                   </Suspense>
@@ -296,56 +408,58 @@ const AppContent = () => {
               <Route
                 path="/data-science"
                 element={
-                  <PageTransition direction="left">
-                    <DataSciencePage />
-                  </PageTransition>
+                  <Suspense fallback={<LoadingSpinner />}>
+                    <PageTransition direction={routeDirection}>
+                      <DataSciencePage />
+                    </PageTransition>
+                  </Suspense>
                 }
               />
               <Route
                 path="/case-study/mnemosyne"
                 element={
-                  <PageTransition direction="right">
-                    <MnemosyneCaseStudy />
-                  </PageTransition>
+                  <Suspense fallback={<LoadingSpinner />}>
+                    <PageTransition direction={routeDirection}>
+                      <MnemosyneCaseStudy />
+                    </PageTransition>
+                  </Suspense>
                 }
               />
               <Route
                 path="/case-study/typesprint"
                 element={
-                  <PageTransition direction="right">
-                    <TypeSprintCaseStudy />
-                  </PageTransition>
-                }
-              />
-              <Route
-                path="/case-study/dert-haritasi"
-                element={
-                  <PageTransition direction="right">
-                    <DertHaritasiCaseStudy />
-                  </PageTransition>
+                  <Suspense fallback={<LoadingSpinner />}>
+                    <PageTransition direction={routeDirection}>
+                      <TypeSprintCaseStudy />
+                    </PageTransition>
+                  </Suspense>
                 }
               />
               <Route
                 path="/case-study/walkkittie"
                 element={
-                  <PageTransition direction="left">
-                    <WalkKittieCaseStudy />
-                  </PageTransition>
+                  <Suspense fallback={<LoadingSpinner />}>
+                    <PageTransition direction={routeDirection}>
+                      <WalkKittieCaseStudy />
+                    </PageTransition>
+                  </Suspense>
                 }
               />
               <Route
                 path="/case-study/msscan"
                 element={
-                  <PageTransition direction="up">
-                    <MsscanCaseStudy />
-                  </PageTransition>
+                  <Suspense fallback={<LoadingSpinner />}>
+                    <PageTransition direction={routeDirection}>
+                      <MsscanCaseStudy />
+                    </PageTransition>
+                  </Suspense>
                 }
               />
               <Route
                 path="*"
                 element={
                   <Suspense fallback={<LoadingSpinner />}>
-                    <PageTransition direction="fade">
+                    <PageTransition direction={routeDirection}>
                       <NotFoundPage />
                     </PageTransition>
                   </Suspense>
@@ -361,19 +475,29 @@ const AppContent = () => {
 };
 
 const scheduleNonCriticalTask = (callback) => {
-  if ('requestIdleCallback' in window) {
-    const idleId = window.requestIdleCallback(callback, { timeout: 2000 });
-    return () => window.cancelIdleCallback(idleId);
-  }
+  let idleId = 0;
+  const timeoutId = window.setTimeout(() => {
+    if ('requestIdleCallback' in window) {
+      idleId = window.requestIdleCallback(callback, { timeout: 2000 });
+      return;
+    }
+    callback();
+  }, 2200);
 
-  const timeoutId = window.setTimeout(callback, 1200);
-  return () => window.clearTimeout(timeoutId);
+  return () => {
+    window.clearTimeout(timeoutId);
+    if (idleId) window.cancelIdleCallback(idleId);
+  };
 };
+
+const shouldLoadVercelInsights = () => !['localhost', '127.0.0.1', '::1'].includes(window.location.hostname);
 
 const DeferredAnalytics = () => {
   const [AnalyticsComponent, setAnalyticsComponent] = useState(null);
 
   useEffect(() => {
+    if (!shouldLoadVercelInsights()) return undefined;
+
     let cancelled = false;
     let removeLoadListener = null;
     let cancelScheduledLoad = null;
@@ -415,6 +539,53 @@ const DeferredAnalytics = () => {
   return <AnalyticsComponent />;
 };
 
+const DeferredSpeedInsights = () => {
+  const [SpeedInsightsComponent, setSpeedInsightsComponent] = useState(null);
+
+  useEffect(() => {
+    if (!shouldLoadVercelInsights()) return undefined;
+
+    let cancelled = false;
+    let removeLoadListener = null;
+    let cancelScheduledLoad = null;
+
+    const loadSpeedInsights = () => {
+      import('@vercel/speed-insights/react')
+        .then(({ SpeedInsights }) => {
+          if (!cancelled) {
+            setSpeedInsightsComponent(() => SpeedInsights);
+          }
+        })
+        .catch((error) => {
+          console.error('Failed to load Vercel Speed Insights:', error);
+        });
+    };
+
+    const scheduleLoad = () => {
+      cancelScheduledLoad = scheduleNonCriticalTask(loadSpeedInsights);
+    };
+
+    if (document.readyState === 'complete') {
+      scheduleLoad();
+    } else {
+      const handleLoad = () => {
+        scheduleLoad();
+      };
+      window.addEventListener('load', handleLoad, { once: true });
+      removeLoadListener = () => window.removeEventListener('load', handleLoad);
+    }
+
+    return () => {
+      cancelled = true;
+      if (removeLoadListener) removeLoadListener();
+      if (cancelScheduledLoad) cancelScheduledLoad();
+    };
+  }, []);
+
+  if (!SpeedInsightsComponent) return null;
+  return <SpeedInsightsComponent />;
+};
+
 function App() {
   return (
     <ErrorBoundary>
@@ -438,6 +609,7 @@ function App() {
               />
             </CommandPaletteProvider>
             <DeferredAnalytics />
+            <DeferredSpeedInsights />
           </LanguageProvider>
         </DarkModeProvider>
       </MotionConfig>

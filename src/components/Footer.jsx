@@ -6,185 +6,114 @@ import { useLanguage } from '../context/LanguageContext';
 
 const footerGrid = {
   hidden: {},
-  visible: { transition: { staggerChildren: 0.12, delayChildren: 0.05 } },
+  visible: { transition: { staggerChildren: 0.1, delayChildren: 0.05 } },
 };
 
 const footerColumn = {
-  hidden: { opacity: 0, y: 24 },
+  hidden: { opacity: 0, y: 20 },
   visible: {
     opacity: 1,
     y: 0,
-    transition: { duration: 0.55, ease: [0.22, 1, 0.36, 1] },
+    transition: { duration: 0.5, ease: [0.22, 1, 0.36, 1] },
   },
 };
-
-const linkUnderline = {
-  initial: { scaleX: 0, originX: 0 },
-  hover: { scaleX: 1 },
-};
-
-/* ── Animated wave SVG separator ── */
-const WaveSeparator = () => (
-  <motion.div
-    className="relative w-full overflow-hidden leading-[0] -mb-1"
-    initial={{ opacity: 0, y: 16 }}
-    whileInView={{ opacity: 1, y: 0 }}
-    viewport={{ once: true }}
-    transition={{ duration: 0.7, ease: 'easeOut' }}
-  >
-    <div className="wave-separator w-[200%]">
-      <svg
-        className="w-full h-16 md:h-24"
-        viewBox="0 0 2880 80"
-        preserveAspectRatio="none"
-        xmlns="http://www.w3.org/2000/svg"
-      >
-        <path
-          d="M0,40 C320,80 640,0 960,40 C1280,80 1600,0 1920,40 C2240,80 2560,0 2880,40 L2880,80 L0,80 Z"
-          className="fill-sand-100/50 dark:fill-dark-700/50"
-        />
-        <path
-          d="M0,50 C320,20 640,70 960,50 C1280,20 1600,70 1920,50 C2240,20 2560,70 2880,50 L2880,80 L0,80 Z"
-          className="fill-sand-100/80 dark:fill-dark-700/80"
-        />
-      </svg>
-    </div>
-  </motion.div>
-);
 
 const Footer = () => {
   const { isTurkish } = useLanguage();
   const currentYear = new Date().getFullYear();
 
   const socialLinks = [
-    {
-      name: 'GitHub',
-      icon: <FiGithub className="w-6 h-6" />,
-      href: 'https://github.com/MertSoylu',
-    },
+    { name: 'GitHub', icon: <FiGithub className="h-5 w-5" />, href: 'https://github.com/MertSoylu' },
     {
       name: 'LinkedIn',
-      icon: <FiLinkedin className="w-6 h-6" />,
+      icon: <FiLinkedin className="h-5 w-5" />,
       href: 'https://www.linkedin.com/in/mert-soylu-b8b6a1341/',
     },
-    {
-      name: 'Email',
-      icon: <HiMail className="w-6 h-6" />,
-      href: 'mailto:s6ylumert@gmail.com',
-    },
+    { name: 'Email', icon: <HiMail className="h-5 w-5" />, href: 'mailto:s6ylumert@gmail.com' },
   ];
 
   return (
-    <div className="mt-20">
-      {/* Wave separator */}
-      <WaveSeparator />
+    <footer className="mt-20 border-t border-ink-200/70 bg-white/50 px-4 py-12 backdrop-blur-xl dark:border-white/10 dark:bg-white/5">
+      <div className="mx-auto max-w-6xl">
+        <div className="studio-rule mb-10" />
 
-      <footer className="bg-sand-100/50 dark:bg-dark-700/50 backdrop-blur-md border-t border-sand-200 dark:border-dark-500 py-12 px-4">
-        <div className="max-w-6xl mx-auto">
-          <motion.div
-            variants={footerGrid}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: '-30px' }}
-            className="grid md:grid-cols-3 gap-8 mb-8"
-          >
-            {/* Brand */}
-            <motion.div variants={footerColumn}>
-              <h3 className="text-2xl font-bold gradient-text mb-2">Mert Soylu</h3>
-              <p className="text-sand-600 dark:text-dark-200 text-sm">
-                {isTurkish ? 'Full-Stack Developer & AI Developer' : 'Full-Stack Developer & AI Developer'}
-              </p>
-            </motion.div>
+        <motion.div
+          variants={footerGrid}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, margin: '-30px' }}
+          className="grid gap-8 md:grid-cols-[1.4fr_1fr_1fr]"
+        >
+          <motion.div variants={footerColumn}>
+            <p className="mb-2 text-caption text-cyan-700 dark:text-cyan-200">Product studio portfolio</p>
+            <h3 className="text-h2 gradient-text mb-3">Mert Soylu</h3>
+            <p className="max-w-sm text-sm leading-relaxed text-ink-600 dark:text-ink-200">
+              {isTurkish
+                ? 'Web, Android, güvenlik ve yapay zeka alanlarında ürüne dönüşen projeler geliştiriyorum.'
+                : 'Building product-minded projects across web, Android, security, and AI.'}
+            </p>
+          </motion.div>
 
-            {/* Quick Links */}
-            <motion.div variants={footerColumn}>
-              <h4 className="font-semibold text-sand-900 dark:text-dark-50 mb-4">
-                {isTurkish ? 'Hızlı Linkler' : 'Quick Links'}
-              </h4>
-              <ul className="space-y-2">
-                {[
-                  { name: isTurkish ? 'Hakkımda' : 'About', href: '#about' },
-                  { name: isTurkish ? 'Projeler' : 'Projects', href: '#projects' },
-                  { name: isTurkish ? 'İletişim' : 'Contact', href: '#contact' },
-                ].map((link) => (
-                  <li key={link.name}>
-                    <motion.a
-                      href={link.href}
-                      whileHover="hover"
-                      initial="initial"
-                      className="relative inline-block text-sand-600 dark:text-dark-200 hover:text-accent-700 dark:hover:text-accent-300 transition-colors text-sm py-1.5"
-                    >
-                      {link.name}
-                      <motion.span
-                        variants={linkUnderline}
-                        transition={{ duration: 0.25, ease: 'easeOut' }}
-                        className="absolute bottom-0 left-0 h-px w-full bg-accent-600 dark:bg-accent-400"
-                      />
-                    </motion.a>
-                  </li>
-                ))}
-              </ul>
-            </motion.div>
-
-            {/* Social Links */}
-            <motion.div variants={footerColumn}>
-              <h4 className="font-semibold text-sand-900 dark:text-dark-50 mb-4">
-                {isTurkish ? 'Bağlantılar' : 'Connect'}
-              </h4>
-              <div className="flex gap-4">
-                {socialLinks.map((link) => (
-                  <motion.a
-                    key={link.name}
+          <motion.div variants={footerColumn}>
+            <h4 className="mb-4 text-sm font-extrabold text-ink-900 dark:text-white">
+              {isTurkish ? 'Sayfalar' : 'Pages'}
+            </h4>
+            <ul className="space-y-2">
+              {[
+                { name: isTurkish ? 'Hakkimda' : 'About', href: '#about' },
+                { name: isTurkish ? 'Projeler' : 'Projects', href: '#projects' },
+                { name: isTurkish ? 'İletişim' : 'Contact', href: '#contact' },
+              ].map((link) => (
+                <li key={link.name}>
+                  <a
                     href={link.href}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="w-11 h-11 flex items-center justify-center rounded-lg text-sand-600 dark:text-dark-200 hover:text-accent-700 dark:hover:text-accent-300 hover:bg-sand-200/50 dark:hover:bg-dark-500/50 transition-colors"
-                    whileHover={{ scale: 1.1 }}
-                    whileTap={{ scale: 0.92 }}
-                    title={link.name}
-                    aria-label={link.name}
+                    className="inline-flex rounded-lg px-1 py-1 text-sm font-semibold text-ink-600 hover:text-cyan-700 dark:text-ink-200 dark:hover:text-cyan-100"
                   >
-                    {link.icon}
-                  </motion.a>
-                ))}
-              </div>
-            </motion.div>
+                    {link.name}
+                  </a>
+                </li>
+              ))}
+            </ul>
           </motion.div>
 
-          {/* Divider */}
-          <div className="relative overflow-hidden my-8">
-            <motion.div
-              className="border-t border-sand-200 dark:border-dark-500"
-              style={{ originX: 0 }}
-              initial={{ scaleX: 0 }}
-              whileInView={{ scaleX: 1 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1], delay: 0.35 }}
-            />
-          </div>
-
-          {/* Bottom */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6, delay: 0.3 }}
-            className="flex flex-col md:flex-row justify-between items-center text-center md:text-left"
-          >
-            <p className="text-sm text-sand-600 dark:text-dark-200">
-              {isTurkish
-                ? `© ${currentYear} Mert Soylu. Tüm hakları saklıdır.`
-                : `© ${currentYear} Mert Soylu. All rights reserved.`}
-            </p>
-            <p className="text-sm text-sand-600 dark:text-dark-200 mt-4 md:mt-0">
-              {isTurkish
-                ? 'React, Tailwind CSS ve Framer Motion ile geliştirildi'
-                : 'Built with React, Tailwind CSS & Framer Motion'}
-            </p>
+          <motion.div variants={footerColumn}>
+            <h4 className="mb-4 text-sm font-extrabold text-ink-900 dark:text-white">
+              {isTurkish ? 'Baglantilar' : 'Connect'}
+            </h4>
+            <div className="flex gap-3">
+              {socialLinks.map((link) => (
+                <motion.a
+                  key={link.name}
+                  href={link.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex h-11 w-11 items-center justify-center rounded-lg border border-ink-200/70 bg-white/50 text-ink-600 shadow-soft hover:border-cyan-300 hover:text-cyan-700 dark:border-white/10 dark:bg-white/10 dark:text-ink-100 dark:hover:text-cyan-100"
+                  whileHover={{ scale: 1.08, y: -2 }}
+                  whileTap={{ scale: 0.94 }}
+                  title={link.name}
+                  aria-label={link.name}
+                >
+                  {link.icon}
+                </motion.a>
+              ))}
+            </div>
           </motion.div>
+        </motion.div>
+
+        <div className="mt-10 flex flex-col justify-between gap-3 border-t border-ink-200/70 pt-6 text-sm text-ink-500 dark:border-white/10 dark:text-ink-300 md:flex-row">
+          <p>
+            {isTurkish
+              ? `© ${currentYear} Mert Soylu. Tum haklari saklidir.`
+              : `© ${currentYear} Mert Soylu. All rights reserved.`}
+          </p>
+          <p>
+            {isTurkish
+              ? 'React, Tailwind CSS ve Framer Motion ile gelistirildi'
+              : 'Built with React, Tailwind CSS, and Framer Motion'}
+          </p>
         </div>
-      </footer>
-    </div>
+      </div>
+    </footer>
   );
 };
 

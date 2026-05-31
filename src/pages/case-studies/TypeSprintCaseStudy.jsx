@@ -1,76 +1,41 @@
 import React from 'react';
-import { motion } from 'framer-motion';
-import { HiLightningBolt, HiShieldCheck, HiGlobe, HiUsers, HiClock, HiChip } from 'react-icons/hi';
+import { HiCursorClick, HiLightningBolt } from 'react-icons/hi';
 import { useLanguage } from '../../context/LanguageContext';
-import { useDarkMode } from '../../context/DarkModeContext';
 import CaseStudyLayout from '../../components/CaseStudyLayout';
 import FadeContent from '../../components/FadeContent';
-import SpotlightCard from '../../components/SpotlightCard';
+
+const InfoCard = ({ title, children }) => (
+  <div className="card-raised p-6">
+    <h2 className="mb-3 text-h3 text-ink-900 dark:text-white">{title}</h2>
+    <div className="text-body text-ink-600 dark:text-ink-200">{children}</div>
+  </div>
+);
 
 const TypeSprintCaseStudy = () => {
   const { isTurkish } = useLanguage();
-  const { isDark } = useDarkMode();
 
-  const metrics = isTurkish
+  const facts = isTurkish
     ? [
-        { icon: <HiGlobe className="w-6 h-6" />, value: '2,000+', label: 'Tamamlanan Test' },
-        { icon: <HiUsers className="w-6 h-6" />, value: '5', label: 'Dil Desteği' },
-        { icon: <HiClock className="w-6 h-6" />, value: '40ms', label: 'Tepki Süresi' },
-        { icon: <HiChip className="w-6 h-6" />, value: '99.9%', label: 'Hile Önleme' },
+        { label: 'Yüzey', value: 'Canlı WPM uygulaması' },
+        { label: 'Odak', value: 'Doğruluk + ritim' },
+        { label: 'Dil', value: 'Çok dilli kelime havuzu' },
       ]
     : [
-        { icon: <HiGlobe className="w-6 h-6" />, value: '2,000+', label: 'Tests Completed' },
-        { icon: <HiUsers className="w-6 h-6" />, value: '5', label: 'Languages' },
-        { icon: <HiClock className="w-6 h-6" />, value: '40ms', label: 'Response Time' },
-        { icon: <HiChip className="w-6 h-6" />, value: '99.9%', label: 'Anti-Cheat' },
+        { label: 'Surface', value: 'Live WPM application' },
+        { label: 'Focus', value: 'Accuracy + rhythm' },
+        { label: 'Language', value: 'Multilingual word pools' },
       ];
 
-  const techStack = ['JavaScript', 'HTML5', 'CSS3', 'LocalStorage', 'Web Workers', 'Canvas API'];
-
-  const challenges = isTurkish
+  const decisions = isTurkish
     ? [
-        {
-          title: 'Gerçek Zamanlı Doğrulama',
-          desc: 'Yanlış tuşa basıldığında anında durdurma mantığını implemente ettim. Bu, kullanıcı deneyimini zorlaştırmadan doğruluk sağlıyor.',
-        },
-        {
-          title: 'Çok Dilli Kelime Havuzları',
-          desc: 'Her dil için optimize edilmiş kelime listeleri oluşturdum. Türkçe dahil 5 farklı dilde tutarlı WPM ölçümü sağladım.',
-        },
-        {
-          title: 'Hile Önleme Sistemi',
-          desc: "Paste event'lerini engelleyerek, kopyala-yapıştır ile hile yapılmasını önledim. Ayrıca anormal yazım hızlarını tespit eden bir algoritma ekledim.",
-        },
+        'Yanlış tuşla devam etmeye izin vermeyen akış, skoru daha dürüst hale getirir.',
+        'Arayüzde odak metin alanında kalır; yardımcı bilgiler çevrede daha sessiz durur.',
+        'Çok dilli yapı, Türkçe dahil farklı kelime ritimlerini ölçüme dahil eder.',
       ]
     : [
-        {
-          title: 'Real-Time Validation',
-          desc: 'Implemented instant stop logic on wrong keypress. This ensures accuracy without degrading the user experience.',
-        },
-        {
-          title: 'Multilingual Word Pools',
-          desc: 'Created optimized word lists for each language. Achieved consistent WPM measurement across 5 languages including Turkish.',
-        },
-        {
-          title: 'Anti-Cheat System',
-          desc: 'Prevented copy-paste cheating by blocking paste events. Added an algorithm that detects abnormal typing speeds.',
-        },
-      ];
-
-  const features = isTurkish
-    ? [
-        'Gerçek zamanlı harf doğrulama',
-        'Çok dilli kelime havuzları (Türkçe dahil)',
-        'Günlük, haftalık ve tüm zamanların skor tabloları',
-        'Hile önleme sistemi',
-        'Responsive tasarım (mobil + masaüstü)',
-      ]
-    : [
-        'Real-time letter validation',
-        'Multilingual word pools (including Turkish)',
-        'Daily, weekly, and all-time leaderboards',
-        'Anti-cheat system',
-        'Responsive design (mobile + desktop)',
+        'Stopping progress on a wrong key makes the score more honest.',
+        'The interface keeps focus on the text area while supporting data stays quieter.',
+        'The multilingual structure includes different word rhythms, including Turkish.',
       ];
 
   return (
@@ -79,202 +44,68 @@ const TypeSprintCaseStudy = () => {
       title="TypeSprint"
       subtitle={
         isTurkish
-          ? 'Gerçek zamanlı çalışan modern bir yazma hızı (WPM) testi uygulaması. Akıcı arayüz, çok dilli destek ve adil test deneyimi.'
-          : 'A modern real-time typing speed (WPM) test application. Smooth interface, multilingual support, and fair testing experience.'
+          ? 'Yazma hızını sadece hız değil, doğruluk ve akış kontrolüyle ölçen canlı web uygulaması.'
+          : 'A live web app that measures typing speed through accuracy and flow control, not only raw speed.'
       }
       liveUrl="https://typesprint.online"
-      heroImage="https://image.thum.io/get/width/1600/https://typesprint.online"
       currentId="typesprint"
       isTurkish={isTurkish}
+      facts={facts}
+      previewVariant="typing"
     >
-      {/* Metrics */}
       <FadeContent duration={700} blur threshold={0.1}>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          {metrics.map((m, i) => (
-            <motion.div
-              key={m.label}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: i * 0.1 }}
-              className="card-raised p-5 text-center"
-            >
-              <div className="inline-flex items-center justify-center w-10 h-10 rounded-xl bg-accent-500/10 text-accent-600 dark:text-accent-400 mb-3">
-                {m.icon}
-              </div>
-              <div className="text-2xl font-bold text-sand-900 dark:text-zinc-50 mb-1">{m.value}</div>
-              <div className="text-caption text-sand-600 dark:text-zinc-400">{m.label}</div>
-            </motion.div>
-          ))}
+        <div className="grid gap-5 md:grid-cols-2">
+          <InfoCard title={isTurkish ? 'Problem' : 'Problem'}>
+            {isTurkish
+              ? 'Birçok WPM testi hızlı görünür ama hatalı yazmayı yeterince cezalandırmaz. Kullanıcı kendini geliştirirken hız ve doğruluk ayrımını net göremez.'
+              : 'Many WPM tests feel fast but do not penalize incorrect typing clearly. Users cannot always separate speed from accuracy while improving.'}
+          </InfoCard>
+          <InfoCard title={isTurkish ? 'Çözüm' : 'Solution'}>
+            {isTurkish
+              ? 'TypeSprint, yanlış girişte akışı durduran ve çok dilli kelime havuzuyla çalışan bir ölçüm deneyimi sunar. Amaç hızlı skor değil, güvenilir sonuçtur.'
+              : 'TypeSprint provides a measurement experience that stops on wrong input and works with multilingual word pools. The goal is reliable results, not inflated speed.'}
+          </InfoCard>
         </div>
       </FadeContent>
 
-      {/* Problem & Solution */}
       <FadeContent duration={700} blur threshold={0.1}>
-        <div className="card-raised p-6 sm:p-8">
-          <div className="grid md:grid-cols-2 gap-8">
-            <div>
-              <h2 className="text-h3 text-sand-900 dark:text-zinc-50 mb-4">
-                {isTurkish ? 'Problem' : 'Problem'}
-              </h2>
-              <p className="text-body text-sand-700 dark:text-zinc-300">
-                {isTurkish
-                  ? 'Mevcut yazma hızı testleri ya hatalı ölçüm yapıyor ya da hileye açık. Çok dilli destek genellikle eksik ve kullanıcı deneyimi düşük kalitede.'
-                  : 'Existing typing speed tests either measure inaccurately or are vulnerable to cheating. Multilingual support is usually lacking and the user experience is low quality.'}
-              </p>
-            </div>
-            <div>
-              <h2 className="text-h3 text-sand-900 dark:text-zinc-50 mb-4">
-                {isTurkish ? 'Çözüm' : 'Solution'}
-              </h2>
-              <p className="text-body text-sand-700 dark:text-zinc-300">
-                {isTurkish
-                  ? 'Yanlış tuşa basıldığında duran, 5 dil destekleyen ve hile önleyici sistemle donatılmış bir WPM testi oluşturdum. Skor tabloları rekabet ortamı yaratıyor.'
-                  : 'Created a WPM test that stops on wrong keypress, supports 5 languages, and is equipped with an anti-cheat system. Leaderboards create a competitive environment.'}
-              </p>
-            </div>
+        <div className="card-prominent p-6 sm:p-8">
+          <div className="mb-5 flex items-center gap-3">
+            <HiCursorClick className="h-6 w-6 text-accent-600 dark:text-accent-200" />
+            <h2 className="text-h3 text-ink-900 dark:text-white">
+              {isTurkish ? 'Ürün kararları' : 'Product decisions'}
+            </h2>
           </div>
-        </div>
-      </FadeContent>
-
-      {/* Tech Stack */}
-      <FadeContent duration={700} blur threshold={0.1}>
-        <div className="card-raised p-6 sm:p-8">
-          <h2 className="text-h3 text-sand-900 dark:text-zinc-50 mb-6">
-            {isTurkish ? 'Teknoloji Yığını' : 'Tech Stack'}
-          </h2>
-          <div className="flex flex-wrap gap-2">
-            {techStack.map((tech) => (
-              <span
-                key={tech}
-                className="px-3 py-1.5 bg-accent-500/10 text-accent-700 dark:text-accent-300 text-sm font-medium rounded-full border border-accent-500/20"
-              >
-                {tech}
-              </span>
-            ))}
-          </div>
-        </div>
-      </FadeContent>
-
-      {/* Architecture Decisions */}
-      <FadeContent duration={700} blur threshold={0.1}>
-        <div className="card-raised p-6 sm:p-8">
-          <h2 className="text-h3 text-sand-900 dark:text-zinc-50 mb-6">
-            {isTurkish ? 'Mimari Kararlar' : 'Architecture Decisions'}
-          </h2>
-          <div className="space-y-4">
-            <div className="flex gap-4">
-              <div className="w-8 h-8 rounded-full bg-accent-500/10 flex items-center justify-center text-accent-600 dark:text-accent-400 font-bold text-sm flex-shrink-0">
-                1
-              </div>
-              <div>
-                <h4 className="font-semibold text-sand-900 dark:text-zinc-100 mb-1">
-                  {isTurkish ? 'Vanilla JS ile Sıfır Bağımlılık' : 'Zero Dependency Vanilla JS'}
-                </h4>
-                <p className="text-body-sm text-sand-700 dark:text-zinc-300">
-                  {isTurkish
-                    ? 'React veya framework kullanmadan saf JavaScript ile geliştirdim. Bu, sayfa yükleme süresini minimize etti ve performansı artırdı.'
-                    : 'Built with pure JavaScript without React or any framework. This minimized page load time and improved performance.'}
-                </p>
-              </div>
-            </div>
-            <div className="flex gap-4">
-              <div className="w-8 h-8 rounded-full bg-accent-500/10 flex items-center justify-center text-accent-600 dark:text-accent-400 font-bold text-sm flex-shrink-0">
-                2
-              </div>
-              <div>
-                <h4 className="font-semibold text-sand-900 dark:text-zinc-100 mb-1">
-                  {isTurkish ? 'Web Workers ile Hesaplama' : 'Web Workers for Computation'}
-                </h4>
-                <p className="text-body-sm text-sand-700 dark:text-zinc-300">
-                  {isTurkish
-                    ? "WPM hesaplamalarını ve istatistikleri Web Worker'da yaparak ana thread'i bloke etmiyorum. Kullanıcı yazarken bile akıcı deneyim sağlanıyor."
-                    : 'Perform WPM calculations and statistics in a Web Worker to avoid blocking the main thread. Ensures a smooth experience even while the user is typing.'}
-                </p>
-              </div>
-            </div>
-            <div className="flex gap-4">
-              <div className="w-8 h-8 rounded-full bg-accent-500/10 flex items-center justify-center text-accent-600 dark:text-accent-400 font-bold text-sm flex-shrink-0">
-                3
-              </div>
-              <div>
-                <h4 className="font-semibold text-sand-900 dark:text-zinc-100 mb-1">
-                  {isTurkish ? 'Canvas API ile Render' : 'Canvas API Rendering'}
-                </h4>
-                <p className="text-body-sm text-sand-700 dark:text-zinc-300">
-                  {isTurkish
-                    ? 'Yazı alanını Canvas API ile render ettim. Bu, binlerce karakterin aynı anda akıcı şekilde gösterilmesini sağlıyor.'
-                    : 'Rendered the typing area with Canvas API. This allows thousands of characters to be displayed smoothly at the same time.'}
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </FadeContent>
-
-      {/* Challenges */}
-      <FadeContent duration={700} blur threshold={0.1}>
-        <div className="card-raised p-6 sm:p-8">
-          <h2 className="text-h3 text-sand-900 dark:text-zinc-50 mb-6">
-            {isTurkish ? 'Karşılaşılan Zorluklar' : 'Challenges Faced'}
-          </h2>
-          <div className="grid md:grid-cols-3 gap-4">
-            {challenges.map((c) => (
-              <SpotlightCard
-                key={c.title}
-                className="card-flat p-5"
-                spotlightColor={isDark ? 'rgba(249, 115, 22, 0.12)' : 'rgba(240, 125, 45, 0.08)'}
-              >
-                <h4 className="text-h4 text-sand-900 dark:text-zinc-50 mb-2">{c.title}</h4>
-                <p className="text-body-sm text-sand-700 dark:text-zinc-300">{c.desc}</p>
-              </SpotlightCard>
-            ))}
-          </div>
-        </div>
-      </FadeContent>
-
-      {/* Features */}
-      <FadeContent duration={700} blur threshold={0.1}>
-        <div className="card-raised p-6 sm:p-8">
-          <h2 className="text-h3 text-sand-900 dark:text-zinc-50 mb-6">
-            {isTurkish ? 'Öne Çıkan Özellikler' : 'Key Features'}
-          </h2>
-          <ul className="grid md:grid-cols-2 gap-3">
-            {features.map((feat) => (
+          <ul className="grid gap-3">
+            {decisions.map((item) => (
               <li
-                key={feat}
-                className="flex items-start gap-3 rounded-xl border border-sand-200/60 dark:border-zinc-800/60 bg-sand-100/40 dark:bg-zinc-900/40 px-4 py-3"
+                key={item}
+                className="flex gap-3 rounded-lg border border-ink-200/70 bg-white/50 p-4 text-body-sm font-semibold text-ink-600 dark:border-white/10 dark:bg-white/10 dark:text-ink-200"
               >
-                <span className="mt-1.5 inline-block h-1.5 w-1.5 flex-shrink-0 rounded-full bg-accent-500" />
-                <span className="text-body-sm text-sand-700 dark:text-zinc-300">{feat}</span>
+                <HiLightningBolt className="mt-0.5 h-5 w-5 shrink-0 text-accent-500" />
+                {item}
               </li>
             ))}
           </ul>
         </div>
       </FadeContent>
 
-      {/* Results */}
       <FadeContent duration={700} blur threshold={0.1}>
-        <div className="card-raised p-6 sm:p-8">
-          <h2 className="text-h3 text-sand-900 dark:text-zinc-50 mb-6">
-            {isTurkish ? 'Sonuçlar' : 'Results'}
-          </h2>
-          <p className="text-body text-sand-700 dark:text-zinc-300 mb-4">
-            {isTurkish
-              ? 'TypeSprint, hızlı yükleme süresi ve adil test deneyimi ile kullanıcılar tarafından olumlu karşılandı. Canvas API ile akıcı karakter render etme, Web Workers ile hesaplama performansı artırıldı.'
-              : 'TypeSprint was well received by users for its fast load time and fair testing experience. Canvas API enables smooth character rendering, while Web Workers improve computational performance.'}
-          </p>
-          <div className="flex flex-wrap gap-2">
-            {['Lighthouse 98', '<100KB JS', 'Zero Dependencies', 'Mobile Optimized'].map((tag) => (
+        <InfoCard title={isTurkish ? 'Sonuç' : 'Result'}>
+          {isTurkish
+            ? 'TypeSprint, küçük bir web aracında bile ölçüm mantığı, kullanıcı psikolojisi ve arayüz ritminin birlikte tasarlanması gerektiğini gösteriyor.'
+            : 'TypeSprint shows that even a small web tool needs measurement logic, user psychology, and interface rhythm designed together.'}
+          <div className="mt-4 flex flex-wrap gap-2">
+            {['JavaScript', 'WPM', 'Multilingual', 'Leaderboard'].map((tag) => (
               <span
                 key={tag}
-                className="px-3 py-1 bg-green-500/10 text-green-700 dark:text-green-300 text-xs font-medium rounded-full border border-green-500/20"
+                className="rounded-lg border border-accent-300/50 bg-accent-50 px-2.5 py-1 text-xs font-bold text-accent-700 dark:border-accent-300/20 dark:bg-accent-300/10 dark:text-accent-200"
               >
                 {tag}
               </span>
             ))}
           </div>
-        </div>
+        </InfoCard>
       </FadeContent>
     </CaseStudyLayout>
   );

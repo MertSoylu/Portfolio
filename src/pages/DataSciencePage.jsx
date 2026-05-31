@@ -1,133 +1,150 @@
 import React from 'react';
-import { HiChartBar, HiSparkles, HiAcademicCap, HiChip, HiClock } from 'react-icons/hi';
+import { motion } from 'framer-motion';
+import { HiAcademicCap, HiChartBar, HiChip, HiClock, HiSparkles } from 'react-icons/hi';
 import { useLanguage } from '../context/LanguageContext';
-import { useDarkMode } from '../context/DarkModeContext';
-import FadeContent from '../components/FadeContent';
-import SpotlightCard from '../components/SpotlightCard';
+import SitePreview from '../components/SitePreview';
 import SpecialtyPageLayout from '../components/SpecialtyPageLayout';
 
 const DataSciencePage = () => {
   const { isTurkish } = useLanguage();
-  const { isDark } = useDarkMode();
 
   const learningFocus = isTurkish
     ? [
         {
-          icon: <HiChartBar className="h-6 w-6" />,
-          title: 'Veri Analizi Temelleri',
-          desc: 'Pandas ve NumPy ile veri temizleme, keşifsel analiz ve temel görselleştirme üzerine çalışıyorum.',
+          icon: <HiChartBar className="h-5 w-5" />,
+          title: 'Veri analizi',
+          desc: 'Pandas, NumPy, temizleme, keşifsel analiz ve görselleştirme temelleri.',
         },
         {
-          icon: <HiSparkles className="h-6 w-6" />,
-          title: 'Makine Öğrenmesi',
-          desc: 'Model kurma, özellik mühendisliği ve değerlendirme metriklerini pratik örneklerle öğreniyorum.',
+          icon: <HiSparkles className="h-5 w-5" />,
+          title: 'Makine öğrenmesi',
+          desc: 'Baseline model kurma, özellik mühendisliği ve değerlendirme metrikleri.',
         },
         {
-          icon: <HiChip className="h-6 w-6" />,
-          title: 'Derin Öğrenme',
-          desc: 'Yapay sinir ağları, eğitim süreçleri ve temel mimariler üzerinde düzenli olarak denemeler yapıyorum.',
+          icon: <HiChip className="h-5 w-5" />,
+          title: 'Derin öğrenme',
+          desc: 'Sinir ağı temelleri, eğitim akışı ve küçük ölçekli deneyler.',
         },
       ]
     : [
         {
-          icon: <HiChartBar className="h-6 w-6" />,
-          title: 'Data Analysis Fundamentals',
-          desc: 'I am practicing with Pandas, NumPy, and core data visualization tools.',
+          icon: <HiChartBar className="h-5 w-5" />,
+          title: 'Data analysis',
+          desc: 'Pandas, NumPy, cleaning, exploratory analysis, and visualization basics.',
         },
         {
-          icon: <HiSparkles className="h-6 w-6" />,
-          title: 'Machine Learning',
-          desc: 'I am learning model logic, feature engineering, and evaluation metrics.',
+          icon: <HiSparkles className="h-5 w-5" />,
+          title: 'Machine learning',
+          desc: 'Baseline models, feature engineering, and evaluation metrics.',
         },
         {
-          icon: <HiChip className="h-6 w-6" />,
-          title: 'Deep Learning',
-          desc: 'I am studying neural network basics, training workflows, and practical architectures.',
+          icon: <HiChip className="h-5 w-5" />,
+          title: 'Deep learning',
+          desc: 'Neural network basics, training flow, and small-scale experiments.',
         },
       ];
 
-  const upcoming = isTurkish
+  const nextSteps = isTurkish
     ? [
-        'EDA: Açık veri seti üzerinde keşifsel analiz',
-        'Sınıflandırma: Scikit-learn ile baseline model',
-        'Regresyon: Özellik mühendisliği denemeleri',
-        'Görüntü Sınıflandırma: CNN ile küçük ölçekli proje',
+        'Açık veri setiyle EDA notu',
+        'Scikit-learn baseline sınıflandırma',
+        'Küçük CNN görüntü sınıflandırma deneyi',
+        'Model sonuçlarını okunur rapora çevirme',
       ]
     : [
-        'EDA: exploratory analysis on an open dataset',
-        'Classification: scikit-learn baseline model',
-        'Regression: feature engineering experiments',
-        'Image Classification: small-scale CNN project',
+        'EDA note on an open dataset',
+        'Scikit-learn baseline classification',
+        'Small CNN image-classification experiment',
+        'Turn model results into readable reports',
       ];
 
   return (
     <SpecialtyPageLayout
       routePath="/data-science"
       accent="zinc"
-      eyebrow={isTurkish ? 'Veri Bilimi ve Derin Öğrenme' : 'Data Science & Deep Learning'}
+      eyebrow={isTurkish ? 'AI ve veri bilimi' : 'AI & Data Science'}
       eyebrowIcon={<HiAcademicCap className="h-4 w-4" />}
-      title={isTurkish ? 'Veri Bilimi Yolculuğundayım' : 'Data Science Learning Journey'}
+      title={isTurkish ? 'Temeli güçlendirdiğim alan' : 'A field where I am building fundamentals'}
       subtitle={
         isTurkish
-          ? 'Bu alanda henüz yayınlanmış bir projem yok. Şu anda temel konuları sistemli biçimde öğreniyor, küçük deneyler yapıyor ve öğrendiklerimi notlandırıyorum. Hazır oldukça burada gerçek projeler paylaşacağım.'
-          : 'I do not have a published project in this area yet. I am currently building strong fundamentals, running small experiments, and documenting what I learn. I will share real projects here as they become ready.'
+          ? 'Bu alanda henüz yayınladığım büyük bir ürün yok. Şu anda öğrenme notları, küçük deneyler ve temel projelerle ilerliyorum.'
+          : 'I do not have a major published product in this area yet. I am currently progressing through notes, small experiments, and fundamentals-first projects.'
       }
+      sideNode={<SitePreview title="AI notes system" variant="web" expandable={false} showActions={false} />}
     >
-      <FadeContent duration={700} blur threshold={0.1}>
-        <div className="card-raised p-6 sm:p-8">
-          <div className="mb-6 flex items-center justify-between gap-3 border-b border-sand-200/70 pb-4 dark:border-zinc-800/70">
-            <h2 className="text-h3 text-sand-900 dark:text-zinc-50">
-              {isTurkish ? 'Şu Anki Durum' : 'Current Status'}
-            </h2>
-            <span className="rounded-full border border-amber-500/30 bg-amber-500/10 px-3 py-1 text-xs font-semibold text-amber-700 dark:text-amber-300">
-              {isTurkish ? 'Aktif Öğrenme' : 'Active Learning'}
+      <div className="grid gap-5">
+        <motion.article
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: '-40px' }}
+          transition={{ duration: 0.55 }}
+          className="card-prominent p-6 sm:p-8"
+        >
+          <div className="mb-5 flex flex-col justify-between gap-3 sm:flex-row sm:items-start">
+            <div>
+              <p className="mb-2 text-caption text-cyan-700 dark:text-cyan-200">
+                {isTurkish ? 'Durum' : 'Status'}
+              </p>
+              <h2 className="text-h2 text-ink-900 dark:text-white">
+                {isTurkish ? 'Aktif öğrenme, abartısız vitrin.' : 'Active learning, honest presentation.'}
+              </h2>
+            </div>
+            <span className="rounded-lg border border-amber-300/60 bg-amber-50 px-3 py-1 text-xs font-extrabold text-amber-700 dark:border-amber-300/25 dark:bg-amber-300/10 dark:text-amber-200">
+              {isTurkish ? 'Yolculuk aşaması' : 'Learning stage'}
             </span>
           </div>
+          <p className="text-body text-ink-600 dark:text-ink-200">
+            {isTurkish
+              ? 'Buradaki amaç, hazır olmadığım bir alanı olduğundan büyük göstermek değil. Temel kavramları sistemli çalışıp, sonuçları okunabilir küçük projelerle paylaşmak.'
+              : 'The goal here is not to overstate a field I am still building. I am studying core concepts systematically and will share results through small, readable projects.'}
+          </p>
+        </motion.article>
 
-          <div className="grid gap-4 sm:grid-cols-3">
-            {learningFocus.map((item) => (
-              <SpotlightCard
-                key={item.title}
-                className="card-flat h-full p-5"
-                spotlightColor={isDark ? 'rgba(249, 115, 22, 0.15)' : 'rgba(240, 125, 45, 0.10)'}
-              >
-                <div className="mb-3 inline-flex h-10 w-10 items-center justify-center rounded-xl border border-accent-500/20 bg-accent-500/10 text-accent-600 dark:text-accent-400">
-                  {item.icon}
-                </div>
-                <h3 className="text-h4 text-sand-900 dark:text-zinc-50 mb-2">{item.title}</h3>
-                <p className="text-body-sm text-sand-700 dark:text-zinc-300">{item.desc}</p>
-              </SpotlightCard>
-            ))}
-          </div>
+        <div className="grid gap-4 md:grid-cols-3">
+          {learningFocus.map((item, index) => (
+            <motion.div
+              key={item.title}
+              initial={{ opacity: 0, y: 24 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: '-40px' }}
+              transition={{ duration: 0.5, delay: index * 0.08 }}
+              className="card-raised p-5"
+            >
+              <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-lg border border-cyan-300/50 bg-cyan-50 text-cyan-700 dark:border-cyan-300/20 dark:bg-cyan-300/10 dark:text-cyan-200">
+                {item.icon}
+              </div>
+              <h3 className="mb-2 text-h4 text-ink-900 dark:text-white">{item.title}</h3>
+              <p className="text-body-sm text-ink-600 dark:text-ink-200">{item.desc}</p>
+            </motion.div>
+          ))}
         </div>
-      </FadeContent>
 
-      <FadeContent duration={700} blur threshold={0.1} delay={150}>
-        <div className="card-raised mt-6 p-6 sm:p-8">
+        <motion.article
+          initial={{ opacity: 0, y: 24 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: '-40px' }}
+          transition={{ duration: 0.55 }}
+          className="card-raised p-6 sm:p-8"
+        >
           <div className="mb-4 flex items-center gap-2">
-            <HiClock className="h-5 w-5 text-accent-600 dark:text-accent-400" />
-            <h2 className="text-h3 text-sand-900 dark:text-zinc-50">
-              {isTurkish ? 'Yakında Gelecek' : 'Coming Up'}
+            <HiClock className="h-5 w-5 text-cyan-700 dark:text-cyan-200" />
+            <h2 className="text-h3 text-ink-900 dark:text-white">
+              {isTurkish ? 'Sıradaki küçük çıktılar' : 'Next small outputs'}
             </h2>
           </div>
-          <p className="mb-4 text-body-sm text-sand-700 dark:text-zinc-300">
-            {isTurkish
-              ? 'Şu konularda mini projeler hazırlamayı planlıyorum:'
-              : 'Mini projects I plan to ship around these topics:'}
-          </p>
           <ul className="grid gap-2 sm:grid-cols-2">
-            {upcoming.map((item) => (
+            {nextSteps.map((item) => (
               <li
                 key={item}
-                className="flex items-start gap-2 rounded-xl border border-sand-200/60 bg-sand-100/40 px-3 py-2 text-sm text-sand-700 dark:border-zinc-800/60 dark:bg-zinc-900/40 dark:text-zinc-300"
+                className="flex items-start gap-2 rounded-lg border border-ink-200/70 bg-white/50 px-3 py-2 text-sm font-semibold text-ink-600 dark:border-white/10 dark:bg-white/10 dark:text-ink-200"
               >
-                <span className="mt-1.5 inline-block h-1.5 w-1.5 flex-shrink-0 rounded-full bg-accent-500" />
+                <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-accent-500" />
                 <span>{item}</span>
               </li>
             ))}
           </ul>
-        </div>
-      </FadeContent>
+        </motion.article>
+      </div>
     </SpecialtyPageLayout>
   );
 };

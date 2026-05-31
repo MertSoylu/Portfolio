@@ -1,76 +1,41 @@
 import React from 'react';
-import { motion } from 'framer-motion';
-import { HiLightningBolt, HiShieldCheck, HiGlobe, HiUsers, HiClock, HiChip } from 'react-icons/hi';
+import { HiLocationMarker, HiSparkles } from 'react-icons/hi';
 import { useLanguage } from '../../context/LanguageContext';
-import { useDarkMode } from '../../context/DarkModeContext';
 import CaseStudyLayout from '../../components/CaseStudyLayout';
 import FadeContent from '../../components/FadeContent';
-import SpotlightCard from '../../components/SpotlightCard';
+
+const InfoCard = ({ title, children }) => (
+  <div className="card-raised p-6">
+    <h2 className="mb-3 text-h3 text-ink-900 dark:text-white">{title}</h2>
+    <div className="text-body text-ink-600 dark:text-ink-200">{children}</div>
+  </div>
+);
 
 const MnemosyneCaseStudy = () => {
   const { isTurkish } = useLanguage();
-  const { isDark } = useDarkMode();
 
-  const metrics = isTurkish
+  const facts = isTurkish
     ? [
-        { icon: <HiGlobe className="w-6 h-6" />, value: '500+', label: 'Bırakılan Anı' },
-        { icon: <HiUsers className="w-6 h-6" />, value: '50+', label: 'Şehir' },
-        { icon: <HiClock className="w-6 h-6" />, value: '<2s', label: 'PWA Yükleme' },
-        { icon: <HiChip className="w-6 h-6" />, value: '100%', label: 'Offline Desteği' },
+        { label: 'Yüzey', value: 'Canlı web uygulaması' },
+        { label: 'Odak', value: 'Konum + zaman katmanları' },
+        { label: 'Rol', value: 'Ürün arayüzü ve uygulama akışı' },
       ]
     : [
-        { icon: <HiGlobe className="w-6 h-6" />, value: '500+', label: 'Memories Dropped' },
-        { icon: <HiUsers className="w-6 h-6" />, value: '50+', label: 'Cities' },
-        { icon: <HiClock className="w-6 h-6" />, value: '<2s', label: 'PWA Load Time' },
-        { icon: <HiChip className="w-6 h-6" />, value: '100%', label: 'Offline Support' },
+        { label: 'Surface', value: 'Live web application' },
+        { label: 'Focus', value: 'Location + time layers' },
+        { label: 'Role', value: 'Product UI and app flow' },
       ];
 
-  const techStack = ['React', 'PWA', 'Geolocation API', 'IndexedDB', 'Service Workers', 'Tailwind CSS'];
-
-  const challenges = isTurkish
+  const decisions = isTurkish
     ? [
-        {
-          title: 'Konum Doğruluğu',
-          desc: 'Farklı cihazlarda GPS sapmalarını minimize etmek için geolocation kalibrasyonu ve harita zoom seviyelerini optimize ettim.',
-        },
-        {
-          title: 'Offline Deneyim',
-          desc: 'Service Workers ve IndexedDB ile anıları yerel depolayarak çevrimdışı erişimi sağladım. Background sync ile bağlantı geri geldiğinde senkronizasyon yapılıyor.',
-        },
-        {
-          title: 'Zaman Katmanları Performansı',
-          desc: 'Aynı konumdaki yüzlerce anının geçmişten bugüne sıralanması için virtualized list ve lazy loading implementasyonu yaptım.',
-        },
+        'Harita, projenin dekoru değil ana navigasyon yüzeyi olarak ele alındı.',
+        'Anılar tekil kartlardan çok, mekanın zaman içindeki değişimini gösterecek şekilde kurgulandı.',
+        'PWA yaklaşımı, uygulamayı klasik web sayfasından daha kalıcı bir deneyime yaklaştırdı.',
       ]
     : [
-        {
-          title: 'Location Accuracy',
-          desc: 'Minimized GPS drift across devices by calibrating geolocation and optimizing map zoom thresholds.',
-        },
-        {
-          title: 'Offline Experience',
-          desc: 'Used Service Workers and IndexedDB to store memories locally. Background sync handles synchronization when connectivity returns.',
-        },
-        {
-          title: 'Time Layers Performance',
-          desc: 'Implemented virtualized lists and lazy loading to handle hundreds of memories at the same location ordered from past to present.',
-        },
-      ];
-
-  const features = isTurkish
-    ? [
-        'Harita üzerinde anı bırakma ve keşif',
-        'Before/After zaman karşılaştırması',
-        'Yorum ve topluluk etkileşimi',
-        'PWA kurulum ve çok cihaz desteği',
-        'Çevrimdışı anı kaydetme ve senkronizasyon',
-      ]
-    : [
-        'Drop and discover memories on a world map',
-        'Before/after time comparison',
-        'Comments and community interaction',
-        'PWA install with cross-device support',
-        'Offline memory saving and sync',
+        'The map is treated as the main navigation surface, not decoration.',
+        'Memories are framed around how places change over time, not only as isolated cards.',
+        'The PWA approach makes the experience feel more persistent than a static website.',
       ];
 
   return (
@@ -79,202 +44,68 @@ const MnemosyneCaseStudy = () => {
       title="Mnemosyne"
       subtitle={
         isTurkish
-          ? 'Konum bazlı bir hafıza ağı. Dünyanın herhangi bir noktasına fotoğraf bırakın, o konumdaki anıları keşfedin, zaman içinde mekanların dönüşümünü görün.'
-          : 'A location-based memory network. Drop photos on real-world places, discover moments left by others, and observe how locations evolve over time.'
+          ? 'Konumlara bırakılan anılar fikrini harita, keşif ve zaman katmanlarıyla çalışan bir web deneyimine dönüştüren proje.'
+          : 'A project that turns location-based memories into a web experience built around maps, discovery, and time layers.'
       }
       liveUrl="https://m-nemosyne.live"
-      heroImage="https://image.thum.io/get/width/1600/https://m-nemosyne.live"
       currentId="mnemosyne"
       isTurkish={isTurkish}
+      facts={facts}
+      previewVariant="memory"
     >
-      {/* Metrics */}
       <FadeContent duration={700} blur threshold={0.1}>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          {metrics.map((m, i) => (
-            <motion.div
-              key={m.label}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: i * 0.1 }}
-              className="card-raised p-5 text-center"
-            >
-              <div className="inline-flex items-center justify-center w-10 h-10 rounded-xl bg-accent-500/10 text-accent-600 dark:text-accent-400 mb-3">
-                {m.icon}
-              </div>
-              <div className="text-2xl font-bold text-sand-900 dark:text-zinc-50 mb-1">{m.value}</div>
-              <div className="text-caption text-sand-600 dark:text-zinc-400">{m.label}</div>
-            </motion.div>
-          ))}
+        <div className="grid gap-5 md:grid-cols-2">
+          <InfoCard title={isTurkish ? 'Problem' : 'Problem'}>
+            {isTurkish
+              ? 'Anılar sosyal akışlarda hızlı kayboluyor. Bir yerin geçmişte nasıl göründüğünü, orada kimlerin ne bıraktığını ve mekanın zamanla nasıl değiştiğini tek bağlamda görmek zor.'
+              : 'Memories disappear quickly in social feeds. It is hard to see how a place looked before, what people left there, and how that location changed over time in one context.'}
+          </InfoCard>
+          <InfoCard title={isTurkish ? 'Çözüm' : 'Solution'}>
+            {isTurkish
+              ? 'Deneyimi konum etrafında kurdum: kullanıcılar harita üzerinden keşfe başlar, anıları yer bağlamında okur ve zaman katmanlarıyla mekanın dönüşümünü takip eder.'
+              : 'I built the experience around location: users start from the map, read memories in place context, and follow transformation through time layers.'}
+          </InfoCard>
         </div>
       </FadeContent>
 
-      {/* Problem & Solution */}
       <FadeContent duration={700} blur threshold={0.1}>
-        <div className="card-raised p-6 sm:p-8">
-          <div className="grid md:grid-cols-2 gap-8">
-            <div>
-              <h2 className="text-h3 text-sand-900 dark:text-zinc-50 mb-4">
-                {isTurkish ? 'Problem' : 'Problem'}
-              </h2>
-              <p className="text-body text-sand-700 dark:text-zinc-300">
-                {isTurkish
-                  ? 'İnsanlar anılarını sosyal medyada kaybediyor; zamanla gönderiler gömülüyor. Mekanların dönüşümü görsel olarak belgelenmiyor ve topluluk odaklı anı paylaşımı eksik.'
-                  : 'People lose their memories on social media; posts get buried over time. The transformation of places is not visually documented, and community-driven memory sharing is lacking.'}
-              </p>
-            </div>
-            <div>
-              <h2 className="text-h3 text-sand-900 dark:text-zinc-50 mb-4">
-                {isTurkish ? 'Çözüm' : 'Solution'}
-              </h2>
-              <p className="text-body text-sand-700 dark:text-zinc-300">
-                {isTurkish
-                  ? 'Konum bazlı bir hafıza ağı oluşturdum. Kullanıcılar haritaya tıklayarak anı bırakıyor, aynı noktadaki farklı yılları karşılaştırabiliyor ve toplulukla etkileşime geçebiliyor. PWA olarak çalışıyor.'
-                  : 'Built a location-based memory network. Users drop memories by clicking on the map, compare different years at the same spot, and interact with the community. Works as a PWA.'}
-              </p>
-            </div>
+        <div className="card-prominent p-6 sm:p-8">
+          <div className="mb-5 flex items-center gap-3">
+            <HiLocationMarker className="h-6 w-6 text-cyan-700 dark:text-cyan-200" />
+            <h2 className="text-h3 text-ink-900 dark:text-white">
+              {isTurkish ? 'Tasarım kararları' : 'Design decisions'}
+            </h2>
           </div>
-        </div>
-      </FadeContent>
-
-      {/* Tech Stack */}
-      <FadeContent duration={700} blur threshold={0.1}>
-        <div className="card-raised p-6 sm:p-8">
-          <h2 className="text-h3 text-sand-900 dark:text-zinc-50 mb-6">
-            {isTurkish ? 'Teknoloji Yığını' : 'Tech Stack'}
-          </h2>
-          <div className="flex flex-wrap gap-2">
-            {techStack.map((tech) => (
-              <span
-                key={tech}
-                className="px-3 py-1.5 bg-accent-500/10 text-accent-700 dark:text-accent-300 text-sm font-medium rounded-full border border-accent-500/20"
-              >
-                {tech}
-              </span>
-            ))}
-          </div>
-        </div>
-      </FadeContent>
-
-      {/* Architecture Decisions */}
-      <FadeContent duration={700} blur threshold={0.1}>
-        <div className="card-raised p-6 sm:p-8">
-          <h2 className="text-h3 text-sand-900 dark:text-zinc-50 mb-6">
-            {isTurkish ? 'Mimari Kararlar' : 'Architecture Decisions'}
-          </h2>
-          <div className="space-y-4">
-            <div className="flex gap-4">
-              <div className="w-8 h-8 rounded-full bg-accent-500/10 flex items-center justify-center text-accent-600 dark:text-accent-400 font-bold text-sm flex-shrink-0">
-                1
-              </div>
-              <div>
-                <h4 className="font-semibold text-sand-900 dark:text-zinc-100 mb-1">
-                  {isTurkish ? 'PWA First Yaklaşımı' : 'PWA First Approach'}
-                </h4>
-                <p className="text-body-sm text-sand-700 dark:text-zinc-300">
-                  {isTurkish
-                    ? 'Uygulamayı PWA olarak tasarladım. Service Workers ile asset önbellekleme, IndexedDB ile veri persistency sağladım. Kullanıcılar ana ekrana ekleyebiliyor.'
-                    : 'Designed the app as a PWA first. Used Service Workers for asset caching and IndexedDB for data persistence. Users can add it to their home screen.'}
-                </p>
-              </div>
-            </div>
-            <div className="flex gap-4">
-              <div className="w-8 h-8 rounded-full bg-accent-500/10 flex items-center justify-center text-accent-600 dark:text-accent-400 font-bold text-sm flex-shrink-0">
-                2
-              </div>
-              <div>
-                <h4 className="font-semibold text-sand-900 dark:text-zinc-100 mb-1">
-                  {isTurkish ? 'Virtualized Time Layers' : 'Virtualized Time Layers'}
-                </h4>
-                <p className="text-body-sm text-sand-700 dark:text-zinc-300">
-                  {isTurkish
-                    ? "Aynı konumdaki yüzlerce anıyı virtualized list ile render ettim. Sadece viewport içindeki öğeler DOM'a ekleniyor, bu da performansı artırıyor."
-                    : 'Rendered hundreds of memories at the same location using a virtualized list. Only viewport items are added to the DOM, improving performance.'}
-                </p>
-              </div>
-            </div>
-            <div className="flex gap-4">
-              <div className="w-8 h-8 rounded-full bg-accent-500/10 flex items-center justify-center text-accent-600 dark:text-accent-400 font-bold text-sm flex-shrink-0">
-                3
-              </div>
-              <div>
-                <h4 className="font-semibold text-sand-900 dark:text-zinc-100 mb-1">
-                  {isTurkish ? 'Background Sync' : 'Background Sync'}
-                </h4>
-                <p className="text-body-sm text-sand-700 dark:text-zinc-300">
-                  {isTurkish
-                    ? 'Kullanıcı çevrimdışıyken anı kaydedebiliyor. Bağlantı geri geldiğinde Background Sync API ile otomatik senkronizasyon gerçekleşiyor.'
-                    : 'Users can save memories while offline. When connectivity returns, the Background Sync API handles automatic synchronization.'}
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </FadeContent>
-
-      {/* Challenges */}
-      <FadeContent duration={700} blur threshold={0.1}>
-        <div className="card-raised p-6 sm:p-8">
-          <h2 className="text-h3 text-sand-900 dark:text-zinc-50 mb-6">
-            {isTurkish ? 'Karşılaşılan Zorluklar' : 'Challenges Faced'}
-          </h2>
-          <div className="grid md:grid-cols-3 gap-4">
-            {challenges.map((c) => (
-              <SpotlightCard
-                key={c.title}
-                className="card-flat p-5"
-                spotlightColor={isDark ? 'rgba(249, 115, 22, 0.12)' : 'rgba(240, 125, 45, 0.08)'}
-              >
-                <h4 className="text-h4 text-sand-900 dark:text-zinc-50 mb-2">{c.title}</h4>
-                <p className="text-body-sm text-sand-700 dark:text-zinc-300">{c.desc}</p>
-              </SpotlightCard>
-            ))}
-          </div>
-        </div>
-      </FadeContent>
-
-      {/* Features */}
-      <FadeContent duration={700} blur threshold={0.1}>
-        <div className="card-raised p-6 sm:p-8">
-          <h2 className="text-h3 text-sand-900 dark:text-zinc-50 mb-6">
-            {isTurkish ? 'Öne Çıkan Özellikler' : 'Key Features'}
-          </h2>
-          <ul className="grid md:grid-cols-2 gap-3">
-            {features.map((feat) => (
+          <ul className="grid gap-3">
+            {decisions.map((item) => (
               <li
-                key={feat}
-                className="flex items-start gap-3 rounded-xl border border-sand-200/60 dark:border-zinc-800/60 bg-sand-100/40 dark:bg-zinc-900/40 px-4 py-3"
+                key={item}
+                className="flex gap-3 rounded-lg border border-ink-200/70 bg-white/50 p-4 text-body-sm font-semibold text-ink-600 dark:border-white/10 dark:bg-white/10 dark:text-ink-200"
               >
-                <span className="mt-1.5 inline-block h-1.5 w-1.5 flex-shrink-0 rounded-full bg-accent-500" />
-                <span className="text-body-sm text-sand-700 dark:text-zinc-300">{feat}</span>
+                <HiSparkles className="mt-0.5 h-5 w-5 shrink-0 text-accent-500" />
+                {item}
               </li>
             ))}
           </ul>
         </div>
       </FadeContent>
 
-      {/* Results */}
       <FadeContent duration={700} blur threshold={0.1}>
-        <div className="card-raised p-6 sm:p-8">
-          <h2 className="text-h3 text-sand-900 dark:text-zinc-50 mb-6">
-            {isTurkish ? 'Sonuçlar' : 'Results'}
-          </h2>
-          <p className="text-body text-sand-700 dark:text-zinc-300 mb-4">
-            {isTurkish
-              ? 'Mnemosyne, konum bazlı anı paylaşımı konusunda benzersiz bir deneyim sunuyor. PWA olarak tasarlanması sayesinde kullanıcılar anında erişebiliyor ve offline çalışabiliyor. Time Layers özelliği ile mekanların dönüşümü görsel olarak belgeleniyor.'
-              : 'Mnemosyne offers a unique experience in location-based memory sharing. Designed as a PWA, users can access it instantly and work offline. The Time Layers feature visually documents the transformation of places.'}
-          </p>
-          <div className="flex flex-wrap gap-2">
-            {['Lighthouse 95+', 'PWA Installable', 'Offline First', 'Cross-Device'].map((tag) => (
+        <InfoCard title={isTurkish ? 'Sonuç' : 'Result'}>
+          {isTurkish
+            ? 'Mnemosyne, web tarafındaki ürün düşüncemi iyi gösteren bir iş: görsel fikir, navigasyon modeli ve kullanıcı motivasyonu aynı ürün dili içinde birleşiyor.'
+            : 'Mnemosyne is a good example of my product thinking on the web: visual concept, navigation model, and user motivation sit inside one cohesive product language.'}
+          <div className="mt-4 flex flex-wrap gap-2">
+            {['React', 'PWA', 'Map-first UI', 'Time layers'].map((tag) => (
               <span
                 key={tag}
-                className="px-3 py-1 bg-green-500/10 text-green-700 dark:text-green-300 text-xs font-medium rounded-full border border-green-500/20"
+                className="rounded-lg border border-cyan-300/50 bg-cyan-50 px-2.5 py-1 text-xs font-bold text-cyan-700 dark:border-cyan-300/20 dark:bg-cyan-300/10 dark:text-cyan-200"
               >
                 {tag}
               </span>
             ))}
           </div>
-        </div>
+        </InfoCard>
       </FadeContent>
     </CaseStudyLayout>
   );

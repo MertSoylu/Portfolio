@@ -1,168 +1,45 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { useSearchParams } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
-import { HiStar, HiCode, HiExternalLink, HiRefresh, HiX } from 'react-icons/hi';
-import {
-  fetchGitHubRepos,
-  fetchRepositoryReadme,
-  getGitHubProfileUrl,
-  getGitHubUsername,
-  clearRateLimitState,
-  resolveGitHubRepoReference,
-  onReposUpdate,
-} from '../utils/githubApi';
+import { Link } from 'react-router-dom';
+import { AnimatePresence, motion } from 'framer-motion';
+import { HiBookOpen, HiExternalLink, HiRefresh, HiStar, HiX } from 'react-icons/hi';
+import { clearRateLimitState, fetchGitHubRepos, getGitHubProfileUrl } from '../utils/githubApi';
 import { FALLBACK_PROJECTS } from '../utils/constants';
 import { useLanguage } from '../context/LanguageContext';
-import { useDarkMode } from '../context/DarkModeContext';
 import ScrollFloat from './ScrollFloat';
-import ScrollReveal from './ScrollReveal';
-import ScrollStack, { ScrollStackItem } from './ScrollStack';
+import SitePreview from './SitePreview';
 
-const INITIAL_README_STATE = {
-  status: 'idle',
-  content: '',
-  errorMessage: '',
+const getLanguageStyle = (language) => {
+  const key = (language || '').toLowerCase();
+  if (key.includes('typescript'))
+    return 'border-cyan-300/50 bg-cyan-50 text-cyan-700 dark:border-cyan-300/25 dark:bg-cyan-300/10 dark:text-cyan-200';
+  if (key.includes('javascript'))
+    return 'border-yellow-300/60 bg-yellow-50 text-yellow-700 dark:border-yellow-300/25 dark:bg-yellow-300/10 dark:text-yellow-200';
+  if (key.includes('kotlin'))
+    return 'border-purple-300/50 bg-purple-50 text-purple-700 dark:border-purple-300/25 dark:bg-purple-300/10 dark:text-purple-200';
+  if (key.includes('python'))
+    return 'border-emerald-300/50 bg-emerald-50 text-emerald-700 dark:border-emerald-300/25 dark:bg-emerald-300/10 dark:text-emerald-200';
+  return 'border-ink-200/70 bg-white/50 text-ink-600 dark:border-white/10 dark:bg-white/10 dark:text-ink-200';
 };
 
-/* ── Skeleton card for loading state ── */
-const ProjectSkeleton = () => (
-  <div className="relative h-full bg-white/40 dark:bg-dark-600/40 backdrop-blur-md rounded-xl border border-sand-200 dark:border-dark-400 overflow-hidden flex flex-col animate-pulse">
-    <div className="h-1 bg-sand-200 dark:bg-dark-500 w-full" />
-    <div className="p-6 flex flex-col flex-grow gap-3">
-      <div className="h-6 bg-sand-200 dark:bg-dark-500 rounded-md w-3/4" />
-      <div className="h-4 bg-sand-100 dark:bg-dark-600 rounded w-full" />
-      <div className="h-4 bg-sand-100 dark:bg-dark-600 rounded w-5/6" />
-      <div className="h-4 bg-sand-100 dark:bg-dark-600 rounded w-2/3" />
-      <div className="mt-auto flex gap-3">
-        <div className="h-4 bg-sand-200 dark:bg-dark-500 rounded-full w-16" />
-        <div className="h-4 bg-sand-200 dark:bg-dark-500 rounded-full w-20" />
-      </div>
-    </div>
-  </div>
-);
-
-const ProjectDetailsSection = ({ project, isTurkish, getLanguageColor }) => {
-  const formatDate = (dateValue) => {
-    if (!dateValue) return isTurkish ? 'Belirtilmemiş' : 'Not available';
-    const parsedDate = new Date(dateValue);
-    if (Number.isNaN(parsedDate.getTime())) return isTurkish ? 'Belirtilmemiş' : 'Not available';
-    return parsedDate.toLocaleDateString(isTurkish ? 'tr-TR' : 'en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-    });
-  };
-
-  const projectDescription = project.description || (isTurkish ? 'Açıklama yok' : 'No description available');
-  const topics = Array.isArray(project.topics) ? project.topics.filter(Boolean) : [];
-
-  return (
-    <div className="space-y-4">
-      <div className="rounded-xl border border-sand-200 dark:border-dark-400 bg-white/70 dark:bg-dark-600/50 p-4">
-        <p className="text-xs font-semibold uppercase tracking-wide text-sand-500 dark:text-dark-300">
-          {isTurkish ? 'Açıklama' : 'Description'}
-        </p>
-        <p className="mt-2 text-sm text-sand-700 dark:text-dark-100 leading-relaxed">{projectDescription}</p>
-      </div>
-      <div className="grid sm:grid-cols-2 gap-3">
-        <div className="rounded-xl border border-sand-200 dark:border-dark-400 bg-white/70 dark:bg-dark-600/50 p-4">
-          <p className="text-xs font-semibold uppercase tracking-wide text-sand-500 dark:text-dark-300">
-            {isTurkish ? 'Dil' : 'Language'}
-          </p>
-          {project.language ? (
-            <span
-              className={`inline-flex mt-2 px-3 py-1 rounded-full text-xs font-semibold bg-gradient-to-r ${getLanguageColor(project.language)} text-white`}
-            >
-              {project.language}
-            </span>
-          ) : (
-            <p className="mt-2 text-sm font-medium text-sand-800 dark:text-dark-100">
-              {isTurkish ? 'Belirtilmemiş' : 'Not available'}
-            </p>
-          )}
-        </div>
-        <div className="rounded-xl border border-sand-200 dark:border-dark-400 bg-white/70 dark:bg-dark-600/50 p-4">
-          <p className="text-xs font-semibold uppercase tracking-wide text-sand-500 dark:text-dark-300">
-            Stars
-          </p>
-          <div className="mt-2 flex items-center gap-2 text-sm font-semibold text-sand-800 dark:text-dark-100">
-            <HiStar className="text-warm-500" />
-            <span>{project.stargazers_count ?? 0}</span>
-          </div>
-        </div>
-        <div className="rounded-xl border border-sand-200 dark:border-dark-400 bg-white/70 dark:bg-dark-600/50 p-4">
-          <p className="text-xs font-semibold uppercase tracking-wide text-sand-500 dark:text-dark-300">
-            {isTurkish ? 'Fork Sayısı' : 'Forks'}
-          </p>
-          <p className="mt-2 text-sm font-semibold text-sand-800 dark:text-dark-100">
-            {project.forks_count ?? 0}
-          </p>
-        </div>
-        <div className="rounded-xl border border-sand-200 dark:border-dark-400 bg-white/70 dark:bg-dark-600/50 p-4">
-          <p className="text-xs font-semibold uppercase tracking-wide text-sand-500 dark:text-dark-300">
-            {isTurkish ? 'Son Güncelleme' : 'Last Updated'}
-          </p>
-          <p className="mt-2 text-sm font-semibold text-sand-800 dark:text-dark-100">
-            {formatDate(project.updated_at)}
-          </p>
-        </div>
-      </div>
-      {topics.length > 0 && (
-        <div className="rounded-xl border border-sand-200 dark:border-dark-400 bg-white/70 dark:bg-dark-600/50 p-4">
-          <p className="text-xs font-semibold uppercase tracking-wide text-sand-500 dark:text-dark-300 mb-3">
-            Topics
-          </p>
-          <div className="flex flex-wrap gap-2">
-            {topics.map((topic) => (
-              <span
-                key={topic}
-                className="px-2.5 py-1 rounded-full text-xs font-medium bg-sand-200/70 dark:bg-dark-500/70 text-sand-700 dark:text-dark-100"
-              >
-                {topic}
-              </span>
-            ))}
-          </div>
-        </div>
-      )}
-    </div>
-  );
-};
-
-const ProjectModal = ({
-  project,
-  onClose,
-  isTurkish,
-  getLanguageColor,
-  readmeState,
-  activeModalTab,
-  onTabChange,
-  onRetryReadme,
-}) => {
-  const titleId = 'project-modal-title';
+const ProjectModal = ({ project, onClose, isTurkish }) => {
   const dialogRef = useRef(null);
+  const titleId = 'project-modal-title';
 
   useEffect(() => {
     const node = dialogRef.current;
     if (!node) return undefined;
 
-    const getFocusable = () =>
-      Array.from(
-        node.querySelectorAll(
-          'a[href], button:not([disabled]), textarea:not([disabled]), input:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])',
-        ),
-      ).filter((el) => !el.hasAttribute('inert') && el.offsetParent !== null);
-
-    const focusables = getFocusable();
-    const firstFocusable = focusables[0];
-    if (firstFocusable) firstFocusable.focus();
+    const focusables = Array.from(
+      node.querySelectorAll('a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])'),
+    );
+    focusables[0]?.focus();
 
     const handleKeyDown = (event) => {
-      if (event.key !== 'Tab') return;
-      const elements = getFocusable();
-      if (elements.length === 0) return;
-      const first = elements[0];
-      const last = elements[elements.length - 1];
+      if (event.key === 'Escape') onClose();
+      if (event.key !== 'Tab' || focusables.length === 0) return;
+      const first = focusables[0];
+      const last = focusables[focusables.length - 1];
       if (event.shiftKey && document.activeElement === first) {
         event.preventDefault();
         last.focus();
@@ -174,74 +51,16 @@ const ProjectModal = ({
 
     node.addEventListener('keydown', handleKeyDown);
     return () => node.removeEventListener('keydown', handleKeyDown);
-  }, []);
+  }, [onClose]);
 
   if (typeof document === 'undefined') return null;
-
-  const isReadmeUnavailable = readmeState.status === 'error' || readmeState.status === 'empty';
-  const projectIdentity =
-    project.full_name || (project.owner && project.repo ? `${project.owner}/${project.repo}` : null);
-
-  const renderReadmePanel = () => {
-    if (readmeState.status === 'loading' || readmeState.status === 'idle') {
-      return (
-        <div className="flex flex-col items-center justify-center py-14 text-center">
-          <div className="w-10 h-10 border-2 border-warm-300 border-t-warm-600 rounded-full animate-spin mb-4" />
-          <p className="text-sm text-sand-600 dark:text-dark-200">
-            {isTurkish ? 'README yükleniyor...' : 'Loading README...'}
-          </p>
-        </div>
-      );
-    }
-    if (readmeState.status === 'error') {
-      return (
-        <div className="rounded-xl border border-red-300 dark:border-red-500/70 bg-red-50/70 dark:bg-red-900/30 p-4">
-          <p className="text-sm text-red-700 dark:text-red-200 mb-3">
-            {isTurkish ? 'README yüklenemedi.' : 'README could not be loaded.'}
-          </p>
-          <p className="text-xs text-red-700/90 dark:text-red-200/90 mb-4">{readmeState.errorMessage}</p>
-          <button
-            type="button"
-            onClick={onRetryReadme}
-            className="inline-flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-semibold bg-red-100 dark:bg-red-800/40 border border-red-300 dark:border-red-600 hover:bg-red-200 dark:hover:bg-red-700/40 text-red-700 dark:text-red-200 transition-colors"
-          >
-            <HiRefresh className="w-4 h-4" />
-            {isTurkish ? 'README Tekrar Dene' : 'Retry README'}
-          </button>
-        </div>
-      );
-    }
-    if (readmeState.status === 'empty') {
-      return (
-        <div className="rounded-xl border border-amber-300 dark:border-amber-500/70 bg-amber-50/70 dark:bg-amber-900/30 p-4">
-          <p className="text-sm text-amber-800 dark:text-amber-200">
-            {isTurkish ? 'Bu repo için README bulunamadı.' : 'No README was found for this repository.'}
-          </p>
-        </div>
-      );
-    }
-    return (
-      <div className="rounded-xl border border-sand-200 dark:border-dark-400 bg-white/70 dark:bg-dark-600/50 p-4">
-        <pre className="whitespace-pre-wrap break-words text-sm leading-relaxed font-sans text-sand-700 dark:text-dark-100">
-          {readmeState.content}
-        </pre>
-      </div>
-    );
-  };
-
-  const tabButtonClass = (isActive) =>
-    `px-4 py-2 rounded-lg text-sm font-semibold transition-colors ${
-      isActive
-        ? 'bg-warm-500 text-white shadow-sm'
-        : 'text-sand-700 dark:text-dark-200 hover:text-warm-600 dark:hover:text-warm-400 hover:bg-sand-100 dark:hover:bg-dark-600'
-    }`;
 
   return createPortal(
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="fixed inset-0 z-[1200] flex items-center justify-center p-4 bg-black/45 backdrop-blur-sm"
+      className="fixed inset-0 z-[1200] flex items-center justify-center bg-ink-900/70 p-4 backdrop-blur-md"
       onClick={onClose}
     >
       <motion.div
@@ -249,109 +68,89 @@ const ProjectModal = ({
         role="dialog"
         aria-modal="true"
         aria-labelledby={titleId}
-        initial={{ scale: 0.95, opacity: 0, y: 24 }}
-        animate={{ scale: 1, opacity: 1, y: 0 }}
-        exit={{ scale: 0.95, opacity: 0, y: 24 }}
+        initial={{ opacity: 0, y: 24, scale: 0.96 }}
+        animate={{ opacity: 1, y: 0, scale: 1 }}
+        exit={{ opacity: 0, y: 24, scale: 0.96 }}
         transition={{ type: 'spring', stiffness: 280, damping: 26 }}
-        className="relative w-full max-w-4xl max-h-[90vh] bg-sand-50 dark:bg-dark-700 border border-sand-200 dark:border-dark-400 rounded-2xl shadow-2xl overflow-hidden flex flex-col"
-        onClick={(e) => e.stopPropagation()}
+        className="relative flex max-h-[90vh] w-full max-w-3xl flex-col overflow-hidden rounded-lg border border-white/10 bg-white text-ink-900 shadow-elevation dark:bg-ink-900 dark:text-white"
+        onClick={(event) => event.stopPropagation()}
       >
-        <div className="px-6 py-5 border-b border-sand-200 dark:border-dark-400">
+        <div className="border-b border-ink-200/70 px-6 py-5 dark:border-white/10">
           <button
             type="button"
             onClick={onClose}
-            className="absolute top-4 right-4 p-1.5 rounded-lg text-sand-500 hover:text-sand-700 dark:text-dark-200 dark:hover:text-dark-50 hover:bg-sand-100 dark:hover:bg-dark-600 transition-colors"
+            className="absolute right-4 top-4 rounded-lg p-2 text-ink-500 hover:bg-ink-100 hover:text-ink-900 dark:text-ink-200 dark:hover:bg-white/10 dark:hover:text-white"
             aria-label={isTurkish ? 'Modalı kapat' : 'Close modal'}
           >
-            <HiX className="w-5 h-5" />
+            <HiX className="h-5 w-5" />
           </button>
           {project.language && (
             <span
-              className={`inline-flex px-3 py-1 text-xs font-semibold rounded-full mb-3 bg-gradient-to-r ${getLanguageColor(project.language)} text-white`}
+              className={`mb-3 inline-flex rounded-lg border px-3 py-1 text-xs font-extrabold ${getLanguageStyle(project.language)}`}
             >
               {project.language}
             </span>
           )}
-          <h3 id={titleId} className="text-2xl font-bold text-sand-900 dark:text-dark-50 pr-10">
+          <h3 id={titleId} className="pr-10 text-h3">
             {project.name}
           </h3>
-          {projectIdentity && (
-            <p className="mt-1 text-xs text-sand-500 dark:text-dark-300">{projectIdentity}</p>
+          {project.full_name && (
+            <p className="mt-1 text-sm text-ink-500 dark:text-ink-300">{project.full_name}</p>
           )}
         </div>
-        <div className="px-6 pt-4 border-b border-sand-200 dark:border-dark-400">
-          <div className="inline-flex gap-2 p-1 bg-sand-100/80 dark:bg-dark-600/80 rounded-xl">
-            <button
-              type="button"
-              className={tabButtonClass(activeModalTab === 'readme')}
-              onClick={() => onTabChange('readme')}
-            >
-              README
-            </button>
-            <button
-              type="button"
-              className={tabButtonClass(activeModalTab === 'details')}
-              onClick={() => onTabChange('details')}
-            >
-              {isTurkish ? 'Detay' : 'Details'}
-            </button>
+
+        <div className="overflow-y-auto px-6 py-5">
+          <div className="mb-4 grid gap-3 sm:grid-cols-3">
+            <div className="card-flat p-4">
+              <p className="text-caption text-ink-500 dark:text-ink-300">Stars</p>
+              <p className="mt-2 flex items-center gap-2 text-sm font-extrabold">
+                <HiStar className="text-accent-500" />
+                {project.stargazers_count ?? 0}
+              </p>
+            </div>
+            <div className="card-flat p-4">
+              <p className="text-caption text-ink-500 dark:text-ink-300">{isTurkish ? 'Fork' : 'Forks'}</p>
+              <p className="mt-2 text-sm font-extrabold">{project.forks_count ?? 0}</p>
+            </div>
+            <div className="card-flat p-4">
+              <p className="text-caption text-ink-500 dark:text-ink-300">
+                {isTurkish ? 'Güncel' : 'Updated'}
+              </p>
+              <p className="mt-2 text-sm font-extrabold">
+                {project.updated_at
+                  ? new Date(project.updated_at).toLocaleDateString(isTurkish ? 'tr-TR' : 'en-US')
+                  : '-'}
+              </p>
+            </div>
           </div>
-        </div>
-        <div className="px-6 py-5 overflow-y-auto">
-          {activeModalTab === 'readme' ? (
-            <>
-              {renderReadmePanel()}
-              {isReadmeUnavailable && (
-                <div className="mt-6 pt-6 border-t border-sand-200 dark:border-dark-400">
-                  <div className="flex flex-wrap items-center justify-between gap-3 mb-3">
-                    <h4 className="text-sm font-semibold text-sand-800 dark:text-dark-100">
-                      {isTurkish ? 'Detaylar (yedek görünüm)' : 'Details (fallback)'}
-                    </h4>
-                    <button
-                      type="button"
-                      onClick={() => onTabChange('details')}
-                      className="text-xs font-semibold text-warm-600 dark:text-warm-400 hover:text-warm-700 dark:hover:text-warm-300"
-                    >
-                      {isTurkish ? 'Detay sekmesini aç' : 'Open details tab'}
-                    </button>
-                  </div>
-                  <ProjectDetailsSection
-                    project={project}
-                    isTurkish={isTurkish}
-                    getLanguageColor={getLanguageColor}
-                  />
-                </div>
-              )}
-            </>
-          ) : (
-            <ProjectDetailsSection
-              project={project}
-              isTurkish={isTurkish}
-              getLanguageColor={getLanguageColor}
-            />
+
+          <p className="text-body text-ink-600 dark:text-ink-200">
+            {project.description ||
+              (isTurkish ? 'Bu repo için açıklama eklenmemiş.' : 'No repository description available.')}
+          </p>
+
+          {Array.isArray(project.topics) && project.topics.length > 0 && (
+            <div className="mt-5 flex flex-wrap gap-2">
+              {project.topics.map((topic) => (
+                <span
+                  key={topic}
+                  className="rounded-lg border border-ink-200/70 bg-white/50 px-2.5 py-1 text-xs font-bold text-ink-600 dark:border-white/10 dark:bg-white/10 dark:text-ink-200"
+                >
+                  {topic}
+                </span>
+              ))}
+            </div>
           )}
         </div>
-        <div className="px-6 py-4 border-t border-sand-200 dark:border-dark-400 flex flex-wrap gap-3">
-          <motion.a
-            href={project.html_url}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="btn-primary inline-flex items-center gap-2"
-            whileHover={{ scale: 1.04, y: -2 }}
-            whileTap={{ scale: 0.97 }}
-          >
-            <HiExternalLink className="w-4 h-4" />
+
+        <div className="flex flex-wrap gap-3 border-t border-ink-200/70 px-6 py-4 dark:border-white/10">
+          <a href={project.html_url} target="_blank" rel="noopener noreferrer" className="btn-primary">
+            <HiExternalLink className="h-4 w-4" />
             GitHub
-          </motion.a>
-          <motion.button
-            type="button"
-            onClick={onClose}
-            className="btn-secondary"
-            whileHover={{ scale: 1.04, y: -2 }}
-            whileTap={{ scale: 0.97 }}
-          >
+          </a>
+          <button type="button" onClick={onClose} className="btn-secondary">
             {isTurkish ? 'Kapat' : 'Close'}
-          </motion.button>
+          </button>
         </div>
       </motion.div>
     </motion.div>,
@@ -359,451 +158,352 @@ const ProjectModal = ({
   );
 };
 
+const FeaturedProjectNav = ({ projects, isTurkish }) => (
+  <div className="mb-6 md:hidden">
+    <div className="mb-3 flex items-center justify-between gap-3">
+      <p className="text-caption text-cyan-700 dark:text-cyan-200">
+        {isTurkish ? 'Seçili ürünler' : 'Selected products'}
+      </p>
+      <span className="text-[11px] font-extrabold uppercase text-ink-400 dark:text-ink-300">
+        {isTurkish ? 'Hızlı geçiş' : 'Quick jump'}
+      </span>
+    </div>
+    <nav
+      className="-mx-4 overflow-x-auto px-4 pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+      aria-label={isTurkish ? 'Öne çıkan projeler' : 'Featured projects'}
+    >
+      <div className="flex min-w-max snap-x gap-2">
+        {projects.map((project, index) => (
+          <a
+            key={project.id}
+            href={`#project-${project.id}`}
+            className="inline-flex min-h-[42px] snap-start items-center gap-2 rounded-lg border border-ink-200/70 bg-white/75 px-3 py-2 text-xs font-extrabold text-ink-700 shadow-soft backdrop-blur-xl dark:border-white/15 dark:bg-ink-800/85 dark:text-ink-100"
+          >
+            <span className="text-cyan-700 dark:text-cyan-200">{String(index + 1).padStart(2, '0')}</span>
+            {project.title}
+          </a>
+        ))}
+      </div>
+    </nav>
+  </div>
+);
+
+const FeaturedProjectCard = ({ project, index, isTurkish }) => (
+  <motion.article
+    id={`project-${project.id}`}
+    initial={{ opacity: 0.82, y: 18 }}
+    whileInView={{ opacity: 1, y: 0 }}
+    viewport={{ once: true, margin: '-40px' }}
+    transition={{ duration: 0.55, delay: index * 0.08 }}
+    className="card-prominent featured-project-card grid scroll-mt-24 gap-3 overflow-hidden p-2.5 sm:scroll-mt-28 sm:gap-4 sm:p-4 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1fr)] lg:gap-5"
+  >
+    <SitePreview
+      title={project.title}
+      url={project.url}
+      type={project.previewType}
+      variant={project.variant}
+      terminalContent={project.terminalContent}
+      expandable={false}
+      showActions={false}
+      snapshotSrc={project.snapshotSrc}
+      forceSnapshot={project.forceSnapshot}
+      livePreview={project.previewType === 'web' && !project.livePreviewBlocked}
+    />
+    <div className="flex flex-col p-1.5 sm:p-2">
+      <div className="mb-3 flex flex-wrap items-center gap-2">
+        <span className={`rounded-lg border px-3 py-1 text-xs font-extrabold ${project.badgeClass}`}>
+          {project.category}
+        </span>
+        <span className="rounded-lg border border-ink-200/70 bg-white/50 px-3 py-1 text-xs font-extrabold text-ink-500 dark:border-white/10 dark:bg-white/10 dark:text-ink-300">
+          {project.status}
+        </span>
+      </div>
+
+      <h3 className="mb-2 text-[1.45rem] font-extrabold leading-tight text-ink-900 dark:text-white sm:mb-3 sm:text-h3">
+        {project.title}
+      </h3>
+      <p className="mb-3 text-sm leading-relaxed text-ink-600 dark:text-ink-200 sm:mb-4 sm:text-body-sm">
+        {project.description}
+      </p>
+
+      <div className="mb-4 flex flex-wrap gap-2 sm:mb-5">
+        {project.tags.map((tag) => (
+          <span
+            key={tag}
+            className="rounded-lg border border-ink-200/70 bg-white/50 px-2.5 py-1 text-xs font-bold text-ink-600 dark:border-white/10 dark:bg-white/10 dark:text-ink-200"
+          >
+            {tag}
+          </span>
+        ))}
+      </div>
+
+      <div className="mt-auto grid grid-cols-2 gap-2 sm:flex sm:flex-wrap sm:gap-3">
+        {project.caseStudyPath && (
+          <Link to={project.caseStudyPath} className="btn-primary min-h-[44px] px-3 py-2 text-xs sm:px-4">
+            <HiBookOpen className="h-4 w-4" />
+            Case Study
+          </Link>
+        )}
+        <a
+          href={project.url}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="btn-secondary min-h-[44px] px-3 py-2 text-xs sm:px-4"
+        >
+          <HiExternalLink className="h-4 w-4" />
+          {isTurkish ? 'Aç' : 'Open'}
+        </a>
+      </div>
+    </div>
+  </motion.article>
+);
+
+const RepoCard = ({ repo, onOpen }) => (
+  <motion.button
+    type="button"
+    onClick={() => onOpen(repo)}
+    initial={{ opacity: 0.86, y: 16 }}
+    whileInView={{ opacity: 1, y: 0 }}
+    viewport={{ once: true, margin: '-30px' }}
+    className="card-raised card-hover flex h-full flex-col p-5 text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400"
+  >
+    <div className="mb-3 flex items-start justify-between gap-3">
+      <h4 className="min-w-0 break-words text-h4 text-ink-900 dark:text-white">{repo.name}</h4>
+      {repo.language && (
+        <span
+          className={`shrink-0 rounded-lg border px-2.5 py-1 text-[11px] font-extrabold ${getLanguageStyle(repo.language)}`}
+        >
+          {repo.language}
+        </span>
+      )}
+    </div>
+    <p className="mb-4 line-clamp-3 text-body-sm text-ink-600 dark:text-ink-200">
+      {repo.description || 'No description available.'}
+    </p>
+    <div className="mt-auto flex items-center justify-between text-xs font-bold text-ink-500 dark:text-ink-300">
+      <span className="inline-flex items-center gap-1">
+        <HiStar className="text-accent-500" />
+        {repo.stargazers_count ?? 0}
+      </span>
+      <span>{repo.updated_at ? new Date(repo.updated_at).toLocaleDateString() : ''}</span>
+    </div>
+  </motion.button>
+);
+
 const Projects = () => {
   const { isTurkish } = useLanguage();
-  const { isDark } = useDarkMode();
-  const [projects, setProjects] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [isUsingFallback, setIsUsingFallback] = useState(false);
-  const [activeFilter, setActiveFilter] = useState('All');
-  const [expandedProject, setExpandedProject] = useState(null);
-  const [activeModalTab, setActiveModalTab] = useState('readme');
-  const [readmeState, setReadmeState] = useState({ ...INITIAL_README_STATE });
-  const [readmeRetryCount, setReadmeRetryCount] = useState(0);
-  const lastTriggerRef = useRef(null);
-  const [searchParams, setSearchParams] = useSearchParams();
-  const deepLinkAppliedRef = useRef(false);
+  const [repos, setRepos] = useState([]);
+  const [status, setStatus] = useState('loading');
+  const [errorMessage, setErrorMessage] = useState('');
+  const [activeProject, setActiveProject] = useState(null);
 
-  const githubProfileUrl = getGitHubProfileUrl();
-  const githubUsername = getGitHubUsername();
-
-  const getProjects = useCallback(async () => {
-    try {
-      setLoading(true);
-      setError(null);
-      const repos = await fetchGitHubRepos();
-      setProjects(repos);
-      setIsUsingFallback(false);
-      setError(repos.length === 0 ? 'empty' : null);
-    } catch (err) {
-      setProjects(FALLBACK_PROJECTS);
-      setIsUsingFallback(true);
-      setError(err instanceof Error ? err.message : 'fetch_error');
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  useEffect(() => {
-    getProjects();
-  }, [getProjects]);
-
-  // Stale-while-revalidate: update UI when fresh data arrives in background
-  useEffect(() => {
-    const unsubscribe = onReposUpdate((freshRepos) => {
-      setProjects(freshRepos);
-      setIsUsingFallback(false);
-      setError(freshRepos.length === 0 ? 'empty' : null);
-    });
-    return unsubscribe;
-  }, []);
-
-  const closeProjectModal = useCallback(() => {
-    setExpandedProject(null);
-    setActiveModalTab('readme');
-    setReadmeState({ ...INITIAL_README_STATE });
-    setSearchParams(
-      (prev) => {
-        const next = new URLSearchParams(prev);
-        next.delete('project');
-        return next;
+  const featuredProjects = useMemo(
+    () => [
+      {
+        id: 'mnemosyne',
+        title: 'Mnemosyne',
+        url: 'https://m-nemosyne.live',
+        caseStudyPath: '/case-study/mnemosyne',
+        category: 'Web',
+        status: isTurkish ? 'Canlı' : 'Live',
+        previewType: 'web',
+        variant: 'memory',
+        snapshotSrc: '/previews/mnemosyne-live.png',
+        forceSnapshot: true,
+        badgeClass:
+          'border-cyan-300/50 bg-cyan-50 text-cyan-700 dark:border-cyan-300/25 dark:bg-cyan-300/10 dark:text-cyan-200',
+        description: isTurkish
+          ? 'Konum bazlı hafıza fikrini web arayüzüne taşıyan, harita ve zaman katmanları etrafında kurgulanmış canlı uygulama.'
+          : 'A live web app that turns location-based memory into a product surface built around maps and time layers.',
+        tags: [
+          'React',
+          'PWA',
+          isTurkish ? 'Konum' : 'Location',
+          isTurkish ? 'Zaman katmanları' : 'Time layers',
+        ],
       },
-      { replace: true },
-    );
-    if (lastTriggerRef.current && typeof lastTriggerRef.current.focus === 'function') {
-      lastTriggerRef.current.focus();
-    }
-  }, [setSearchParams]);
-
-  const openProjectModal = useCallback(
-    (project) => {
-      if (typeof document !== 'undefined') {
-        lastTriggerRef.current = document.activeElement;
-      }
-      setExpandedProject(project);
-      setActiveModalTab('readme');
-      setReadmeState({ ...INITIAL_README_STATE });
-      const projectKey = project?.name || project?.id;
-      if (projectKey) {
-        setSearchParams(
-          (prev) => {
-            const next = new URLSearchParams(prev);
-            next.set('project', String(projectKey));
-            return next;
-          },
-          { replace: false },
-        );
-      }
-    },
-    [setSearchParams],
+      {
+        id: 'typesprint',
+        title: 'TypeSprint',
+        url: 'https://typesprint.online',
+        caseStudyPath: '/case-study/typesprint',
+        category: 'Web',
+        status: isTurkish ? 'Canlı' : 'Live',
+        previewType: 'web',
+        variant: 'typing',
+        badgeClass:
+          'border-accent-300/50 bg-accent-50 text-accent-700 dark:border-accent-300/25 dark:bg-accent-300/10 dark:text-accent-200',
+        description: isTurkish
+          ? 'Yazma hızını doğrulukla birlikte ölçen; çok dilli kelime havuzu ve skor mantığıyla çalışan WPM deneyimi.'
+          : 'A typing-speed experience focused on accuracy, multilingual word pools, and fair score tracking.',
+        tags: ['JavaScript', 'WPM', isTurkish ? 'Çok dilli' : 'Multilingual', 'Leaderboard'],
+      },
+      {
+        id: 'walkkittie',
+        title: 'WalkKittie',
+        url: 'https://play.google.com/store/apps/details?id=com.mert.paticat',
+        caseStudyPath: '/case-study/walkkittie',
+        category: 'Android',
+        status: 'Google Play',
+        previewType: 'mobile',
+        variant: 'mobile',
+        badgeClass:
+          'border-purple-300/50 bg-purple-50 text-purple-700 dark:border-purple-300/25 dark:bg-purple-300/10 dark:text-purple-200',
+        description: isTurkish
+          ? 'Adım sayacı, su takibi ve sanal kedi bakımını birleştiren; Google Play’de yayında olan Android uygulaması.'
+          : 'An Android app on Google Play combining step tracking, water tracking, and virtual pet care.',
+        tags: ['Kotlin', 'Jetpack Compose', 'Material 3', isTurkish ? 'Sağlık' : 'Health'],
+      },
+      {
+        id: 'msscan',
+        title: 'msscan',
+        url: 'https://github.com/MertSoylu/msscan',
+        caseStudyPath: '/case-study/msscan',
+        category: 'Security',
+        status: 'GitHub',
+        previewType: 'terminal',
+        variant: 'terminal',
+        badgeClass:
+          'border-ink-300/60 bg-ink-50 text-ink-700 dark:border-white/20 dark:bg-white/10 dark:text-white',
+        description: isTurkish
+          ? 'XSS, SQLi, CSRF, header ve subdomain kontrolleri için geliştirilen async Python CLI güvenlik tarayıcısı.'
+          : 'An async Python CLI security scanner for XSS, SQLi, CSRF, headers, redirects, SSRF, and subdomains.',
+        tags: ['Python', 'CLI', 'Async', isTurkish ? 'Raporlama' : 'Reports'],
+      },
+    ],
+    [isTurkish],
   );
 
-  useEffect(() => {
-    if (deepLinkAppliedRef.current) return;
-    if (loading || projects.length === 0) return;
-    const projectKey = searchParams.get('project');
-    if (!projectKey) {
-      deepLinkAppliedRef.current = true;
-      return;
+  const loadRepos = async ({ resetRateLimit = false } = {}) => {
+    setStatus('loading');
+    setErrorMessage('');
+    if (resetRateLimit) clearRateLimitState();
+    try {
+      const nextRepos = await fetchGitHubRepos();
+      setRepos(nextRepos.length ? nextRepos : FALLBACK_PROJECTS);
+      setStatus(nextRepos.length ? 'success' : 'fallback');
+    } catch (error) {
+      setRepos(FALLBACK_PROJECTS);
+      setStatus('error');
+      setErrorMessage(error?.message || 'GitHub repositories could not be loaded.');
     }
-    const match = projects.find((p) => String(p.name) === projectKey || String(p.id) === projectKey);
-    if (match) {
-      setExpandedProject(match);
-      setActiveModalTab('readme');
-      setReadmeState({ ...INITIAL_README_STATE });
-    }
-    deepLinkAppliedRef.current = true;
-  }, [loading, projects, searchParams]);
+  };
 
-  const retryReadme = useCallback(() => {
-    setReadmeRetryCount((prev) => prev + 1);
+  useEffect(() => {
+    loadRepos();
   }, []);
 
-  useEffect(() => {
-    if (!expandedProject) return undefined;
-    let isCancelled = false;
-    const loadReadme = async () => {
-      const repoReference = resolveGitHubRepoReference(expandedProject);
-      if (!repoReference) {
-        if (!isCancelled) setReadmeState({ status: 'empty', content: '', errorMessage: '' });
-        return;
-      }
-      if (!isCancelled) setReadmeState({ status: 'loading', content: '', errorMessage: '' });
-      try {
-        const readmeContent = await fetchRepositoryReadme(repoReference);
-        if (isCancelled) return;
-        if (typeof readmeContent === 'string' && readmeContent.trim().length > 0) {
-          setReadmeState({ status: 'success', content: readmeContent, errorMessage: '' });
-          return;
-        }
-        setReadmeState({ status: 'empty', content: '', errorMessage: '' });
-      } catch (err) {
-        if (isCancelled) return;
-        setReadmeState({
-          status: 'error',
-          content: '',
-          errorMessage:
-            err instanceof Error
-              ? err.message
-              : isTurkish
-                ? 'README yüklenirken hata oluştu.'
-                : 'Failed to load README.',
-        });
-      }
-    };
-    loadReadme();
-    return () => {
-      isCancelled = true;
-    };
-  }, [expandedProject, readmeRetryCount, isTurkish]);
-
-  useEffect(() => {
-    if (!expandedProject) return undefined;
-    const previousOverflow = document.body.style.overflow;
-    document.body.style.overflow = 'hidden';
-    const handleEscape = (event) => {
-      if (event.key === 'Escape') closeProjectModal();
-    };
-    window.addEventListener('keydown', handleEscape);
-    return () => {
-      window.removeEventListener('keydown', handleEscape);
-      document.body.style.overflow = previousOverflow;
-    };
-  }, [expandedProject, closeProjectModal]);
-
-  const getProjectCategory = (project) => {
-    const androidLangs = ['Java', 'Kotlin'];
-    const webLangs = ['JavaScript', 'TypeScript', 'HTML', 'CSS'];
-    const securityTopics = ['security', 'cybersecurity', 'pentest', 'ctf', 'hacking', 'scanner', 'exploit'];
-    const topics = Array.isArray(project.topics) ? project.topics.map((t) => t.toLowerCase()) : [];
-    const name = (project.name || '').toLowerCase();
-
-    if (androidLangs.includes(project.language)) return 'Android';
-    if (
-      topics.some((t) => securityTopics.includes(t)) ||
-      name.includes('scan') ||
-      name.includes('ctf') ||
-      name.includes('hack')
-    )
-      return 'Security';
-    if (project.language === 'Python') return 'Security';
-    if (webLangs.includes(project.language)) return 'Web';
-    return 'Other';
-  };
-
-  const getLanguageColor = (language) => {
-    const colors = {
-      JavaScript: 'from-yellow-400 to-yellow-600',
-      TypeScript: 'from-zinc-500 to-zinc-700',
-      Python: 'from-zinc-400 to-zinc-600',
-      Java: 'from-orange-400 to-orange-600',
-      HTML: 'from-red-400 to-red-600',
-      CSS: 'from-pink-400 to-pink-600',
-      React: 'from-zinc-500 to-zinc-800',
-      null: 'from-gray-400 to-gray-600',
-    };
-    return colors[language] || colors.null;
-  };
-
-  const CATEGORIES = ['All', 'Web', 'Android', 'Security'];
-  const CATEGORY_LABELS = {
-    All: isTurkish ? 'Tümü' : 'All',
-    Web: isTurkish ? 'Web' : 'Web',
-    Android: 'Android',
-    Security: isTurkish ? 'Güvenlik' : 'Security',
-  };
-
-  const filteredProjects =
-    activeFilter === 'All' ? projects : projects.filter((p) => getProjectCategory(p) === activeFilter);
-
   return (
-    <section id="projects" className="py-20 md:py-28 px-4 relative">
-      <AnimatePresence>
-        {expandedProject && (
-          <ProjectModal
-            project={expandedProject}
-            onClose={closeProjectModal}
-            isTurkish={isTurkish}
-            getLanguageColor={getLanguageColor}
-            readmeState={readmeState}
-            activeModalTab={activeModalTab}
-            onTabChange={setActiveModalTab}
-            onRetryReadme={retryReadme}
-          />
-        )}
-      </AnimatePresence>
-
-      <div className="max-w-6xl mx-auto">
-        {/* Section header */}
-        <div className="text-center mb-10">
+    <section id="projects" className="relative px-4 py-16 md:py-28">
+      <div className="mx-auto max-w-6xl">
+        <div className="mb-10 text-center md:mb-16">
           <ScrollFloat
             containerClassName="overflow-hidden"
-            textClassName="text-3xl sm:text-4xl md:text-5xl font-bold heading-gradient"
+            textClassName="section-title"
             animationDuration={1}
             ease="back.inOut(2)"
             scrollStart="center bottom+=50%"
             scrollEnd="bottom bottom-=40%"
             stagger={0.03}
           >
-            {isTurkish ? 'Projelerim' : 'My Projects'}
+            {isTurkish ? 'Projeler' : 'Projects'}
           </ScrollFloat>
-          <ScrollReveal
-            containerClassName="mt-4"
-            textClassName="text-body-lg text-sand-700 dark:text-zinc-300 font-normal"
-            enableBlur={true}
-            baseOpacity={0.75}
-            baseRotation={3}
-            blurStrength={1.5}
-          >
-            {isTurkish ? 'GitHub profilimdeki repolar' : 'Repositories from my GitHub profile'}
-          </ScrollReveal>
+          <p className="mx-auto mt-4 max-w-2xl text-body-lg text-ink-600 dark:text-ink-200">
+            {isTurkish
+              ? 'Canlı ürünler, yayınlanmış mobil iş ve açık kaynak araçlar. Her kart problem, arayüz ve teknik karar odaklı.'
+              : 'Live products, published mobile work, and open-source tools. Each card focuses on the problem, interface, and technical decisions.'}
+          </p>
         </div>
 
-        {/* Category filter buttons */}
-        {!loading && projects.length > 0 && (
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4 }}
-            className="flex flex-wrap gap-2 justify-center mb-10"
-          >
-            {CATEGORIES.map((cat) => (
-              <button
-                key={cat}
-                onClick={() => setActiveFilter(cat)}
-                className={`relative px-4 py-2 min-h-[44px] rounded-full text-sm font-medium border transition-colors duration-200 cursor-pointer flex items-center ${
-                  activeFilter === cat
-                    ? 'border-accent-500 shadow-md text-white'
-                    : 'bg-white/40 dark:bg-zinc-900/60 text-sand-700 dark:text-zinc-300 border-sand-200 dark:border-zinc-700 hover:border-accent-500/50 hover:text-accent-700 dark:hover:text-accent-300'
-                }`}
-              >
-                {activeFilter === cat && (
-                  <motion.div
-                    layoutId="activeFilterPill"
-                    className="absolute inset-0 bg-accent-500 rounded-full -z-10"
-                    transition={{ type: 'spring', stiffness: 380, damping: 30 }}
-                  />
-                )}
-                <span className="relative z-10">{CATEGORY_LABELS[cat]}</span>
-              </button>
-            ))}
-          </motion.div>
-        )}
+        <FeaturedProjectNav projects={featuredProjects} isTurkish={isTurkish} />
 
-        {/* Error state */}
-        {!loading && error && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="bg-amber-50 dark:bg-zinc-900/80 border border-amber-300 dark:border-zinc-700 text-amber-800 dark:text-zinc-200 px-4 py-3 rounded-lg text-center mb-8"
-          >
-            {error === 'empty'
-              ? isTurkish
-                ? 'Herkese açık repo bulunamadı.'
-                : 'No public repositories found.'
-              : error}
-            {error !== 'empty' && (
-              <motion.button
-                onClick={() => {
-                  clearRateLimitState();
-                  getProjects();
-                }}
-                className="mt-3 inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-amber-100 dark:bg-zinc-800/90 border border-amber-300 dark:border-zinc-700 text-amber-800 dark:text-zinc-200 text-sm font-medium hover:bg-amber-200 dark:hover:bg-zinc-700/90 transition-colors cursor-pointer"
-                whileHover={{ scale: 1.04, y: -2 }}
-                whileTap={{ scale: 0.97 }}
-              >
-                <HiRefresh className="w-4 h-4" />
-                {isTurkish ? 'Tekrar Dene' : 'Try Again'}
-              </motion.button>
-            )}
-          </motion.div>
-        )}
+        <div className="mb-5 flex items-center gap-3">
+          <p className="text-caption text-accent-700 dark:text-accent-200">
+            {isTurkish ? 'Ürün seçkisi' : 'Selected products'}
+          </p>
+          <div className="studio-rule flex-1" />
+        </div>
 
-        {/* Skeleton loading */}
-        {loading && projects.length === 0 && (
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {[...Array(6)].map((_, i) => (
-              <ProjectSkeleton key={i} />
-            ))}
-          </div>
-        )}
+        <div className="space-y-4 sm:space-y-5">
+          {featuredProjects.map((project, index) => (
+            <FeaturedProjectCard key={project.id} project={project} index={index} isTurkish={isTurkish} />
+          ))}
+        </div>
 
-        {/* Projects — ScrollStack */}
-        {!loading && filteredProjects.length > 0 && (
-          <ScrollStack
-            useWindowScroll={true}
-            itemDistance={200}
-            itemScale={0.03}
-            itemStackDistance={30}
-            stackPosition="20%"
-            scaleEndPosition="10%"
-            baseScale={0.85}
-            rotationAmount={0}
-            blurAmount={0}
-          >
-            {filteredProjects.map((project) => (
-              <ScrollStackItem
-                key={project.id || project.name}
-                itemClassName="!h-auto !my-4 !p-0 !rounded-2xl !shadow-none"
-              >
-                <div
-                  role="button"
-                  tabIndex={0}
-                  aria-label={isTurkish ? `${project.name} detaylarını aç` : `Open ${project.name} details`}
-                  className="card-raised p-6 cursor-pointer hover:border-accent-500/50 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-accent-500"
-                  onClick={() => openProjectModal(project)}
-                  onKeyDown={(event) => {
-                    if (event.key === 'Enter' || event.key === ' ') {
-                      event.preventDefault();
-                      openProjectModal(project);
-                    }
-                  }}
-                >
-                  <div className="flex items-start justify-between gap-4 mb-3">
-                    <div className="flex items-center gap-3">
-                      {project.language && (
-                        <span
-                          className={`inline-flex px-3 py-1 rounded-full text-xs font-semibold bg-gradient-to-r ${getLanguageColor(project.language)} text-white`}
-                        >
-                          {project.language}
-                        </span>
-                      )}
-                      <h3 className="text-h4 text-sand-900 dark:text-zinc-100">{project.name}</h3>
-                    </div>
-                    <div className="flex items-center gap-3 text-sm text-sand-600 dark:text-zinc-400 shrink-0">
-                      {project.stargazers_count > 0 && (
-                        <div className="flex items-center gap-1">
-                          <HiStar className="text-accent-500" />
-                          <span>{project.stargazers_count}</span>
-                        </div>
-                      )}
-                      {project.forks_count > 0 && <span>{project.forks_count} forks</span>}
-                    </div>
-                  </div>
-                  <p className="text-body-sm text-sand-700 dark:text-zinc-300 mb-4 line-clamp-2">
-                    {project.description || (isTurkish ? 'Açıklama yok' : 'No description available')}
-                  </p>
-                  <div className="flex items-center justify-between">
-                    <div className="flex flex-wrap gap-1.5">
-                      {Array.isArray(project.topics) &&
-                        project.topics.slice(0, 4).map((topic) => (
-                          <span
-                            key={topic}
-                            className="px-2 py-0.5 rounded-full text-xs font-medium bg-sand-200/70 dark:bg-zinc-800/80 text-sand-700 dark:text-zinc-300"
-                          >
-                            {topic}
-                          </span>
-                        ))}
-                    </div>
-                    <motion.a
-                      href={project.html_url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-1.5 text-sm font-semibold text-accent-600 dark:text-accent-400 hover:text-accent-700 dark:hover:text-accent-300"
-                      whileHover={{ scale: 1.05 }}
-                      onClick={(e) => e.stopPropagation()}
-                    >
-                      GitHub <HiExternalLink className="w-4 h-4" />
-                    </motion.a>
-                  </div>
-                </div>
-              </ScrollStackItem>
-            ))}
-          </ScrollStack>
-        )}
-
-        {!loading && filteredProjects.length === 0 && !error && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="text-center text-sand-600 dark:text-zinc-300 py-12"
-          >
-            {activeFilter !== 'All'
-              ? isTurkish
-                ? `"${activeFilter}" dilinde proje bulunamadı.`
-                : `No projects found in ${activeFilter}.`
-              : isTurkish
-                ? 'Gösterilecek proje yok.'
-                : 'No projects to display.'}
-          </motion.div>
-        )}
-
-        {/* View all projects link */}
-        {!loading && projects.length > 0 && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5 }}
-            className="text-center mt-12"
-          >
-            <motion.a
-              href={githubProfileUrl}
+        <div className="mt-16 border-t border-ink-200/70 pt-10 dark:border-white/10">
+          <div className="mb-6 flex flex-col justify-between gap-3 sm:flex-row sm:items-end">
+            <div>
+              <p className="text-caption text-cyan-700 dark:text-cyan-200">
+                {isTurkish ? 'Açık kaynak akışı' : 'Open-source feed'}
+              </p>
+              <h3 className="mt-2 text-h2 text-ink-900 dark:text-white">
+                {isTurkish ? 'Güncel public repo akışı' : 'Current public repository feed'}
+              </h3>
+              <p className="mt-2 max-w-xl text-body-sm text-ink-500 dark:text-ink-300">
+                {isTurkish
+                  ? 'Üstteki ürün kartları seçilmiş işler; burası GitHub API’den gelen canlı repo listesi.'
+                  : 'The product cards above are curated; this stays as the live GitHub API repository list.'}
+              </p>
+            </div>
+            <a
+              href={getGitHubProfileUrl()}
               target="_blank"
               rel="noopener noreferrer"
-              className="btn-primary"
-              whileHover={{ scale: 1.06, y: -4, boxShadow: '0 8px 30px rgba(240, 125, 45, 0.45)' }}
-              whileTap={{ scale: 0.97 }}
-              transition={{ type: 'spring', stiffness: 300, damping: 18 }}
+              className="btn-secondary px-4 py-2 text-xs"
             >
-              {isTurkish
-                ? `GitHub'da ${isUsingFallback ? `${githubUsername} kullanıcısının` : 'Tüm'} Projelerini Gör`
-                : `View ${isUsingFallback ? `${githubUsername}'s` : 'All'} Projects on GitHub`}
-            </motion.a>
-          </motion.div>
-        )}
+              <HiExternalLink className="h-4 w-4" />
+              GitHub
+            </a>
+          </div>
+
+          {status === 'error' && (
+            <div className="mb-4 rounded-lg border border-accent-300/50 bg-accent-50 p-4 text-sm text-accent-800 dark:border-accent-300/20 dark:bg-accent-300/10 dark:text-accent-100">
+              <p className="mb-3 font-bold">
+                {isTurkish
+                  ? 'GitHub akışı yüklenemedi; yedek liste gösteriliyor.'
+                  : 'GitHub feed could not load; showing fallback list.'}
+              </p>
+              {errorMessage && <p className="mb-3">{errorMessage}</p>}
+              <button
+                type="button"
+                onClick={() => loadRepos({ resetRateLimit: true })}
+                className="btn-outline px-4 py-2 text-xs"
+              >
+                <HiRefresh className="h-4 w-4" />
+                {isTurkish ? 'Tekrar dene' : 'Retry'}
+              </button>
+            </div>
+          )}
+
+          {status === 'loading' ? (
+            <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+              {Array.from({ length: 3 }).map((_, index) => (
+                <div key={index} className="card-raised h-44 animate-pulse p-5">
+                  <div className="mb-4 h-5 w-2/3 rounded-lg bg-ink-100 dark:bg-white/10" />
+                  <div className="mb-2 h-3 rounded-lg bg-ink-100 dark:bg-white/10" />
+                  <div className="h-3 w-4/5 rounded-lg bg-ink-100 dark:bg-white/10" />
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+              {repos.map((repo) => (
+                <RepoCard key={repo.id || repo.name} repo={repo} onOpen={setActiveProject} />
+              ))}
+            </div>
+          )}
+        </div>
       </div>
+
+      <AnimatePresence>
+        {activeProject && (
+          <ProjectModal
+            project={activeProject}
+            onClose={() => setActiveProject(null)}
+            isTurkish={isTurkish}
+          />
+        )}
+      </AnimatePresence>
     </section>
   );
 };

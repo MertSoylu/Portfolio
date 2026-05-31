@@ -21,19 +21,19 @@ const pageVariants = {
 // Static lookup so Tailwind picks up class names at build time.
 const accentClasses = {
   emerald: {
-    eyebrow: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20',
+    eyebrow: 'bg-emerald-500/10 text-emerald-700 dark:text-emerald-200 border-emerald-500/25',
   },
   red: {
-    eyebrow: 'bg-red-500/10 text-red-600 dark:text-red-400 border-red-500/20',
+    eyebrow: 'bg-accent-500/10 text-accent-700 dark:text-accent-200 border-accent-500/25',
   },
   blue: {
-    eyebrow: 'bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/20',
+    eyebrow: 'bg-cyan-500/10 text-cyan-700 dark:text-cyan-200 border-cyan-500/25',
   },
   zinc: {
-    eyebrow: 'bg-zinc-500/10 text-zinc-700 dark:text-zinc-300 border-zinc-500/20',
+    eyebrow: 'bg-ink-500/10 text-ink-700 dark:text-ink-100 border-ink-500/20',
   },
   warm: {
-    eyebrow: 'bg-accent-500/10 text-accent-700 dark:text-accent-300 border-accent-500/20',
+    eyebrow: 'bg-accent-500/10 text-accent-700 dark:text-accent-200 border-accent-500/25',
   },
 };
 
@@ -53,15 +53,16 @@ const SpecialtyPageLayout = ({
   centered = false,
   className = '',
   contentClassName = '',
+  sideNode,
   children,
 }) => {
   const accentTheme = accentClasses[accent] ?? accentClasses.warm;
 
   const containerClasses = centered
     ? 'flex min-h-screen items-center justify-center px-4'
-    : 'min-h-screen pt-24 pb-20 px-4';
+    : 'min-h-screen px-4 pb-16 pt-24 sm:pb-20';
 
-  const innerClasses = centered ? 'mx-auto w-full max-w-lg text-center' : 'mx-auto w-full max-w-3xl';
+  const innerClasses = centered ? 'mx-auto w-full max-w-lg text-center' : 'mx-auto w-full max-w-6xl';
 
   return (
     <motion.div
@@ -75,41 +76,62 @@ const SpecialtyPageLayout = ({
       {!hideBackButton && <PageBackButton />}
 
       <div className={innerClasses}>
-        {(eyebrow || title || titleNode || subtitle) && (
-          <header className={`mb-12 md:mb-16 ${centered ? '' : 'text-center'}`}>
-            {eyebrow && (
-              <motion.span
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.4, delay: 0.15 }}
-                className={`inline-flex items-center gap-2 rounded-full border px-4 py-1.5 text-caption mb-6 ${accentTheme.eyebrow}`}
-              >
-                {eyebrowIcon}
-                {eyebrow}
-              </motion.span>
-            )}
+        {(eyebrow || title || titleNode || subtitle || sideNode) && (
+          <header
+            className={`mb-10 grid items-end gap-6 md:mb-16 md:gap-8 ${
+              centered || !sideNode ? 'text-center' : 'lg:grid-cols-[minmax(0,1fr)_420px]'
+            }`}
+          >
+            <div className={centered || !sideNode ? 'mx-auto max-w-3xl' : 'max-w-3xl'}>
+              {eyebrow && (
+                <motion.span
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ duration: 0.4, delay: 0.15 }}
+                  className={`mb-4 inline-flex items-center gap-2 rounded-lg border px-4 py-1.5 text-caption sm:mb-6 ${accentTheme.eyebrow}`}
+                >
+                  {eyebrowIcon}
+                  {eyebrow}
+                </motion.span>
+              )}
 
-            {titleNode ? (
-              <div className="mb-6">{titleNode}</div>
-            ) : title ? (
-              <BlurText
-                text={title}
-                delay={80}
-                animateBy="words"
-                direction="top"
-                className="text-h1 text-sand-900 dark:text-zinc-50 mb-6 justify-center"
-              />
-            ) : null}
+              {titleNode ? (
+                <div className="mb-4 sm:mb-6">{titleNode}</div>
+              ) : title ? (
+                <BlurText
+                  text={title}
+                  delay={65}
+                  animateBy="words"
+                  direction="top"
+                  className={`mb-4 text-h1 text-ink-900 dark:text-white sm:mb-6 ${
+                    centered || !sideNode ? 'justify-center' : ''
+                  }`}
+                />
+              ) : null}
 
-            {subtitle && (
-              <motion.p
-                initial={{ opacity: 0, y: 15 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: 0.4 }}
-                className="text-body-lg text-sand-700 dark:text-zinc-300 max-w-2xl mx-auto"
+              {subtitle && (
+                <motion.p
+                  initial={{ opacity: 0, y: 15 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5, delay: 0.4 }}
+                  className={`text-body-lg text-ink-600 dark:text-ink-200 ${
+                    centered || !sideNode ? 'mx-auto max-w-2xl' : 'max-w-2xl'
+                  }`}
+                >
+                  {subtitle}
+                </motion.p>
+              )}
+            </div>
+
+            {sideNode && (
+              <motion.div
+                initial={{ opacity: 0, y: 28, rotate: 1.5 }}
+                animate={{ opacity: 1, y: 0, rotate: 0 }}
+                transition={{ duration: 0.7, delay: 0.25, ease: [0.22, 1, 0.36, 1] }}
+                className="mx-auto w-full max-w-md lg:mx-0"
               >
-                {subtitle}
-              </motion.p>
+                {sideNode}
+              </motion.div>
             )}
           </header>
         )}

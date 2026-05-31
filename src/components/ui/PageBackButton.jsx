@@ -16,7 +16,7 @@ const PageBackButton = ({ to = '/', className = '' }) => {
     >
       <Link
         to={to}
-        className="group inline-flex items-center justify-center gap-0 rounded-2xl border border-sand-200/60 bg-white/80 p-2.5 font-medium text-warm-600 shadow-soft backdrop-blur-md transition-colors hover:text-warm-700 hover:shadow-elevation dark:border-zinc-800/60 dark:bg-zinc-900/80 dark:text-accent-400 dark:hover:text-accent-300 sm:justify-start sm:gap-2 sm:px-4 sm:py-2"
+        className="group inline-flex items-center justify-center gap-0 rounded-lg border border-ink-200/70 bg-white/75 p-2.5 font-bold text-ink-700 shadow-soft backdrop-blur-xl transition-colors hover:border-cyan-300 hover:text-cyan-700 hover:shadow-elevation dark:border-white/10 dark:bg-white/10 dark:text-ink-100 dark:hover:border-cyan-300/40 dark:hover:text-cyan-100 sm:justify-start sm:gap-2 sm:px-4 sm:py-2"
       >
         <HiArrowLeft className="w-5 h-5 transition-transform group-hover:-translate-x-1" />
         <span className="hidden sm:inline text-sm">{isTurkish ? 'Ana Sayfaya Dön' : 'Back to Home'}</span>

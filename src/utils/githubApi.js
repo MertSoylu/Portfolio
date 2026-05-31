@@ -17,7 +17,7 @@ const readmeMemoryCache = new Map();
 const readmeInFlightRequests = new Map();
 
 const defaultHeaders = {
-  'Accept': 'application/vnd.github.v3+json',
+  Accept: 'application/vnd.github.v3+json',
   ...(GITHUB_TOKEN ? { Authorization: `Bearer ${GITHUB_TOKEN}` } : {}),
 };
 
@@ -393,15 +393,15 @@ const revalidateRepos = () => {
   apiFetch(`/users/${GITHUB_USERNAME}/repos?sort=updated&direction=desc&per_page=100&type=public`)
     .then((response) => {
       const freshRepos = normalizeRepos(response.data);
-      const staleIds = (reposMemoryCache || []).map(r => r.id).join(',');
-      const freshIds = freshRepos.map(r => r.id).join(',');
+      const staleIds = (reposMemoryCache || []).map((r) => r.id).join(',');
+      const freshIds = freshRepos.map((r) => r.id).join(',');
 
       // Only notify if data actually changed
       if (staleIds !== freshIds) {
         reposMemoryCache = freshRepos;
         reposMemoryCacheTimestamp = Date.now();
         setCachedData(CACHE_KEY, freshRepos);
-        reposUpdateListeners.forEach(cb => cb(freshRepos));
+        reposUpdateListeners.forEach((cb) => cb(freshRepos));
       }
     })
     .catch((error) => {
@@ -439,7 +439,9 @@ export const fetchGitHubRepos = async () => {
 
   reserveRateLimitSlot();
 
-  reposInFlightRequest = apiFetch(`/users/${GITHUB_USERNAME}/repos?sort=updated&direction=desc&per_page=100&type=public`)
+  reposInFlightRequest = apiFetch(
+    `/users/${GITHUB_USERNAME}/repos?sort=updated&direction=desc&per_page=100&type=public`,
+  )
     .then((response) => {
       const repos = normalizeRepos(response.data);
       reposMemoryCache = repos;
@@ -449,7 +451,7 @@ export const fetchGitHubRepos = async () => {
     })
     .catch((error) => {
       applyServerRateLimitCooldown(error);
-      console.error('Error fetching GitHub repositories:', error);
+      console.warn('Error fetching GitHub repositories:', error);
       throw new Error(getGitHubErrorMessage(error));
     })
     .finally(() => {
@@ -475,7 +477,9 @@ export const clearGitHubCache = () => {
         sessionStorage.removeItem(key);
       }
     }
-  } catch { /* ignore */ }
+  } catch {
+    /* ignore */
+  }
 };
 
 /**

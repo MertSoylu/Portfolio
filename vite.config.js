@@ -14,7 +14,7 @@ export default defineConfig(({ mode }) => ({
       manifest: false,
       manifestFilename: 'manifest.webmanifest',
       workbox: {
-        globPatterns: ['**/*.{js,css,html,svg,woff2}'],
+        globPatterns: ['**/*.{js,css,html,svg,woff2,png,webp,jpg,jpeg}'],
         navigateFallback: '/index.html',
         navigateFallbackDenylist: [/^\/api\//, /^\/cv\.pdf$/, /^\/certificates\//],
         runtimeCaching: [

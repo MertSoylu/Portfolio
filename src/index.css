@@ -3,35 +3,43 @@
 @tailwind utilities;
 
 :root {
-  --warm-50: 255 251 245;
-  --warm-100: 255 248 240;
-  --warm-200: 255 232 214;
-  --warm-300: 255 212 179;
-  --warm-400: 255 184 138;
-  --warm-500: 255 154 92;
-  --warm-600: 240 125 45;
-  --warm-700: 212 94 31;
-  --warm-800: 168 70 23;
-  --warm-900: 122 52 16;
+  --warm-50: 255 244 240;
+  --warm-100: 255 228 220;
+  --warm-200: 255 196 184;
+  --warm-300: 255 150 135;
+  --warm-400: 255 108 97;
+  --warm-500: 255 79 70;
+  --warm-600: 231 60 53;
+  --warm-700: 191 46 42;
+  --warm-800: 152 41 38;
+  --warm-900: 119 38 34;
+  --studio-bg: #fffdf7;
+  --studio-text: #121d2d;
+  --studio-muted: #5f6f85;
+  --studio-line: rgba(18, 29, 45, 0.14);
 }
 
 html.dark {
-  --warm-50: 24 24 27;
-  --warm-100: 39 39 42;
-  --warm-200: 63 63 70;
-  --warm-300: 82 82 91;
-  --warm-400: 113 113 122;
-  --warm-500: 161 161 170;
-  --warm-600: 212 212 216;
-  --warm-700: 228 228 231;
-  --warm-800: 244 244 245;
-  --warm-900: 250 250 250;
+  --warm-50: 255 244 240;
+  --warm-100: 255 228 220;
+  --warm-200: 255 196 184;
+  --warm-300: 255 150 135;
+  --warm-400: 255 108 97;
+  --warm-500: 255 79 70;
+  --warm-600: 231 60 53;
+  --warm-700: 191 46 42;
+  --warm-800: 152 41 38;
+  --warm-900: 119 38 34;
+  --studio-bg: #050912;
+  --studio-text: #f7fbff;
+  --studio-muted: #aab9cc;
+  --studio-line: rgba(247, 251, 255, 0.14);
 }
 
 * {
+  box-sizing: border-box;
   margin: 0;
   padding: 0;
-  box-sizing: border-box;
 }
 
 html,
@@ -45,28 +53,79 @@ html {
 }
 
 body {
+  min-height: 100vh;
+  background:
+    linear-gradient(90deg, rgba(18, 29, 45, 0.045) 1px, transparent 1px),
+    linear-gradient(180deg, rgba(18, 29, 45, 0.04) 1px, transparent 1px),
+    linear-gradient(135deg, #fffdf7 0%, #f7fbff 48%, #eefbff 100%);
+  background-size:
+    44px 44px,
+    44px 44px,
+    auto;
+  color: var(--studio-text);
   font-family:
-    'Space Grotesk',
+    'Manrope',
     -apple-system,
     BlinkMacSystemFont,
     'Segoe UI',
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background-color: #faf8f3;
-  color: #3d342e;
   transition:
-    background-color 0.6s cubic-bezier(0.4, 0, 0.2, 1),
-    color 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    background-color 0.5s cubic-bezier(0.4, 0, 0.2, 1),
+    color 0.5s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .dark body,
 html.dark body {
-  background-color: #050505;
-  color: #e2e8f0;
+  background:
+    linear-gradient(90deg, rgba(255, 255, 255, 0.045) 1px, transparent 1px),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.035) 1px, transparent 1px),
+    linear-gradient(135deg, #050912 0%, #09111f 50%, #101827 100%);
+  background-size:
+    44px 44px,
+    44px 44px,
+    auto;
+  color: var(--studio-text);
 }
 
-/* Language switch text animation */
+@media (max-width: 640px) {
+  html {
+    font-size: 100%;
+  }
+
+  body {
+    background:
+      linear-gradient(90deg, rgba(18, 29, 45, 0.04) 1px, transparent 1px),
+      linear-gradient(180deg, rgba(18, 29, 45, 0.035) 1px, transparent 1px),
+      radial-gradient(circle at 50% 9%, rgba(255, 79, 70, 0.12), transparent 24rem),
+      radial-gradient(circle at 50% 32%, rgba(6, 182, 212, 0.13), transparent 22rem),
+      linear-gradient(135deg, #fffdf7 0%, #f7fbff 48%, #eefbff 100%);
+    background-size:
+      30px 30px,
+      30px 30px,
+      auto,
+      auto,
+      auto;
+  }
+
+  .dark body,
+  html.dark body {
+    background:
+      linear-gradient(90deg, rgba(255, 255, 255, 0.04) 1px, transparent 1px),
+      linear-gradient(180deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+      radial-gradient(circle at 50% 9%, rgba(255, 79, 70, 0.18), transparent 24rem),
+      radial-gradient(circle at 50% 32%, rgba(6, 182, 212, 0.16), transparent 22rem),
+      linear-gradient(135deg, #050912 0%, #09111f 50%, #101827 100%);
+    background-size:
+      30px 30px,
+      30px 30px,
+      auto,
+      auto,
+      auto;
+  }
+}
+
 @keyframes lang-text-fade-up {
   0% {
     opacity: 0.2;
@@ -92,7 +151,6 @@ html.dark body {
   animation: lang-text-fade-up 0.28s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
-/* Smooth theme transition — structural elements only */
 body,
 header,
 nav,
@@ -100,17 +158,21 @@ main,
 section,
 footer {
   transition-property: background-color, border-color, color;
-  transition-duration: 0.5s;
+  transition-duration: 0.45s;
   transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* Interactive elements get a faster transition */
+section[id],
+[id^='project-'] {
+  scroll-margin-top: 6.5rem;
+}
+
 a,
 button,
 input,
 textarea,
 label {
-  transition-property: background-color, border-color, color, box-shadow;
+  transition-property: background-color, border-color, color, box-shadow, transform;
   transition-duration: 0.2s;
   transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
 }
@@ -121,12 +183,11 @@ label {
   *::after {
     animation-duration: 0.2s !important;
     animation-iteration-count: 1 !important;
-    transition-duration: 0.2s !important;
     scroll-behavior: auto !important;
+    transition-duration: 0.2s !important;
   }
 }
 
-/* Exclude elements that need instant transitions */
 .no-theme-transition,
 .no-theme-transition *,
 canvas,
@@ -141,173 +202,137 @@ h3,
 h4,
 h5,
 h6 {
-  font-family: 'Archivo', system-ui, sans-serif;
+  font-family: 'Bricolage Grotesque', system-ui, sans-serif;
+  letter-spacing: 0;
 }
 
-code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
+code,
+pre,
+.font-mono {
+  font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', monospace;
 }
 
-/* Scrollbar styling */
 ::-webkit-scrollbar {
   width: 10px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #f1f1f1;
+  background: #eef3f7;
 }
 
 .dark ::-webkit-scrollbar-track {
-  background: #0f0f0f;
+  background: #050912;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #c9b8a0;
-  border-radius: 5px;
+  background: #9db2c8;
+  border-radius: 999px;
 }
 
 .dark ::-webkit-scrollbar-thumb {
-  background: #2a2a2a;
+  background: #26364d;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #b8a08c;
+  background: #ff6c61;
 }
 
-.dark ::-webkit-scrollbar-thumb:hover {
-  background: #3a3a3a;
-}
-
-/* Selection color */
 ::selection {
-  background-color: #d4c4af;
-  color: #fff;
+  background-color: #9ff4ff;
+  color: #050912;
 }
 
 .dark ::selection {
-  background-color: #2a2a2a;
-  color: #fff;
+  background-color: #ff6c61;
+  color: #050912;
 }
 
-/* Link styling */
 a {
   color: inherit;
   text-decoration: none;
 }
 
-/* Button base styles */
-.btn-base {
-  @apply px-6 py-3 rounded-lg font-semibold transition-all duration-300 ease-out;
+.btn-base,
+.btn-primary,
+.btn-secondary,
+.btn-outline {
+  @apply inline-flex items-center justify-center gap-2 rounded-lg px-5 py-3 text-sm font-bold;
 }
 
 .btn-primary {
-  @apply px-6 py-3 rounded-lg font-semibold transition-all duration-300 ease-out bg-warm-500 text-white hover:bg-warm-600 hover:shadow-lg hover:-translate-y-1;
+  @apply border border-accent-400/70 bg-accent-500 text-white shadow-warm-soft hover:-translate-y-1 hover:bg-accent-600 hover:shadow-warm-prominent;
 }
 
 .btn-secondary {
-  @apply px-6 py-3 rounded-lg font-semibold transition-all duration-300 ease-out bg-sand-300 text-sand-900 hover:bg-sand-400 hover:shadow-lg hover:-translate-y-1;
+  @apply border border-ink-200/70 bg-white/75 text-ink-800 shadow-soft backdrop-blur-md hover:-translate-y-1 hover:border-cyan-300 hover:text-ink-900 hover:shadow-elevation;
 }
 
 .dark .btn-secondary {
-  background-color: #171717;
-  color: #e2e8f0;
-}
-.dark .btn-secondary:hover {
-  background-color: #262626;
-}
-
-/* Keep the primary CTA warm in dark mode — the warm-* CSS vars otherwise
-   resolve to gray, dropping brand identity at the most prominent button. */
-.dark .btn-primary {
-  background-color: #f97316;
-  color: #ffffff;
-}
-.dark .btn-primary:hover {
-  background-color: #ea580c;
+  @apply border-white/10 bg-white/10 text-ink-50 hover:border-cyan-300/50 hover:bg-white/10 hover:text-white;
 }
 
 .btn-outline {
-  @apply px-6 py-3 rounded-lg font-semibold transition-all duration-300 ease-out border-2 border-warm-500 text-warm-600 hover:bg-warm-500 hover:text-white;
+  @apply border border-cyan-400/70 bg-cyan-50/70 text-cyan-800 hover:-translate-y-1 hover:bg-cyan-100 hover:shadow-glow;
 }
 
 .dark .btn-outline {
-  border-color: #ff9a5c;
-  color: #ffb380;
-}
-.dark .btn-outline:hover {
-  background-color: #ff9a5c;
-  color: #0a0a0a;
+  @apply border-cyan-300/50 bg-cyan-300/10 text-cyan-100 hover:bg-cyan-300/20;
 }
 
-/* Container styling */
 .container-custom {
-  @apply max-w-6xl mx-auto px-4 sm:px-6 lg:px-8;
+  @apply mx-auto max-w-6xl px-4 sm:px-6 lg:px-8;
 }
 
-/* Section title */
-.section-title {
-  @apply text-3xl sm:text-4xl md:text-5xl font-bold mb-2;
-  background: linear-gradient(270deg, #f07d2d, #d45e1f, #c9b8a0, #f07d2d);
-  background-size: 300% 300%;
+.section-title,
+.heading-gradient,
+.gradient-text {
+  background-image: linear-gradient(90deg, #ff4f46 0%, #06b6d4 48%, #121d2d 100%);
   -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
   background-clip: text;
-  animation: gradient-x 4s ease infinite;
+  color: transparent;
 }
 
-@keyframes gradient-x {
-  0%,
-  100% {
-    background-position: 0% 50%;
-  }
-  50% {
-    background-position: 100% 50%;
-  }
+.dark .section-title,
+.dark .heading-gradient,
+.dark .gradient-text {
+  background-image: linear-gradient(90deg, #ff9687 0%, #66e5f4 48%, #f7fbff 100%);
 }
 
-/* Section title — dark mode override.
-   The default gradient (orange → brown → sand) disappears against dark
-   backgrounds, so swap to lighter warm stops that retain brand identity. */
-.dark .section-title {
-  background: linear-gradient(270deg, #ff9a5c, #ffb380, #ede6db, #ff9a5c);
-  background-size: 300% 300%;
+.section-title {
+  @apply mb-2 text-3xl font-extrabold leading-tight sm:text-4xl md:text-5xl;
 }
 
 .section-subtitle {
-  @apply text-lg text-sand-700 mb-8 md:mb-12;
+  @apply mb-8 text-lg leading-relaxed text-ink-600 md:mb-12;
 }
 
 .dark .section-subtitle {
-  @apply text-dark-200;
+  @apply text-ink-200;
 }
 
-/* ---------------------------------------------------------------------------
- * Typography scale — semantic tokens.
- * Replaces ad-hoc text-[N]px values and disjointed responsive jumps.
- * ------------------------------------------------------------------------- */
 .text-display {
-  @apply text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight leading-[1.05];
-  font-family: 'Archivo', system-ui, sans-serif;
+  @apply text-5xl font-extrabold leading-[1.02] sm:text-6xl lg:text-7xl;
+  font-family: 'Bricolage Grotesque', system-ui, sans-serif;
 }
 
 .text-h1 {
-  @apply text-4xl md:text-5xl font-bold tracking-tight leading-[1.1];
-  font-family: 'Archivo', system-ui, sans-serif;
+  @apply text-4xl font-extrabold leading-[1.06] md:text-5xl;
+  font-family: 'Bricolage Grotesque', system-ui, sans-serif;
 }
 
 .text-h2 {
-  @apply text-2xl md:text-3xl font-bold tracking-tight leading-tight;
-  font-family: 'Archivo', system-ui, sans-serif;
+  @apply text-2xl font-extrabold leading-tight md:text-3xl;
+  font-family: 'Bricolage Grotesque', system-ui, sans-serif;
 }
 
 .text-h3 {
-  @apply text-xl md:text-2xl font-semibold leading-snug;
-  font-family: 'Archivo', system-ui, sans-serif;
+  @apply text-xl font-bold leading-snug md:text-2xl;
+  font-family: 'Bricolage Grotesque', system-ui, sans-serif;
 }
 
 .text-h4 {
-  @apply text-lg font-semibold leading-snug;
-  font-family: 'Archivo', system-ui, sans-serif;
+  @apply text-lg font-bold leading-snug;
+  font-family: 'Bricolage Grotesque', system-ui, sans-serif;
 }
 
 .text-body-lg {
@@ -319,73 +344,145 @@ a {
 }
 
 .text-body-sm {
-  @apply text-sm leading-normal;
+  @apply text-sm leading-relaxed;
 }
 
 .text-caption {
-  @apply text-xs font-medium uppercase tracking-wider;
+  @apply text-xs font-extrabold uppercase tracking-[0.14em];
 }
 
-/* ---------------------------------------------------------------------------
- * Card elevation — 3-tier system.
- * flat: list items, low-emphasis content
- * raised: standard content cards
- * prominent: featured / hero cards
- * ------------------------------------------------------------------------- */
 .card-flat {
-  @apply rounded-2xl border border-sand-200/60 bg-transparent;
+  @apply rounded-lg border border-ink-200/60 bg-white/30;
 }
 
 .dark .card-flat {
-  @apply border-zinc-800/60;
+  @apply border-white/10 bg-white/5;
 }
 
 .card-raised {
-  @apply rounded-2xl border border-sand-200/50 bg-white/60 backdrop-blur-md;
+  @apply rounded-lg border border-ink-200/70 bg-white/75 shadow-soft backdrop-blur-xl;
 }
 
 .dark .card-raised {
-  @apply border-zinc-800/50 bg-zinc-900/50;
+  @apply border-white/15 bg-ink-800/85 shadow-soft;
 }
 
 .card-prominent {
-  @apply rounded-3xl border border-accent-500/20 bg-white/80 backdrop-blur-md shadow-warm-soft;
+  @apply rounded-lg border border-accent-300/60 bg-white shadow-elevation backdrop-blur-xl;
 }
 
 .dark .card-prominent {
-  @apply border-accent-500/15 bg-zinc-900/70;
+  @apply border-cyan-300/25 bg-ink-800/90 shadow-soft;
 }
 
-/* Card hover effects */
 .card-hover {
-  @apply transition-all duration-300 hover:shadow-xl hover:-translate-y-2 cursor-pointer;
+  @apply cursor-pointer transition-all duration-300 hover:-translate-y-2 hover:shadow-elevation;
 }
 
-/* Gradient text */
-.gradient-text {
-  @apply bg-gradient-to-r from-warm-600 to-sand-600 bg-clip-text text-transparent;
+.studio-panel {
+  @apply rounded-lg border border-ink-200/70 bg-white/70 shadow-soft backdrop-blur-xl;
 }
 
-/* In dark mode the warm-* CSS vars invert to grayscale, so the gradient
-   becomes a flat gray. Use literal warm hex values to keep the accent. */
-.dark .gradient-text {
-  background-image: linear-gradient(to right, #ff9a5c, #ede6db);
-  -webkit-background-clip: text;
-  background-clip: text;
+.dark .studio-panel {
+  @apply border-white/15 bg-ink-800/85 shadow-soft;
 }
 
-/* Three-stop heading gradient used by section titles (ScrollFloat). */
-.heading-gradient {
-  @apply bg-gradient-to-r from-warm-600 via-warm-500 to-sand-500 bg-clip-text text-transparent;
+.studio-kicker {
+  @apply inline-flex items-center gap-2 rounded-lg border border-cyan-300/60 bg-cyan-50/70 px-3 py-1.5 text-caption text-cyan-800;
 }
 
-.dark .heading-gradient {
-  background-image: linear-gradient(to right, #ff9a5c, #ffb380, #ede6db);
-  -webkit-background-clip: text;
-  background-clip: text;
+.dark .studio-kicker {
+  @apply border-cyan-300/30 bg-cyan-300/10 text-cyan-100;
 }
 
-/* Wave separator animation */
+.studio-rule {
+  background-image: linear-gradient(
+    90deg,
+    transparent,
+    rgba(6, 182, 212, 0.45),
+    rgba(255, 79, 70, 0.45),
+    transparent
+  );
+  height: 1px;
+}
+
+.mobile-hero-shell,
+.mobile-hero-name-stage {
+  position: relative;
+  isolation: isolate;
+}
+
+@media (max-width: 640px) {
+  .mobile-hero-shell {
+    padding: 0.95rem 0.85rem 0.35rem;
+  }
+
+  .mobile-hero-shell::before {
+    content: '';
+    position: absolute;
+    inset: -0.35rem -0.15rem auto;
+    z-index: -2;
+    height: min(56svh, 31rem);
+    border: 1px solid rgba(196, 211, 228, 0.74);
+    border-radius: 26px;
+    background:
+      linear-gradient(135deg, rgba(255, 255, 255, 0.68), rgba(235, 255, 255, 0.46)),
+      repeating-linear-gradient(90deg, rgba(18, 29, 45, 0.045) 0 1px, transparent 1px 34px);
+    box-shadow: 0 24px 80px -54px rgba(5, 9, 18, 0.38);
+    pointer-events: none;
+  }
+
+  .dark .mobile-hero-shell::before {
+    border-color: rgba(255, 255, 255, 0.12);
+    background:
+      linear-gradient(135deg, rgba(9, 17, 31, 0.76), rgba(10, 34, 48, 0.48)),
+      repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.04) 0 1px, transparent 1px 34px);
+    box-shadow: 0 26px 90px -54px rgba(0, 0, 0, 0.78);
+  }
+
+  .mobile-hero-name-stage::before,
+  .mobile-hero-name-stage::after {
+    content: '';
+    position: absolute;
+    top: 0.55rem;
+    bottom: 0.55rem;
+    z-index: -1;
+    width: 2px;
+    border-radius: 999px;
+    background: linear-gradient(
+      180deg,
+      transparent,
+      rgba(255, 79, 70, 0.78),
+      rgba(6, 182, 212, 0.68),
+      transparent
+    );
+  }
+
+  .mobile-hero-name-stage::before {
+    left: 0.1rem;
+  }
+
+  .mobile-hero-name-stage::after {
+    right: 0.1rem;
+  }
+
+  .mobile-hero-name-stage .text-pressure-title {
+    justify-content: center !important;
+    gap: 0.055em;
+    text-shadow: 0 16px 44px rgba(255, 79, 70, 0.16);
+  }
+
+  .section-title {
+    font-size: 2.35rem;
+    line-height: 1.02;
+  }
+
+  .text-body-lg {
+    font-size: 1.05rem;
+    line-height: 1.65;
+  }
+}
+
 .wave-separator {
   animation: wave-shift 8s linear infinite;
 }
@@ -399,90 +496,82 @@ a {
   }
 }
 
-/* Perspective container for 3D card effects */
 .perspective-container {
   perspective: 1000px;
 }
 
-/* Animated gradient background for cards */
 .animated-card-bg {
   background-size: 200% 200%;
   animation: gradient-x 4s ease infinite;
 }
 
-/* Dark mode transition for all elements */
+@keyframes gradient-x {
+  0%,
+  100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
 .dark-transition {
   transition:
     background-color 0.3s ease,
-    color 0.3s ease,
-    border-color 0.3s ease;
+    border-color 0.3s ease,
+    color 0.3s ease;
 }
 
-/* Gradient border glow on card hover */
 .card-border-glow {
   position: relative;
 }
+
 .card-border-glow::before {
   content: '';
   position: absolute;
   inset: -1px;
+  z-index: 1;
   border-radius: inherit;
-  padding: 1px;
-  background: linear-gradient(
-    135deg,
-    rgba(240, 125, 45, 0.35) 0%,
-    rgba(201, 184, 160, 0.15) 50%,
-    rgba(240, 125, 45, 0.1) 100%
-  );
+  background: linear-gradient(135deg, rgba(255, 79, 70, 0.45), rgba(6, 182, 212, 0.34));
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
   -webkit-mask:
     linear-gradient(#fff 0 0) content-box,
     linear-gradient(#fff 0 0);
   -webkit-mask-composite: xor;
   mask-composite: exclude;
-  opacity: 0;
-  transition: opacity 0.3s ease;
-  pointer-events: none;
-  z-index: 1;
+  padding: 1px;
 }
+
 .card-border-glow:hover::before {
   opacity: 1;
 }
-.dark .card-border-glow::before {
-  background: linear-gradient(
-    135deg,
-    rgba(255, 154, 92, 0.4) 0%,
-    rgba(100, 116, 139, 0.15) 50%,
-    rgba(255, 154, 92, 0.15) 100%
-  );
-}
 
-/* Remove mobile tap delay */
 button,
 a,
 [role='button'] {
   touch-action: manipulation;
 }
 
-/* Keyboard focus rings */
 :focus-visible {
-  outline: 2px solid #f07d2d;
+  border-radius: 8px;
+  outline: 2px solid #06b6d4;
   outline-offset: 3px;
-  border-radius: 6px;
 }
 
 .dark :focus-visible {
-  outline-color: #ff9a5c;
+  outline-color: #66e5f4;
 }
 
-/* Print stylesheet — clean CV-style output */
 @media print {
   *,
   *::before,
   *::after {
     animation: none !important;
-    transition: none !important;
     box-shadow: none !important;
     text-shadow: none !important;
+    transition: none !important;
   }
 
   html,
@@ -519,10 +608,10 @@ a,
   h4,
   h5,
   h6 {
-    color: #000000 !important;
-    -webkit-text-fill-color: #000000 !important;
     background: none !important;
+    color: #000000 !important;
     page-break-after: avoid;
+    -webkit-text-fill-color: #000000 !important;
   }
 
   a {
@@ -541,10 +630,11 @@ a,
   }
 
   .gradient-text,
+  .heading-gradient,
   .section-title {
     background: none !important;
-    -webkit-text-fill-color: #000000 !important;
     color: #000000 !important;
+    -webkit-text-fill-color: #000000 !important;
   }
 
   @page {
