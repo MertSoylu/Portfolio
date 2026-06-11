@@ -177,16 +177,19 @@ const ScreenContent = ({ project, isTurkish }) => {
 // Device frame (morphs via animate when `device` prop changes)
 // ---------------------------------------------------------------------------
 
-const DeviceFrame = ({ device, children, animateMorph = true }) => {
+const DeviceFrame = ({ device, children, animateMorph = true, scale = 1 }) => {
   const g = GEO[device];
   const isPhone = device === 'phone';
   const isLaptop = device === 'laptop';
+  const w = g.w * scale;
+  const h = g.h * scale;
+  const radius = g.radius * scale;
 
   return (
     <div className="flex flex-col items-center">
       <motion.div
         initial={false}
-        animate={{ width: g.w, height: g.h, borderRadius: g.radius }}
+        animate={{ width: w, height: h, borderRadius: radius }}
         transition={animateMorph ? FRAME_SPRING : { duration: 0 }}
         className="relative max-w-full border border-white/10 bg-[linear-gradient(145deg,#1b1b24,#0b0b11)] p-[10px] shadow-elevation"
       >
@@ -210,13 +213,50 @@ const DeviceFrame = ({ device, children, animateMorph = true }) => {
       <motion.div
         initial={false}
         animate={{
-          height: isLaptop ? 12 : 0,
-          width: isLaptop ? g.w + 64 : g.w,
+          height: isLaptop ? 12 * scale : 0,
+          width: isLaptop ? w + 64 * scale : w,
           opacity: isLaptop ? 1 : 0,
         }}
         transition={FRAME_SPRING}
         className="-mt-px max-w-full rounded-b-2xl border border-white/10 bg-[linear-gradient(180deg,#15151c,#0a0a0f)] shadow-lg"
       />
+    </div>
+  );
+};
+
+// Largest device footprint (laptop frame + padding) used as the fit reference.
+const FIT_REFERENCE = 560;
+
+// Measures an element's width and returns a downscale factor so the widest
+// device frame fits inside it (never upscales past 1). Keeps device proportions
+// intact on narrow screens instead of letting max-w-full squish the frame.
+const useFitScale = (ref) => {
+  const [scale, setScale] = useState(1);
+
+  useEffect(() => {
+    const node = ref.current;
+    if (!node) return undefined;
+    const update = () => setScale(Math.min(1, node.clientWidth / FIT_REFERENCE));
+    update();
+    if (typeof ResizeObserver === 'undefined') return undefined;
+    const observer = new ResizeObserver(update);
+    observer.observe(node);
+    return () => observer.disconnect();
+  }, [ref]);
+
+  return scale;
+};
+
+// Self-measuring frame for the static (reduced-motion) layout.
+const ResponsiveDeviceFrame = ({ device, project, isTurkish }) => {
+  const wrapRef = useRef(null);
+  const scale = useFitScale(wrapRef);
+
+  return (
+    <div ref={wrapRef} className="flex w-full justify-center">
+      <DeviceFrame device={device} animateMorph={false} scale={scale}>
+        <ScreenContent project={project} isTurkish={isTurkish} />
+      </DeviceFrame>
     </div>
   );
 };
@@ -309,6 +349,8 @@ const MorphDeviceShowcase = ({ projects, isTurkish }) => {
 
   const [[active, dir], setState] = useState([0, 0]);
   const [paused, setPaused] = useState(false);
+  const stageRef = useRef(null);
+  const stageScale = useFitScale(stageRef);
 
   const paginate = useCallback(
     (nextDir) => {
@@ -336,10 +378,8 @@ const MorphDeviceShowcase = ({ projects, isTurkish }) => {
             key={project.id}
             className="flex flex-col items-center gap-6 rounded-3xl border border-ink-200/60 bg-white/50 p-6 dark:border-white/10 dark:bg-white/5 sm:flex-row"
           >
-            <div className="shrink-0">
-              <DeviceFrame device={project.device} animateMorph={false}>
-                <ScreenContent project={project} isTurkish={isTurkish} />
-              </DeviceFrame>
+            <div className="w-full sm:w-[56%] sm:shrink-0">
+              <ResponsiveDeviceFrame device={project.device} project={project} isTurkish={isTurkish} />
             </div>
             <ProjectMeta project={project} isTurkish={isTurkish} />
           </div>
@@ -354,8 +394,11 @@ const MorphDeviceShowcase = ({ projects, isTurkish }) => {
     <div className="relative" onMouseEnter={() => setPaused(true)} onMouseLeave={() => setPaused(false)}>
       <div className="grid items-center gap-8 lg:grid-cols-[1.05fr_0.95fr]">
         {/* device stage */}
-        <div className="relative flex min-h-[420px] items-center justify-center [perspective:1400px]">
-          <DeviceFrame device={activeProject.device}>
+        <div
+          ref={stageRef}
+          className="relative flex min-h-[300px] items-center justify-center [perspective:1400px] sm:min-h-[420px]"
+        >
+          <DeviceFrame device={activeProject.device} scale={stageScale}>
             <AnimatePresence custom={{ device: activeProject.device, dir }} initial={false}>
               <motion.div
                 key={activeProject.id}
