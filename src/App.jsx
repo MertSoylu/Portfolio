@@ -80,9 +80,9 @@ const HomePage = () => (
       <SectionDivider />
       <About />
       <SectionDivider />
-      <Certificates />
-      <SectionDivider />
       <Projects />
+      <SectionDivider />
+      <Certificates />
       <SectionDivider />
       <Contact />
     </Suspense>
