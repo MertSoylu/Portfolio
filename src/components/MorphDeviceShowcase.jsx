@@ -20,9 +20,9 @@ const DEVICE_BY_PREVIEW = {
 
 // Visual geometry of the morphing frame per device (px).
 const GEO = {
-  laptop: { w: 540, h: 338, radius: 18 },
-  phone: { w: 220, h: 452, radius: 42 },
-  terminal: { w: 520, h: 332, radius: 16 },
+  laptop: { w: 540, h: 338, radius: 18, minW: 260, minH: 165 },
+  phone: { w: 220, h: 452, radius: 42, minW: 180, minH: 370 },
+  terminal: { w: 520, h: 332, radius: 16, minW: 260, minH: 170 },
 };
 
 const DEVICE_META = {
@@ -181,17 +181,28 @@ const DeviceFrame = ({ device, children, animateMorph = true, scale = 1 }) => {
   const g = GEO[device];
   const isPhone = device === 'phone';
   const isLaptop = device === 'laptop';
-  const w = g.w * scale;
-  const h = g.h * scale;
-  const radius = g.radius * scale;
+
+  // Calculate base dimensions
+  const baseW = g.w * scale;
+  const baseH = g.h * scale;
+
+  // Enforce viewport constraints directly in the calculation
+  const maxAllowedWidth =
+    typeof window !== 'undefined'
+      ? Math.min(window.innerWidth - 32, baseW) // 32px = 2rem padding
+      : baseW;
+
+  const w = Math.max(g.minW || 180, Math.min(maxAllowedWidth, baseW));
+  const h = Math.max(g.minH || 165, baseH * (w / baseW)); // maintain aspect ratio
+  const radius = g.radius * scale * (w / baseW);
 
   return (
-    <div className="flex flex-col items-center">
+    <div className="flex w-full flex-col items-center justify-center px-2 sm:px-0">
       <motion.div
         initial={false}
         animate={{ width: w, height: h, borderRadius: radius }}
         transition={animateMorph ? FRAME_SPRING : { duration: 0 }}
-        className="relative max-w-full border border-white/10 bg-[linear-gradient(145deg,#1b1b24,#0b0b11)] p-[10px] shadow-elevation"
+        className="relative border border-white/10 bg-[linear-gradient(145deg,#1b1b24,#0b0b11)] p-[10px] shadow-elevation"
       >
         {/* phone notch */}
         <motion.span
@@ -214,18 +225,24 @@ const DeviceFrame = ({ device, children, animateMorph = true, scale = 1 }) => {
         initial={false}
         animate={{
           height: isLaptop ? 12 * scale : 0,
-          width: isLaptop ? w + 64 * scale : w,
+          width: isLaptop ? Math.min(w + 64 * scale, maxAllowedWidth + 40) : w,
           opacity: isLaptop ? 1 : 0,
         }}
         transition={FRAME_SPRING}
-        className="-mt-px max-w-full rounded-b-2xl border border-white/10 bg-[linear-gradient(180deg,#15151c,#0a0a0f)] shadow-lg"
+        className="-mt-px rounded-b-2xl border border-white/10 bg-[linear-gradient(180deg,#15151c,#0a0a0f)] shadow-lg"
       />
     </div>
   );
 };
 
 // Largest device footprint (laptop frame + padding) used as the fit reference.
-const FIT_REFERENCE = 560;
+const getFitReference = () => {
+  if (typeof window === 'undefined') return 560;
+  const vw = window.innerWidth;
+  if (vw < 360) return 280; // very small mobile
+  if (vw < 640) return 340; // mobile
+  return 560; // tablet+
+};
 
 // Measures an element's width and returns a downscale factor so the widest
 // device frame fits inside it (never upscales past 1). Keeps device proportions
@@ -236,12 +253,35 @@ const useFitScale = (ref) => {
   useEffect(() => {
     const node = ref.current;
     if (!node) return undefined;
-    const update = () => setScale(Math.min(1, node.clientWidth / FIT_REFERENCE));
+    const update = () => {
+      const vw = window.innerWidth;
+      const containerWidth = node.clientWidth;
+      const padding = 32; // 2rem total
+      const availableWidth = Math.min(containerWidth, vw - padding);
+
+      // Target width based on viewport
+      let targetWidth;
+      if (vw < 360) targetWidth = 260;
+      else if (vw < 640) targetWidth = Math.min(320, availableWidth);
+      else targetWidth = 540;
+
+      const computed = Math.min(1, availableWidth / targetWidth);
+      setScale(computed);
+    };
     update();
-    if (typeof ResizeObserver === 'undefined') return undefined;
-    const observer = new ResizeObserver(update);
-    observer.observe(node);
-    return () => observer.disconnect();
+
+    const handleResize = () => update();
+    window.addEventListener('resize', handleResize);
+
+    if (typeof ResizeObserver !== 'undefined') {
+      const observer = new ResizeObserver(update);
+      observer.observe(node);
+      return () => {
+        observer.disconnect();
+        window.removeEventListener('resize', handleResize);
+      };
+    }
+    return () => window.removeEventListener('resize', handleResize);
   }, [ref]);
 
   return scale;
@@ -331,7 +371,7 @@ const ArrowButton = ({ direction, onClick, label }) => (
     type="button"
     onClick={onClick}
     aria-label={label}
-    className="flex h-11 w-11 items-center justify-center rounded-full border border-ink-200/70 bg-white/70 text-ink-700 shadow-soft backdrop-blur-md transition-all hover:-translate-y-0.5 hover:border-violet-300 hover:text-violet-700 hover:shadow-elevation dark:border-white/10 dark:bg-white/10 dark:text-ink-100 dark:hover:border-aqua-300/50 dark:hover:text-aqua-200"
+    className="flex h-11 w-11 min-h-[44px] min-w-[44px] items-center justify-center rounded-full border border-ink-200/70 bg-white/70 text-ink-700 shadow-soft backdrop-blur-md transition-all hover:-translate-y-0.5 hover:border-violet-300 hover:text-violet-700 hover:shadow-elevation dark:border-white/10 dark:bg-white/10 dark:text-ink-100 dark:hover:border-aqua-300/50 dark:hover:text-aqua-200"
   >
     {direction === 'prev' ? <HiChevronLeft className="h-5 w-5" /> : <HiChevronRight className="h-5 w-5" />}
   </button>
@@ -391,12 +431,16 @@ const MorphDeviceShowcase = ({ projects, isTurkish }) => {
   const activeProject = deviceProjects[active];
 
   return (
-    <div className="relative" onMouseEnter={() => setPaused(true)} onMouseLeave={() => setPaused(false)}>
-      <div className="grid items-center gap-8 lg:grid-cols-[1.05fr_0.95fr]">
+    <div
+      className="relative w-full"
+      onMouseEnter={() => setPaused(true)}
+      onMouseLeave={() => setPaused(false)}
+    >
+      <div className="grid w-full items-center gap-8 lg:grid-cols-[1.05fr_0.95fr]">
         {/* device stage */}
         <div
           ref={stageRef}
-          className="relative flex min-h-[300px] items-center justify-center [perspective:1400px] sm:min-h-[420px]"
+          className="relative flex w-full min-h-[280px] items-center justify-center [perspective:1400px] sm:min-h-[420px]"
         >
           <DeviceFrame device={activeProject.device} scale={stageScale}>
             <AnimatePresence custom={{ device: activeProject.device, dir }} initial={false}>
@@ -418,7 +462,7 @@ const MorphDeviceShowcase = ({ projects, isTurkish }) => {
         </div>
 
         {/* meta */}
-        <div className="relative min-h-[300px] lg:min-h-[280px]">
+        <div className="relative min-h-[260px] lg:min-h-[280px]">
           <AnimatePresence custom={{ dir }} initial={false}>
             <motion.div
               key={activeProject.id}

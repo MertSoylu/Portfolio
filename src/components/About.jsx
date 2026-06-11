@@ -179,7 +179,7 @@ const About = () => {
                   alt={isTurkish ? 'Mert Soylu GitHub katkı grafiği' : 'Mert Soylu GitHub contribution chart'}
                   loading="lazy"
                   decoding="async"
-                  className="mx-auto w-full min-w-[480px] max-w-3xl"
+                  className="mx-auto w-full min-w-full max-w-3xl sm:min-w-[480px]"
                 />
               </div>
             </div>

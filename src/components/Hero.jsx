@@ -62,7 +62,7 @@ const ZoneCard = ({ icon, title, link, detail, index, delay }) => {
         onPointerMove={handlePointerMove}
         onPointerLeave={handlePointerLeave}
         style={{ rotateX: springX, rotateY: springY, transformPerspective: 900 }}
-        className="group relative h-full min-h-[132px] overflow-hidden rounded-2xl border border-ink-200/70 bg-white/65 p-3 shadow-soft backdrop-blur-xl transition-colors dark:border-white/10 dark:bg-white/8 sm:min-h-[150px] sm:p-4"
+        className="group relative h-full min-h-[120px] overflow-hidden rounded-2xl border border-ink-200/70 bg-white/65 p-3 shadow-soft backdrop-blur-xl transition-colors dark:border-white/10 dark:bg-white/8 sm:min-h-[150px] sm:p-4"
         initial={reduce ? { opacity: 0 } : { opacity: 0, y: 30, rotateX: -14 }}
         animate={reduce ? { opacity: 1 } : { opacity: 1, y: 0, rotateX: 0 }}
         transition={{ duration: 0.7, delay, ease: [0.22, 1, 0.36, 1] }}
@@ -231,7 +231,7 @@ const Hero = () => {
             {isTurkish ? 'Merhaba, ben' : "Hi, I'm"}
           </motion.p>
 
-          <div className="mobile-hero-name-stage mb-4 h-[112px] w-full sm:mb-6 sm:h-[122px] md:h-[160px] lg:h-[200px]">
+          <div className="mobile-hero-name-stage mb-4 h-[clamp(100px,28vw,200px)] w-full sm:mb-6">
             <TextPressure
               text="Mert Soylu"
               fontFamily="Compressa VF"
@@ -245,7 +245,7 @@ const Hero = () => {
               scale={false}
               textColor={isDark ? '#ac94ff' : '#7c5cff'}
               className=""
-              minFontSize={isCompactHero ? 46 : 36}
+              minFontSize={isCompactHero ? Math.max(40, window.innerWidth * 0.11) : 36}
               idleCenter={isCompactHero}
             />
           </div>
@@ -275,7 +275,7 @@ const Hero = () => {
           </motion.p>
 
           <motion.div
-            className="mx-auto mb-8 grid w-full max-w-[22rem] grid-cols-2 gap-2 max-[360px]:grid-cols-1 sm:mb-12 sm:flex sm:max-w-none sm:flex-wrap sm:justify-center sm:gap-3"
+            className="mx-auto mb-8 grid w-full max-w-[min(22rem,calc(100vw-2rem))] grid-cols-2 gap-2 max-[360px]:grid-cols-1 sm:mb-12 sm:flex sm:max-w-none sm:flex-wrap sm:justify-center sm:gap-3"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 1.2, duration: 0.5 }}

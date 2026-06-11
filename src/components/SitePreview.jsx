@@ -50,7 +50,7 @@ const LIVE_PREVIEW_VIEWPORT = {
 };
 
 const SnapshotWebsitePreview = ({ title, src, isTurkish }) => (
-  <div className="relative min-h-[190px] overflow-hidden rounded-lg border border-ink-200/70 bg-ink-950 sm:min-h-[250px]">
+  <div className="relative min-h-[180px] overflow-hidden rounded-lg border border-ink-200/70 bg-ink-950 sm:min-h-[250px]">
     <img
       src={src}
       alt={`${title} ${isTurkish ? 'site önizlemesi' : 'site preview'}`}
@@ -149,7 +149,7 @@ const LiveWebsitePreview = ({ title, url, isTurkish, fallbackSrc }) => {
 };
 
 const MemoryPreview = ({ title }) => (
-  <div className="relative min-h-[190px] overflow-hidden rounded-lg bg-gradient-to-br from-ink-900 via-ink-800 to-cyan-900 p-4 text-white sm:min-h-[230px]">
+  <div className="relative min-h-[180px] overflow-hidden rounded-lg bg-gradient-to-br from-ink-900 via-ink-800 to-cyan-900 p-4 text-white sm:min-h-[230px]">
     <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(255,255,255,0.07)_1px,transparent_1px),linear-gradient(180deg,rgba(255,255,255,0.05)_1px,transparent_1px)] bg-[size:28px_28px]" />
     <div className="relative z-10 flex h-full flex-col">
       <div className="mb-4 flex items-center justify-between">
@@ -181,7 +181,7 @@ const MemoryPreview = ({ title }) => (
 const TypingPreview = ({ isTurkish }) => {
   const words = isTurkish ? ['hız', 'doğruluk', 'ritim', 'odak'] : ['speed', 'accuracy', 'rhythm', 'focus'];
   return (
-    <div className="min-h-[190px] rounded-lg bg-ink-900 p-4 text-white sm:min-h-[230px]">
+    <div className="min-h-[180px] rounded-lg bg-ink-900 p-4 text-white sm:min-h-[230px]">
       <div className="mb-5 flex items-center justify-between">
         <div>
           <p className="text-xs font-bold uppercase tracking-[0.18em] text-cyan-200">Typing engine</p>
@@ -228,7 +228,7 @@ const TypingPreview = ({ isTurkish }) => {
 };
 
 const PortfolioPreview = () => (
-  <div className="min-h-[190px] rounded-lg bg-white p-4 dark:bg-ink-900 sm:min-h-[230px]">
+  <div className="min-h-[180px] rounded-lg bg-white p-4 dark:bg-ink-900 sm:min-h-[230px]">
     <div className="mb-5 flex items-center justify-between">
       <h4 className="text-h3 text-ink-900 dark:text-white">Portfolio system</h4>
       <HiSparkles className="h-7 w-7 text-accent-500" />
