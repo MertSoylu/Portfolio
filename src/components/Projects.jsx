@@ -6,7 +6,8 @@ import { HiBookOpen, HiExternalLink, HiRefresh, HiStar, HiX } from 'react-icons/
 import { clearRateLimitState, fetchGitHubRepos, getGitHubProfileUrl } from '../utils/githubApi';
 import { FALLBACK_PROJECTS } from '../utils/constants';
 import { useLanguage } from '../context/LanguageContext';
-import ScrollFloat from './ScrollFloat';
+import KineticHeadline from './motion/KineticHeadline';
+import ScrollScene from './motion/ScrollScene';
 import SitePreview from './SitePreview';
 
 const getLanguageStyle = (language) => {
@@ -195,7 +196,8 @@ const FeaturedProjectCard = ({ project, index, isTurkish }) => (
     whileInView={{ opacity: 1, y: 0 }}
     viewport={{ once: true, margin: '-40px' }}
     transition={{ duration: 0.55, delay: index * 0.08 }}
-    className="card-prominent featured-project-card grid scroll-mt-24 gap-3 overflow-hidden p-2.5 sm:scroll-mt-28 sm:gap-4 sm:p-4 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1fr)] lg:gap-5"
+    whileHover={{ y: -6 }}
+    className="card-prominent card-border-glow featured-project-card grid scroll-mt-24 gap-3 overflow-hidden p-2.5 sm:scroll-mt-28 sm:gap-4 sm:p-4 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1fr)] lg:gap-5"
   >
     <SitePreview
       title={project.title}
@@ -265,7 +267,8 @@ const RepoCard = ({ repo, onOpen }) => (
     initial={{ opacity: 0.86, y: 16 }}
     whileInView={{ opacity: 1, y: 0 }}
     viewport={{ once: true, margin: '-30px' }}
-    className="card-raised card-hover flex h-full flex-col p-5 text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400"
+    whileHover={{ y: -6 }}
+    className="card-raised card-hover card-border-glow flex h-full flex-col p-5 text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-violet-400"
   >
     <div className="mb-3 flex items-start justify-between gap-3">
       <h4 className="min-w-0 break-words text-h4 text-ink-900 dark:text-white">{repo.name}</h4>
@@ -397,17 +400,12 @@ const Projects = () => {
     <section id="projects" className="relative px-4 py-16 md:py-28">
       <div className="mx-auto max-w-6xl">
         <div className="mb-10 text-center md:mb-16">
-          <ScrollFloat
-            containerClassName="overflow-hidden"
-            textClassName="section-title"
-            animationDuration={1}
-            ease="back.inOut(2)"
-            scrollStart="center bottom+=50%"
-            scrollEnd="bottom bottom-=40%"
-            stagger={0.03}
-          >
-            {isTurkish ? 'Projeler' : 'Projects'}
-          </ScrollFloat>
+          <KineticHeadline
+            as="h2"
+            gradient
+            className="section-title justify-center text-center"
+            text={isTurkish ? 'Projeler' : 'Projects'}
+          />
           <p className="mx-auto mt-4 max-w-2xl text-body-lg text-ink-600 dark:text-ink-200">
             {isTurkish
               ? 'Canlı ürünler, yayınlanmış mobil iş ve açık kaynak araçlar. Her kart problem, arayüz ve teknik karar odaklı.'
@@ -424,11 +422,11 @@ const Projects = () => {
           <div className="studio-rule flex-1" />
         </div>
 
-        <div className="space-y-4 sm:space-y-5">
+        <ScrollScene className="space-y-4 sm:space-y-5">
           {featuredProjects.map((project, index) => (
             <FeaturedProjectCard key={project.id} project={project} index={index} isTurkish={isTurkish} />
           ))}
-        </div>
+        </ScrollScene>
 
         <div className="mt-16 border-t border-ink-200/70 pt-10 dark:border-white/10">
           <div className="mb-6 flex flex-col justify-between gap-3 sm:flex-row sm:items-end">

@@ -195,9 +195,10 @@ export const FluidParticlesBackground = ({
         if (particle.y < 0) particle.y = canvas.height;
         if (particle.y > canvas.height) particle.y = 0;
 
-        ctx.fillStyle = isDark
-          ? `rgba(255, 255, 255, ${opacity})`
-          : `rgba(0, 0, 0, ${opacity})`;
+        // NOCTURNE LAB duotone: noise field shifts particles between violet & aqua
+        const violet = isDark ? "172, 148, 255" : "124, 92, 255";
+        const aqua = isDark ? "92, 240, 216" : "14, 197, 171";
+        ctx.fillStyle = `rgba(${n > 0 ? violet : aqua}, ${opacity})`;
         ctx.beginPath();
         ctx.arc(particle.x, particle.y, particle.size, 0, Math.PI * 2);
         ctx.fill();

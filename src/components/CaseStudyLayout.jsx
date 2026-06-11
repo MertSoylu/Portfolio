@@ -6,6 +6,8 @@ import PageMeta from './PageMeta';
 import PageBackButton from './ui/PageBackButton';
 import FadeContent from './FadeContent';
 import SitePreview from './SitePreview';
+import KineticHeadline from './motion/KineticHeadline';
+import MorphBlob from './motion/MorphBlob';
 
 const pageVariants = {
   initial: { opacity: 0, y: 40 },
@@ -96,22 +98,35 @@ const CaseStudyLayout = ({
       initial="initial"
       animate="animate"
       exit="exit"
-      className="min-h-screen px-4 pb-16 pt-24 sm:pb-20"
+      className="relative min-h-screen overflow-hidden px-4 pb-16 pt-24 sm:pb-20"
     >
       {routePath && <PageMeta route={routePath} />}
       <PageBackButton />
 
-      <div className="mx-auto w-full max-w-6xl">
+      <MorphBlob
+        className="pointer-events-none absolute left-[-14%] top-[10%] -z-10 h-[40vh] w-[40vh]"
+        from="#27e0c4"
+        to="#7c5cff"
+        opacity={0.15}
+        blur={48}
+        duration={24}
+      />
+
+      <div className="relative mx-auto w-full max-w-6xl">
         <header className="mb-10 grid items-end gap-6 sm:mb-12 sm:gap-8 lg:grid-cols-[minmax(0,1fr)_440px]">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.55, delay: 0.1 }}
           >
-            <span className="studio-kicker mb-4 sm:mb-5">
+            <span className="lab-kicker mb-4 sm:mb-5">
               {isTurkish ? 'Ürün dosyası' : 'Product case study'}
             </span>
-            <h1 className="mb-3 text-h1 text-ink-900 dark:text-white sm:mb-4">{title}</h1>
+            <KineticHeadline
+              as="h1"
+              text={title}
+              className="mb-3 text-h1 text-ink-900 dark:text-white sm:mb-4"
+            />
             <p className="mb-5 max-w-2xl text-[1.05rem] leading-relaxed text-ink-600 dark:text-ink-200 sm:mb-6 sm:text-body-lg">
               {subtitle}
             </p>
