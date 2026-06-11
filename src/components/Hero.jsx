@@ -1,6 +1,14 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { motion, useScroll, useTransform } from 'framer-motion';
+import {
+  motion,
+  useMotionTemplate,
+  useMotionValue,
+  useReducedMotion,
+  useScroll,
+  useSpring,
+  useTransform,
+} from 'framer-motion';
 import { HiArrowRight, HiChip, HiCode, HiDownload, HiShieldCheck } from 'react-icons/hi';
 import { HiDevicePhoneMobile } from 'react-icons/hi2';
 import { useLanguage } from '../context/LanguageContext';
@@ -12,20 +20,67 @@ import TextPressure from './TextPressure';
 import MorphBlob from './motion/MorphBlob';
 import { useMagnetic } from '../hooks/useMagnetic';
 
-const ZoneCard = ({ icon, title, link, detail, delay }) => {
+const ZoneCard = ({ icon, title, link, detail, index, delay }) => {
+  const reduce = useReducedMotion();
+  const cardRef = useRef(null);
+
+  // pointer-tracked 3D tilt
+  const rotX = useMotionValue(0);
+  const rotY = useMotionValue(0);
+  const springX = useSpring(rotX, { stiffness: 150, damping: 18 });
+  const springY = useSpring(rotY, { stiffness: 150, damping: 18 });
+
+  // spotlight follow position (%)
+  const glowX = useMotionValue(50);
+  const glowY = useMotionValue(50);
+  const glow = useMotionTemplate`radial-gradient(170px circle at ${glowX}% ${glowY}%, rgba(124,92,255,0.22), rgba(39,224,196,0.12) 45%, transparent 70%)`;
+
+  const handlePointerMove = (event) => {
+    if (reduce) return;
+    const node = cardRef.current;
+    if (!node) return;
+    const rect = node.getBoundingClientRect();
+    const px = (event.clientX - rect.left) / rect.width;
+    const py = (event.clientY - rect.top) / rect.height;
+    rotY.set((px - 0.5) * 12);
+    rotX.set(-(py - 0.5) * 12);
+    glowX.set(px * 100);
+    glowY.set(py * 100);
+  };
+
+  const handlePointerLeave = () => {
+    rotX.set(0);
+    rotY.set(0);
+    glowX.set(50);
+    glowY.set(50);
+  };
+
   return (
-    <Link to={link} className="block h-full">
+    <Link to={link} className="block h-full [perspective:900px]">
       <motion.div
-        className="group relative h-full min-h-[124px] overflow-hidden rounded-2xl border border-ink-200/70 bg-white/65 p-3 shadow-soft backdrop-blur-xl transition-colors dark:border-white/10 dark:bg-white/8 sm:min-h-[142px] sm:p-4"
-        initial={{ opacity: 0, y: 26 }}
-        animate={{ opacity: 1, y: 0 }}
+        ref={cardRef}
+        onPointerMove={handlePointerMove}
+        onPointerLeave={handlePointerLeave}
+        style={{ rotateX: springX, rotateY: springY, transformPerspective: 900 }}
+        className="group relative h-full min-h-[132px] overflow-hidden rounded-2xl border border-ink-200/70 bg-white/65 p-3 shadow-soft backdrop-blur-xl transition-colors dark:border-white/10 dark:bg-white/8 sm:min-h-[150px] sm:p-4"
+        initial={reduce ? { opacity: 0 } : { opacity: 0, y: 30, rotateX: -14 }}
+        animate={reduce ? { opacity: 1 } : { opacity: 1, y: 0, rotateX: 0 }}
         transition={{ duration: 0.7, delay, ease: [0.22, 1, 0.36, 1] }}
-        whileHover={{ y: -8, scale: 1.02 }}
+        whileHover={reduce ? undefined : { y: -8 }}
       >
-        {/* duotone wash that blooms on hover */}
-        <span className="pointer-events-none absolute -right-8 -top-8 h-24 w-24 rounded-full bg-gradient-to-br from-violet-400/40 to-aqua-300/30 opacity-0 blur-2xl transition-opacity duration-500 group-hover:opacity-100" />
-        <div className="relative z-10 flex h-full flex-col">
-          <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-xl border border-ink-200/70 bg-white/70 text-violet-600 transition-transform duration-500 group-hover:rotate-6 dark:border-white/10 dark:bg-white/10 dark:text-aqua-200 sm:mb-4 sm:h-11 sm:w-11">
+        {/* spotlight that follows the pointer */}
+        <motion.span
+          className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+          style={{ background: glow }}
+        />
+        {/* top accent bar grows on hover */}
+        <span className="pointer-events-none absolute inset-x-0 top-0 h-[2px] origin-left scale-x-0 bg-gradient-to-r from-violet-500 via-aqua-300 to-ember-400 transition-transform duration-500 group-hover:scale-x-100" />
+        {/* lab index */}
+        <span className="lab-mono pointer-events-none absolute right-3 top-2.5 text-[10px] font-bold tracking-[0.2em] text-ink-300 transition-colors group-hover:text-violet-500 dark:text-white/30 dark:group-hover:text-aqua-200">
+          {String(index + 1).padStart(2, '0')}
+        </span>
+        <div className="relative z-10 flex h-full flex-col [transform:translateZ(28px)]">
+          <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-xl border border-ink-200/70 bg-white/70 text-violet-600 transition-all duration-500 group-hover:-rotate-6 group-hover:border-violet-300 group-hover:text-violet-700 dark:border-white/10 dark:bg-white/10 dark:text-aqua-200 dark:group-hover:border-aqua-300/50 sm:mb-4 sm:h-11 sm:w-11">
             {icon}
           </div>
           <h3 className="text-base font-extrabold leading-snug text-ink-900 dark:text-white sm:text-h4">
@@ -272,7 +327,7 @@ const Hero = () => {
           transition={{ delay: 1.45, duration: 0.5 }}
         >
           {zones.map((zone, index) => (
-            <ZoneCard key={zone.id} {...zone} delay={1.55 + index * 0.12} />
+            <ZoneCard key={zone.id} {...zone} index={index} delay={1.55 + index * 0.12} />
           ))}
         </motion.div>
 
