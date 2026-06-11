@@ -6,7 +6,8 @@ import { Link } from 'react-router-dom';
 import { fetchGitHubRepos } from '../utils/githubApi';
 import { useLanguage } from '../context/LanguageContext';
 import { SKILLS_DESCRIPTIONS } from '../utils/constants';
-import ScrollFloat from './ScrollFloat';
+import KineticHeadline from './motion/KineticHeadline';
+import ScrollScene from './motion/ScrollScene';
 import SpotlightCard from './SpotlightCard';
 import { useDarkMode } from '../context/DarkModeContext';
 
@@ -48,7 +49,7 @@ const About = () => {
 
   const githubChartUrl = useMemo(() => {
     const date = new Date().toISOString().split('T')[0];
-    return `https://ghchart.rshah.org/ff4f46/MertSoylu?t=${date}`;
+    return `https://ghchart.rshah.org/7c5cff/MertSoylu?t=${date}`;
   }, []);
 
   useEffect(() => {
@@ -107,17 +108,12 @@ const About = () => {
     <section id="about" className="relative px-4 py-20 md:py-28">
       <div className="mx-auto max-w-6xl">
         <div className="mb-14 text-center">
-          <ScrollFloat
-            containerClassName="overflow-hidden"
-            textClassName="section-title"
-            animationDuration={1}
-            ease="back.inOut(2)"
-            scrollStart="center bottom+=50%"
-            scrollEnd="bottom bottom-=40%"
-            stagger={0.03}
-          >
-            {isTurkish ? 'Hakkımda' : 'About Me'}
-          </ScrollFloat>
+          <KineticHeadline
+            as="h2"
+            gradient
+            className="section-title justify-center text-center"
+            text={isTurkish ? 'Hakkımda' : 'About Me'}
+          />
           <p className="mx-auto mt-4 max-w-2xl text-body-lg text-ink-600 dark:text-ink-200">
             {isTurkish
               ? 'Öğrenmeyi bekleme odasında tutmadan, her yeni konuyu çalışan bir ürün parçasına çeviriyorum.'
@@ -165,13 +161,7 @@ const About = () => {
           </motion.div>
         </div>
 
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: '-40px' }}
-          transition={{ duration: 0.6 }}
-          className="mt-8"
-        >
+        <ScrollScene blurReveal className="mt-8">
           <h4 className="mb-4 text-center text-caption text-ink-500 dark:text-ink-300">
             {isTurkish ? 'GitHub aktivitesi' : 'GitHub activity'}
           </h4>
@@ -184,12 +174,16 @@ const About = () => {
               className="mx-auto w-full max-w-3xl"
             />
           </div>
-        </motion.div>
+        </ScrollScene>
 
         <div className="mt-14">
-          <h3 className="mb-8 text-center text-h2 text-ink-900 dark:text-white">
-            {isTurkish ? 'Odak alanları' : 'Focus areas'}
-          </h3>
+          <KineticHeadline
+            as="h3"
+            className="mb-8 text-center text-h2 text-ink-900 dark:text-white"
+            text={isTurkish ? 'Odak alanları' : 'Focus areas'}
+          />
+        </div>
+        <div className="mt-2">
           <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
             {skills.map((skill, index) => (
               <motion.div
@@ -200,8 +194,8 @@ const About = () => {
                 transition={{ duration: 0.5, delay: index * 0.1 }}
               >
                 <SpotlightCard
-                  className="card-raised flex h-full flex-col p-6"
-                  spotlightColor={isDark ? 'rgba(102, 229, 244, 0.16)' : 'rgba(6, 182, 212, 0.12)'}
+                  className="card-raised card-border-glow flex h-full flex-col p-6"
+                  spotlightColor={isDark ? 'rgba(124, 92, 255, 0.20)' : 'rgba(124, 92, 255, 0.14)'}
                 >
                   <div
                     className={`mb-4 flex h-12 w-12 items-center justify-center rounded-lg border border-ink-200/70 bg-white/70 dark:border-white/10 dark:bg-white/10 ${skill.tone}`}

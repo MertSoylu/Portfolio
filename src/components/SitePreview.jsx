@@ -272,7 +272,7 @@ const MobilePreview = ({ isTurkish }) => (
 );
 
 const TerminalPreview = ({ terminalContent, isTurkish }) => (
-  <div className="min-h-[190px] rounded-lg bg-[#050912] p-4 font-mono text-xs text-ink-100 sm:min-h-[230px] sm:text-sm">
+  <div className="min-h-[190px] rounded-lg bg-[#08080c] p-4 font-mono text-xs text-ink-100 sm:min-h-[230px] sm:text-sm">
     <div className="mb-4 flex items-center justify-between border-b border-white/10 pb-3">
       <div className="flex items-center gap-1.5">
         <span className="h-2.5 w-2.5 rounded-full bg-accent-400" />

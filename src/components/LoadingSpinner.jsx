@@ -12,7 +12,7 @@ const LoadingSpinner = () => {
         {/* Outer ring - rotating */}
         <motion.div
           className="absolute inset-0 rounded-full border-2 border-ink-200 dark:border-white/10"
-          style={{ borderTopColor: '#06b6d4', borderRightColor: '#ff4f46' }}
+          style={{ borderTopColor: '#7c5cff', borderRightColor: '#27e0c4' }}
           animate={{ rotate: 360 }}
           transition={{ duration: 1.2, repeat: Infinity, ease: 'linear' }}
         />

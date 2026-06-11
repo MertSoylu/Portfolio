@@ -165,15 +165,15 @@ const Navbar = () => {
     openMenuAriaLabel: isTurkish ? 'Menüyü aç' : 'Open menu',
     closeMenuAriaLabel: isTurkish ? 'Menüyü kapat' : 'Close menu',
     colors: isDark
-      ? ['rgba(255,79,70,0.92)', 'rgba(6,182,212,0.9)']
-      : ['rgba(18,29,45,0.92)', 'rgba(255,79,70,0.86)'],
+      ? ['rgba(124,92,255,0.92)', 'rgba(39,224,196,0.9)']
+      : ['rgba(124,92,255,0.92)', 'rgba(255,90,54,0.86)'],
     panelBg: isDark
-      ? 'linear-gradient(145deg, rgba(5,9,18,0.97) 0%, rgba(9,17,31,0.95) 54%, rgba(10,34,48,0.97) 100%)'
-      : 'linear-gradient(145deg, rgba(255,253,247,0.97) 0%, rgba(236,252,255,0.95) 48%, rgba(255,244,240,0.97) 100%)',
-    panelTextColor: isDark ? '#f7fbff' : '#121d2d',
-    accentColor: isDark ? '#66e5f4' : '#ff4f46',
-    menuButtonColor: isDark ? '#f7fbff' : '#121d2d',
-    openMenuButtonColor: isDark ? '#f7fbff' : '#121d2d',
+      ? 'linear-gradient(145deg, rgba(8,8,12,0.97) 0%, rgba(12,11,22,0.95) 54%, rgba(10,15,20,0.97) 100%)'
+      : 'linear-gradient(145deg, rgba(244,241,233,0.97) 0%, rgba(238,240,246,0.95) 48%, rgba(241,238,251,0.97) 100%)',
+    panelTextColor: isDark ? '#f4f1e9' : '#15131c',
+    accentColor: isDark ? '#5cf0d8' : '#7c5cff',
+    menuButtonColor: isDark ? '#f4f1e9' : '#15131c',
+    openMenuButtonColor: isDark ? '#f4f1e9' : '#15131c',
     changeMenuColorOnOpen: false,
   };
   const fallback = (

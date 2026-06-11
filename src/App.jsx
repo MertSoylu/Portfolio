@@ -103,7 +103,7 @@ const ROUTE_DIRECTIONS = {
 };
 
 const ROUTE_OVERLAYS = {
-  '/': 'from-white/75 via-cyan-50/50 to-white/75 dark:from-ink-900/90 dark:via-ink-800/75 dark:to-ink-900/90',
+  '/': 'from-white/70 via-violet-50/45 to-white/70 dark:from-ink-900/90 dark:via-violet-900/25 dark:to-ink-900/90',
   '/web':
     'from-white/70 via-cyan-50/40 to-white/70 dark:from-ink-900/80 dark:via-ink-800/70 dark:to-ink-900/80',
   '/android':
@@ -182,18 +182,18 @@ const PageTransition = ({ children, direction = 'fade' }) => {
       initial={{
         opacity: 0,
         clipPath: getClipPath(direction, 'initial'),
-        ...(isFade && { y: 24, scale: 0.98 }),
+        ...(isFade && { y: 24, scale: 0.98, filter: 'blur(14px)' }),
       }}
       animate={{
         opacity: 1,
         clipPath: getClipPath(direction, 'animate'),
-        ...(isFade && { y: 0, scale: 1 }),
-        transition: { duration: isFade ? 0.55 : 0.5, ease: [0.22, 1, 0.36, 1] },
+        ...(isFade && { y: 0, scale: 1, filter: 'blur(0px)' }),
+        transition: { duration: isFade ? 0.6 : 0.5, ease: [0.22, 1, 0.36, 1] },
       }}
       exit={{
         opacity: 0,
         clipPath: getClipPath(direction, 'exit'),
-        ...(isFade && { y: -16, scale: 1.01 }),
+        ...(isFade && { y: -16, scale: 1.01, filter: 'blur(10px)' }),
         transition: { duration: 0.3, ease: [0.55, 0, 1, 0.45] },
       }}
     >

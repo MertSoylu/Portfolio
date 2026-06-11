@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { motion, useMotionValue, useScroll, useSpring, useTransform } from 'framer-motion';
+import { motion, useScroll, useTransform } from 'framer-motion';
 import { HiArrowRight, HiChip, HiCode, HiDownload, HiShieldCheck } from 'react-icons/hi';
 import { HiDevicePhoneMobile } from 'react-icons/hi2';
 import { useLanguage } from '../context/LanguageContext';
@@ -9,41 +9,23 @@ import { fetchGitHubRepos } from '../utils/githubApi';
 import { CV_LABEL, CV_PATH, HERO_ROLES } from '../utils/constants';
 import { MorphingRoles } from './SplitFlapText';
 import TextPressure from './TextPressure';
-
-const useMagneticButton = (strength = 0.22) => {
-  const ref = React.useRef(null);
-  const x = useMotionValue(0);
-  const y = useMotionValue(0);
-  const springX = useSpring(x, { stiffness: 180, damping: 18 });
-  const springY = useSpring(y, { stiffness: 180, damping: 18 });
-
-  const onMouseMove = (event) => {
-    if (!ref.current) return;
-    const rect = ref.current.getBoundingClientRect();
-    x.set((event.clientX - (rect.left + rect.width / 2)) * strength);
-    y.set((event.clientY - (rect.top + rect.height / 2)) * strength);
-  };
-
-  const onMouseLeave = () => {
-    x.set(0);
-    y.set(0);
-  };
-
-  return { ref, style: { x: springX, y: springY }, onMouseMove, onMouseLeave };
-};
+import MorphBlob from './motion/MorphBlob';
+import { useMagnetic } from '../hooks/useMagnetic';
 
 const ZoneCard = ({ icon, title, link, detail, delay }) => {
   return (
     <Link to={link} className="block h-full">
       <motion.div
-        className="group relative h-full min-h-[124px] overflow-hidden rounded-lg border border-ink-200/70 bg-white/70 p-3 shadow-soft backdrop-blur-xl dark:border-white/10 dark:bg-white/10 sm:min-h-[142px] sm:p-4"
+        className="group relative h-full min-h-[124px] overflow-hidden rounded-2xl border border-ink-200/70 bg-white/65 p-3 shadow-soft backdrop-blur-xl transition-colors dark:border-white/10 dark:bg-white/8 sm:min-h-[142px] sm:p-4"
         initial={{ opacity: 0, y: 26 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.7, delay, ease: [0.22, 1, 0.36, 1] }}
         whileHover={{ y: -8, scale: 1.02 }}
       >
+        {/* duotone wash that blooms on hover */}
+        <span className="pointer-events-none absolute -right-8 -top-8 h-24 w-24 rounded-full bg-gradient-to-br from-violet-400/40 to-aqua-300/30 opacity-0 blur-2xl transition-opacity duration-500 group-hover:opacity-100" />
         <div className="relative z-10 flex h-full flex-col">
-          <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-lg border border-ink-200/70 bg-white/70 text-ink-800 dark:border-white/10 dark:bg-white/10 dark:text-white sm:mb-4 sm:h-11 sm:w-11">
+          <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-xl border border-ink-200/70 bg-white/70 text-violet-600 transition-transform duration-500 group-hover:rotate-6 dark:border-white/10 dark:bg-white/10 dark:text-aqua-200 sm:mb-4 sm:h-11 sm:w-11">
             {icon}
           </div>
           <h3 className="text-base font-extrabold leading-snug text-ink-900 dark:text-white sm:text-h4">
@@ -52,7 +34,7 @@ const ZoneCard = ({ icon, title, link, detail, delay }) => {
           <p className="mt-1.5 line-clamp-2 text-[11px] font-semibold leading-relaxed text-ink-500 dark:text-ink-300 sm:mt-2 sm:text-xs">
             {detail}
           </p>
-          <span className="mt-auto inline-flex items-center gap-1 pt-3 text-[11px] font-extrabold uppercase tracking-[0.12em] text-cyan-700 dark:text-cyan-200 sm:pt-4 sm:text-xs">
+          <span className="mt-auto inline-flex items-center gap-1 pt-3 text-[11px] font-bold uppercase tracking-[0.16em] text-violet-700 dark:text-aqua-200 sm:pt-4 sm:text-xs">
             Open <HiArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-1" />
           </span>
         </div>
@@ -101,9 +83,9 @@ const Hero = () => {
     return () => mediaQuery.removeListener(handleChange);
   }, []);
 
-  const magBtn1 = useMagneticButton();
-  const magBtn2 = useMagneticButton();
-  const magBtn3 = useMagneticButton();
+  const magBtn1 = useMagnetic();
+  const magBtn2 = useMagnetic();
+  const magBtn3 = useMagnetic();
   const roles = isTurkish ? HERO_ROLES.tr : HERO_ROLES.en;
 
   const handleProjectJump = (event) => {
@@ -159,6 +141,23 @@ const Hero = () => {
       ref={sectionRef}
       className="relative flex min-h-[100svh] flex-col items-center justify-center overflow-hidden px-4 pb-12 pt-20 sm:pt-16"
     >
+      {/* Morphing duotone backdrop blobs */}
+      <MorphBlob
+        className="pointer-events-none absolute -left-[18%] top-[6%] h-[46vh] w-[46vh] -z-10"
+        from="#7c5cff"
+        to="#27e0c4"
+        opacity={isDark ? 0.32 : 0.24}
+        blur={36}
+        duration={18}
+      />
+      <MorphBlob
+        className="pointer-events-none absolute -right-[14%] bottom-[4%] h-[42vh] w-[42vh] -z-10"
+        from="#27e0c4"
+        to="#ff5a36"
+        opacity={isDark ? 0.26 : 0.2}
+        blur={42}
+        duration={24}
+      />
       <motion.div
         style={{
           y,
@@ -189,7 +188,7 @@ const Hero = () => {
               flex={true}
               stroke={false}
               scale={false}
-              textColor={isDark ? '#ff9687' : '#ff4f46'}
+              textColor={isDark ? '#ac94ff' : '#7c5cff'}
               className=""
               minFontSize={isCompactHero ? 46 : 36}
               idleCenter={isCompactHero}

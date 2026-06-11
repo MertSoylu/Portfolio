@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import { HiAcademicCap, HiExternalLink } from 'react-icons/hi';
 import { useLanguage } from '../context/LanguageContext';
 import { CERTIFICATES } from '../utils/constants';
-import ScrollFloat from './ScrollFloat';
+import KineticHeadline from './motion/KineticHeadline';
 
 const Certificates = () => {
   const { isTurkish } = useLanguage();
@@ -14,17 +14,12 @@ const Certificates = () => {
     <section id="certificates" className="relative px-4 py-20 md:py-28">
       <div className="mx-auto max-w-6xl">
         <div className="mb-12 text-center md:mb-16">
-          <ScrollFloat
-            containerClassName="overflow-hidden"
-            textClassName="section-title"
-            animationDuration={1}
-            ease="back.inOut(2)"
-            scrollStart="center bottom+=50%"
-            scrollEnd="bottom bottom-=40%"
-            stagger={0.03}
-          >
-            {isTurkish ? 'Sertifikalar' : 'Certificates'}
-          </ScrollFloat>
+          <KineticHeadline
+            as="h2"
+            gradient
+            className="section-title justify-center text-center"
+            text={isTurkish ? 'Sertifikalar' : 'Certificates'}
+          />
           <p className="mx-auto mt-4 max-w-2xl text-body-lg text-ink-600 dark:text-ink-200">
             {isTurkish
               ? 'Öğrenme sürecimi destekleyen, güvenlik ve yazılım temelini güçlendiren eğitimler.'
@@ -40,10 +35,11 @@ const Certificates = () => {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: '-40px' }}
               transition={{ duration: 0.5, delay: index * 0.1 }}
-              className="card-raised flex h-full flex-col p-6"
+              whileHover={{ y: -6 }}
+              className="card-raised card-border-glow group flex h-full flex-col p-6"
             >
               <div className="mb-5 flex items-start justify-between gap-4">
-                <div className="flex h-12 w-12 items-center justify-center rounded-lg border border-cyan-300/50 bg-cyan-50 text-cyan-700 dark:border-cyan-300/25 dark:bg-cyan-300/10 dark:text-cyan-200">
+                <div className="flex h-12 w-12 items-center justify-center rounded-xl border border-violet-300/50 bg-violet-50 text-violet-700 transition-transform duration-500 group-hover:rotate-6 dark:border-aqua-300/25 dark:bg-aqua-300/10 dark:text-aqua-200">
                   <HiAcademicCap className="h-6 w-6" />
                 </div>
                 <span className="rounded-lg border border-ink-200/70 bg-white/50 px-3 py-1 text-xs font-extrabold text-ink-500 dark:border-white/10 dark:bg-white/10 dark:text-ink-300">

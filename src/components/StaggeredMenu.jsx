@@ -453,11 +453,11 @@ export const StaggeredMenu = ({
 .sm-scope .sm-logo { display: flex; align-items: center; user-select: none; }
 .sm-scope .sm-logo-img { display: block; height: 32px; width: auto; object-fit: contain; filter: drop-shadow(0 10px 18px rgba(5,9,18,0.18)); }
 .sm-scope .sm-toggle { position: relative; display: inline-flex; min-width: 96px; height: 100%; align-items: center; justify-content: space-between; gap: 0.7rem; padding: 0 0.95rem; border-radius: 12px; background: rgba(255, 253, 247, 0.72); border: 1px solid rgba(18,29,45,0.16); box-shadow: 0 14px 35px -24px rgba(5,9,18,0.42); cursor: pointer; font-weight: 900; line-height: 1; overflow: hidden; text-transform: uppercase; letter-spacing: 0; backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); }
-.sm-scope .sm-toggle::before { content: ''; position: absolute; inset: 0; background: linear-gradient(120deg, rgba(255,79,70,0.16), transparent 42%, rgba(6,182,212,0.18)); opacity: 0; transition: opacity 0.22s ease; pointer-events: none; }
+.sm-scope .sm-toggle::before { content: ''; position: absolute; inset: 0; background: linear-gradient(120deg, rgba(124,92,255,0.16), transparent 42%, rgba(39,224,196,0.18)); opacity: 0; transition: opacity 0.22s ease; pointer-events: none; }
 .sm-scope .sm-toggle:hover::before,
 .sm-scope .sm-toggle:focus-visible::before { opacity: 1; }
-.sm-scope .sm-toggle:hover { border-color: rgba(6,182,212,0.46); transform: translateY(-1px); }
-.sm-scope .sm-toggle:focus-visible { outline: 2px solid var(--sm-accent, #06b6d4); outline-offset: 4px; border-radius: 12px; }
+.sm-scope .sm-toggle:hover { border-color: rgba(124,92,255,0.5); transform: translateY(-1px); }
+.sm-scope .sm-toggle:focus-visible { outline: 2px solid var(--sm-accent, #7c5cff); outline-offset: 4px; border-radius: 12px; }
 .sm-scope .sm-line:last-of-type { margin-top: 6px; }
 .sm-scope .sm-toggle-label { position: relative; z-index: 1; display: inline-flex; align-items: center; height: 18px; line-height: 18px; white-space: nowrap; font-size: 0.72rem; }
 .sm-scope .sm-icon { position: relative; width: 16px; height: 16px; flex: 0 0 16px; display: inline-flex; align-items: center; justify-content: center; will-change: transform; }
@@ -468,13 +468,13 @@ export const StaggeredMenu = ({
 .sm-scope .sm-icon[data-open] .sm-icon-line-h { transform: translate(-50%, -50%) rotate(45deg); }
 .sm-scope .sm-icon[data-open] .sm-icon-line-v { transform: translate(-50%, -50%) rotate(-45deg); }
 .sm-scope .sm-line { display: none !important; }
-.sm-scope .staggered-menu-panel { position: absolute; top: 0; right: 0; width: min(100%, 520px); height: 100%; backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px); display: flex; flex-direction: column; padding: 6.4rem 2rem 2rem 2rem; overflow-x: hidden; overflow-y: auto; z-index: 10; box-shadow: -34px 0 90px -54px rgba(5,9,18,0.75); border-left: 1px solid rgba(6,182,212,0.25); isolation: isolate; }
+.sm-scope .staggered-menu-panel { position: absolute; top: 0; right: 0; width: min(100%, 520px); height: 100%; backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px); display: flex; flex-direction: column; padding: 6.4rem 2rem 2rem 2rem; overflow-x: hidden; overflow-y: auto; z-index: 10; box-shadow: -34px 0 90px -54px rgba(5,9,18,0.75); border-left: 1px solid rgba(39,224,196,0.25); isolation: isolate; }
 .sm-scope .staggered-menu-panel::before { content: ''; position: absolute; inset: 0; z-index: -2; background:
-  linear-gradient(135deg, rgba(255,79,70,0.16) 0%, transparent 28%, transparent 70%, rgba(6,182,212,0.16) 100%),
+  linear-gradient(135deg, rgba(124,92,255,0.16) 0%, transparent 28%, transparent 70%, rgba(39,224,196,0.16) 100%),
   repeating-linear-gradient(90deg, rgba(18,29,45,0.08) 0 1px, transparent 1px 42px),
   repeating-linear-gradient(0deg, rgba(18,29,45,0.06) 0 1px, transparent 1px 42px);
 }
-.sm-scope .staggered-menu-panel::after { content: ''; position: absolute; right: -22%; top: 12%; z-index: -1; width: 78%; height: 76%; background: repeating-linear-gradient(135deg, rgba(255,79,70,0.18) 0 2px, transparent 2px 14px); transform: rotate(-8deg); opacity: 0.52; pointer-events: none; }
+.sm-scope .staggered-menu-panel::after { content: ''; position: absolute; right: -22%; top: 12%; z-index: -1; width: 78%; height: 76%; background: repeating-linear-gradient(135deg, rgba(124,92,255,0.18) 0 2px, transparent 2px 14px); transform: rotate(-8deg); opacity: 0.52; pointer-events: none; }
 .sm-scope [data-position='left'] .staggered-menu-panel { right: auto; left: 0; }
 .sm-scope .sm-prelayers { position: absolute; top: 0; right: 0; bottom: 0; width: min(100%, 520px); pointer-events: none; z-index: 5; }
 .sm-scope [data-position='left'] .sm-prelayers { right: auto; left: 0; }
@@ -495,7 +495,7 @@ export const StaggeredMenu = ({
 .sm-scope .sm-panel-title { margin: 0; font-size: 1rem; font-weight: 600; color: #fff; text-transform: uppercase; }
 .sm-scope .sm-panel-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.85rem; }
 .sm-scope .sm-panel-item { position: relative; width: 100%; min-height: 76px; color: inherit; font-weight: 900; font-size: clamp(2.35rem, 7.4vw, 4.6rem); cursor: pointer; line-height: 0.94; letter-spacing: 0; text-transform: uppercase; transition: background 0.25s, color 0.25s, border-color 0.25s, transform 0.25s; display: flex; align-items: center; text-decoration: none; padding: 0.36em 1.55em 0.34em 0.24em; border: 1px solid rgba(18,29,45,0.14); border-radius: 16px; background: rgba(255,255,255,0.20); overflow: hidden; }
-.sm-scope .sm-panel-item::before { content: ''; position: absolute; inset: 0; background: linear-gradient(90deg, rgba(255,79,70,0.16), transparent 45%, rgba(6,182,212,0.18)); opacity: 0; transition: opacity 0.25s ease; pointer-events: none; }
+.sm-scope .sm-panel-item::before { content: ''; position: absolute; inset: 0; background: linear-gradient(90deg, rgba(124,92,255,0.16), transparent 45%, rgba(39,224,196,0.18)); opacity: 0; transition: opacity 0.25s ease; pointer-events: none; }
 .sm-scope .sm-panel-itemLabel { position: relative; z-index: 1; display: inline-block; will-change: transform; transform-origin: 50% 100%; }
 .sm-scope .sm-panel-item:hover { color: var(--sm-accent, #ff0000); border-color: var(--sm-accent, #ff0000); transform: translateX(-6px); }
 .sm-scope .sm-panel-item:hover::before,

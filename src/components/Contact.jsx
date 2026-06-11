@@ -6,7 +6,7 @@ import { HiArrowRight, HiCheckCircle, HiDownload, HiMail, HiXCircle } from 'reac
 import { FiGithub, FiLinkedin, FiMapPin } from 'react-icons/fi';
 import { useLanguage } from '../context/LanguageContext';
 import { CV_LABEL, CV_PATH } from '../utils/constants';
-import ScrollFloat from './ScrollFloat';
+import KineticHeadline from './motion/KineticHeadline';
 import FadeContent from './FadeContent';
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -303,17 +303,12 @@ const Contact = () => {
     <section id="contact" className="relative px-4 py-20 md:py-28">
       <div className="mx-auto max-w-6xl">
         <div className="mb-12 text-center">
-          <ScrollFloat
-            containerClassName="overflow-hidden"
-            textClassName="section-title"
-            animationDuration={1}
-            ease="back.inOut(2)"
-            scrollStart="center bottom+=50%"
-            scrollEnd="bottom bottom-=40%"
-            stagger={0.03}
-          >
-            {isTurkish ? 'İletişim' : 'Contact'}
-          </ScrollFloat>
+          <KineticHeadline
+            as="h2"
+            gradient
+            className="section-title justify-center text-center"
+            text={isTurkish ? 'İletişim' : 'Contact'}
+          />
           <p className="mx-auto mt-4 max-w-2xl text-body-lg text-ink-600 dark:text-ink-200">
             {isTurkish
               ? 'Full-stack, Android veya AI odaklı işler için kısa bir mesaj yeterli.'

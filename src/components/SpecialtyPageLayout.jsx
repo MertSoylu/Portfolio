@@ -1,6 +1,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import BlurText from './BlurText';
+import KineticHeadline from './motion/KineticHeadline';
+import MorphBlob from './motion/MorphBlob';
 import PageMeta from './PageMeta';
 import PageBackButton from './ui/PageBackButton';
 
@@ -27,7 +28,7 @@ const accentClasses = {
     eyebrow: 'bg-accent-500/10 text-accent-700 dark:text-accent-200 border-accent-500/25',
   },
   blue: {
-    eyebrow: 'bg-cyan-500/10 text-cyan-700 dark:text-cyan-200 border-cyan-500/25',
+    eyebrow: 'bg-violet-500/10 text-violet-700 dark:text-violet-200 border-violet-500/25',
   },
   zinc: {
     eyebrow: 'bg-ink-500/10 text-ink-700 dark:text-ink-100 border-ink-500/20',
@@ -70,12 +71,21 @@ const SpecialtyPageLayout = ({
       initial="initial"
       animate="animate"
       exit="exit"
-      className={`${containerClasses} ${className}`}
+      className={`relative overflow-hidden ${containerClasses} ${className}`}
     >
       {routePath && <PageMeta route={routePath} />}
       {!hideBackButton && <PageBackButton />}
 
-      <div className={innerClasses}>
+      <MorphBlob
+        className="pointer-events-none absolute right-[-12%] top-[8%] -z-10 h-[40vh] w-[40vh]"
+        from="#7c5cff"
+        to="#27e0c4"
+        opacity={0.16}
+        blur={48}
+        duration={22}
+      />
+
+      <div className={`relative ${innerClasses}`}>
         {(eyebrow || title || titleNode || subtitle || sideNode) && (
           <header
             className={`mb-10 grid items-end gap-6 md:mb-16 md:gap-8 ${
@@ -98,13 +108,11 @@ const SpecialtyPageLayout = ({
               {titleNode ? (
                 <div className="mb-4 sm:mb-6">{titleNode}</div>
               ) : title ? (
-                <BlurText
+                <KineticHeadline
+                  as="h1"
                   text={title}
-                  delay={65}
-                  animateBy="words"
-                  direction="top"
                   className={`mb-4 text-h1 text-ink-900 dark:text-white sm:mb-6 ${
-                    centered || !sideNode ? 'justify-center' : ''
+                    centered || !sideNode ? 'text-center' : ''
                   }`}
                 />
               ) : null}
