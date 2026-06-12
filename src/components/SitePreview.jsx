@@ -56,9 +56,29 @@ const SnapshotWebsitePreview = ({ title, src, isTurkish }) => (
       alt={`${title} ${isTurkish ? 'site önizlemesi' : 'site preview'}`}
       loading="lazy"
       decoding="async"
-      className="absolute inset-0 h-full w-full object-cover"
+      className="absolute inset-0 h-full w-full object-cover object-top"
     />
     <div className="pointer-events-none absolute inset-0 rounded-lg ring-1 ring-inset ring-white/10" />
+  </div>
+);
+
+const MobileSnapshotPreview = ({ title, src, isTurkish }) => (
+  <div className="relative mx-auto flex min-h-[250px] w-full items-center justify-center overflow-hidden rounded-lg bg-gradient-to-br from-ink-950 via-ink-900 to-cyan-950 p-4 sm:min-h-[330px]">
+    <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(90deg,rgba(255,255,255,0.06)_1px,transparent_1px),linear-gradient(180deg,rgba(255,255,255,0.04)_1px,transparent_1px)] bg-[size:28px_28px]" />
+    <div className="relative w-[176px] rounded-[2rem] border-[7px] border-ink-950 bg-ink-950 p-2 shadow-elevation ring-1 ring-white/15 sm:w-[210px]">
+      <div className="mb-2 flex justify-center">
+        <span className="h-1.5 w-16 rounded-full bg-white/25" />
+      </div>
+      <div className="relative aspect-[9/19] overflow-hidden rounded-[1.25rem] bg-black">
+        <img
+          src={src}
+          alt={`${title} ${isTurkish ? 'uygulama ekran görüntüsü' : 'app screenshot'}`}
+          loading="lazy"
+          decoding="async"
+          className="absolute inset-0 h-full w-full object-cover object-top"
+        />
+      </div>
+    </div>
   </div>
 );
 
@@ -327,6 +347,8 @@ const WebPreview = ({ title }) => (
 const PreviewBody = ({ kind, title, url, terminalContent, isTurkish, snapshotSrc }) => {
   if (kind === 'snapshot')
     return <SnapshotWebsitePreview title={title} src={snapshotSrc} isTurkish={isTurkish} />;
+  if (kind === 'mobile-snapshot')
+    return <MobileSnapshotPreview title={title} src={snapshotSrc} isTurkish={isTurkish} />;
   if (kind === 'live')
     return <LiveWebsitePreview title={title} url={url} isTurkish={isTurkish} fallbackSrc={snapshotSrc} />;
   if (kind === 'memory') return <MemoryPreview title={title} />;
@@ -419,6 +441,7 @@ const SitePreview = ({
   const { isTurkish } = useLanguage();
   const [modalOpen, setModalOpen] = useState(false);
   const kind = useMemo(() => {
+    if (snapshotSrc && type === 'mobile') return 'mobile-snapshot';
     if (forceSnapshot && snapshotSrc) return 'snapshot';
     if (livePreview && url && type === 'web') return 'live';
     if (snapshotSrc) return 'snapshot';

@@ -87,6 +87,7 @@ const CaseStudyLayout = ({
   isTurkish,
   facts = [],
   previewVariant,
+  previewSnapshotSrc,
   terminalContent,
   children,
 }) => {
@@ -113,7 +114,7 @@ const CaseStudyLayout = ({
       />
 
       <div className="relative mx-auto w-full max-w-6xl">
-        <header className="mb-10 grid items-end gap-6 sm:mb-12 sm:gap-8 lg:grid-cols-[minmax(0,1fr)_440px]">
+        <header className="mb-10 grid items-start gap-6 sm:mb-12 sm:gap-8 lg:grid-cols-[minmax(0,1fr)_440px]">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -170,6 +171,7 @@ const CaseStudyLayout = ({
               url={liveUrl || githubUrl}
               type={variant === 'mobile' ? 'mobile' : variant === 'terminal' ? 'terminal' : 'web'}
               variant={variant}
+              snapshotSrc={previewSnapshotSrc}
               terminalContent={terminalContent}
             />
           </motion.div>

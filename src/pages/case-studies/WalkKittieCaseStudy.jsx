@@ -54,6 +54,7 @@ const WalkKittieCaseStudy = () => {
       isTurkish={isTurkish}
       facts={facts}
       previewVariant="mobile"
+      previewSnapshotSrc="/previews/walkkittie.png"
     >
       <FadeContent duration={700} blur threshold={0.1}>
         <div className="grid gap-5 md:grid-cols-2">
