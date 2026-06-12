@@ -297,7 +297,7 @@ const Projects = () => {
   }, []);
 
   return (
-    <section id="projects" className="relative px-4 py-16 md:py-28">
+    <section id="projects" className="relative px-4 py-16 sm:py-20 md:py-28">
       <div className="mx-auto max-w-6xl">
         <SectionHeader
           index="02"

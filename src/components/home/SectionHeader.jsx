@@ -16,15 +16,15 @@ const SectionHeader = ({ index, kicker, kickerIcon, title, lead, aside, classNam
   const reduce = useReducedMotion();
 
   return (
-    <div className={`mb-12 md:mb-16 ${className}`}>
-      <div className="grid items-end gap-8 lg:grid-cols-[minmax(0,1fr)_auto] lg:gap-12">
-        <div>
+    <div className={`mb-10 sm:mb-12 md:mb-16 ${className}`}>
+      <div className="grid min-w-0 items-end gap-7 lg:grid-cols-[minmax(0,1fr)_auto] lg:gap-12">
+        <div className="min-w-0">
           <motion.span
             initial={reduce ? { opacity: 0 } : { opacity: 0, y: 14 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: '-60px' }}
             transition={{ duration: 0.5 }}
-            className="lab-kicker mb-5"
+            className="lab-kicker mb-5 max-w-full flex-wrap"
           >
             {index && <span className="lab-mono text-[10px] opacity-70">{index}</span>}
             {kickerIcon}
@@ -35,7 +35,7 @@ const SectionHeader = ({ index, kicker, kickerIcon, title, lead, aside, classNam
             as="h2"
             gradient
             text={title}
-            className="text-4xl font-extrabold leading-[1.04] tracking-tight text-ink-900 dark:text-white sm:text-5xl lg:text-6xl"
+            className="max-w-full break-words text-[2.45rem] font-extrabold leading-[1.04] tracking-tight text-ink-900 dark:text-white min-[380px]:text-4xl sm:text-5xl lg:text-6xl"
           />
 
           <motion.span
@@ -53,7 +53,7 @@ const SectionHeader = ({ index, kicker, kickerIcon, title, lead, aside, classNam
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: '-60px' }}
               transition={{ duration: 0.55, delay: 0.25 }}
-              className="mt-6 max-w-xl text-body-lg text-ink-600 dark:text-ink-200"
+              className="mt-5 max-w-xl text-base leading-relaxed text-ink-600 dark:text-ink-200 sm:mt-6 sm:text-body-lg"
             >
               {lead}
             </motion.p>
@@ -66,7 +66,7 @@ const SectionHeader = ({ index, kicker, kickerIcon, title, lead, aside, classNam
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: '-60px' }}
             transition={{ duration: 0.6, delay: 0.35, ease: EASE }}
-            className="lg:pb-2"
+            className="min-w-0 lg:pb-2"
           >
             {aside}
           </motion.div>

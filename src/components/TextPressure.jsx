@@ -44,6 +44,8 @@ const TextPressure = ({
   className = '',
 
   minFontSize = 24,
+  maxFontSize = Number.POSITIVE_INFINITY,
+  edgePadding = '0px',
   idleCenter = false,
 }) => {
   const containerRef = useRef(null);
@@ -106,7 +108,7 @@ const TextPressure = ({
     const { width: containerW, height: containerH } = containerRef.current.getBoundingClientRect();
 
     let newFontSize = containerW / (chars.length / 2);
-    newFontSize = Math.max(newFontSize, minFontSize);
+    newFontSize = Math.min(Math.max(newFontSize, minFontSize), maxFontSize);
 
     setFontSize(newFontSize);
     setScaleY(1);
@@ -115,6 +117,12 @@ const TextPressure = ({
     requestAnimationFrame(() => {
       if (!titleRef.current) return;
       const textRect = titleRef.current.getBoundingClientRect();
+      const maxTextWidth = containerW * 0.96;
+
+      if (textRect.width > maxTextWidth) {
+        const fittedFontSize = Math.max(minFontSize, newFontSize * (maxTextWidth / textRect.width));
+        setFontSize(Math.min(fittedFontSize, maxFontSize));
+      }
 
       if (scale && textRect.height > 0) {
         const yRatio = containerH / textRect.height;
@@ -122,7 +130,7 @@ const TextPressure = ({
         setLineHeight(yRatio);
       }
     });
-  }, [chars.length, minFontSize, scale]);
+  }, [chars.length, maxFontSize, minFontSize, scale]);
 
   useEffect(() => {
     const debouncedSetSize = debounce(setSize, 100);
@@ -217,6 +225,9 @@ const TextPressure = ({
           transform: `scale(1, ${scaleY})`,
           transformOrigin: 'center top',
           margin: 0,
+          width: '100%',
+          boxSizing: 'border-box',
+          paddingInline: edgePadding,
           fontWeight: 100,
           color: stroke ? undefined : textColor,
         }}

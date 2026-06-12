@@ -108,7 +108,7 @@ const About = () => {
   ];
 
   return (
-    <section id="about" className="relative px-4 py-20 md:py-28">
+    <section id="about" className="relative px-4 py-16 sm:py-20 md:py-28">
       <div className="mx-auto max-w-6xl">
         <SectionHeader
           index="01"

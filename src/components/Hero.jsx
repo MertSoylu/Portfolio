@@ -62,7 +62,7 @@ const ZoneCard = ({ icon, title, link, detail, index, delay }) => {
         onPointerMove={handlePointerMove}
         onPointerLeave={handlePointerLeave}
         style={{ rotateX: springX, rotateY: springY, transformPerspective: 900 }}
-        className="group relative h-full min-h-[120px] overflow-hidden rounded-2xl border border-ink-200/70 bg-white/65 p-3 shadow-soft backdrop-blur-xl transition-colors dark:border-white/10 dark:bg-white/8 sm:min-h-[150px] sm:p-4"
+        className="group relative h-full min-h-[132px] overflow-hidden rounded-2xl border border-ink-200/70 bg-white/65 p-4 shadow-soft backdrop-blur-xl transition-colors dark:border-white/10 dark:bg-white/8 sm:min-h-[150px]"
         initial={reduce ? { opacity: 0 } : { opacity: 0, y: 30, rotateX: -14 }}
         animate={reduce ? { opacity: 1 } : { opacity: 1, y: 0, rotateX: 0 }}
         transition={{ duration: 0.7, delay, ease: [0.22, 1, 0.36, 1] }}
@@ -231,7 +231,7 @@ const Hero = () => {
             {isTurkish ? 'Merhaba, ben' : "Hi, I'm"}
           </motion.p>
 
-          <div className="mobile-hero-name-stage mb-4 h-[clamp(100px,28vw,200px)] w-full sm:mb-6">
+          <div className="mobile-hero-name-stage mb-4 h-[clamp(96px,27vw,200px)] w-full sm:mb-6">
             <TextPressure
               text="Mert Soylu"
               fontFamily="Compressa VF"
@@ -245,7 +245,9 @@ const Hero = () => {
               scale={false}
               textColor={isDark ? '#ac94ff' : '#7c5cff'}
               className=""
-              minFontSize={isCompactHero ? Math.max(40, window.innerWidth * 0.11) : 36}
+              minFontSize={isCompactHero ? 38 : 36}
+              maxFontSize={isCompactHero ? 64 : 180}
+              edgePadding={isCompactHero ? '0.08em' : '0px'}
               idleCenter={isCompactHero}
             />
           </div>
@@ -275,7 +277,7 @@ const Hero = () => {
           </motion.p>
 
           <motion.div
-            className="mx-auto mb-8 grid w-full max-w-[min(22rem,calc(100vw-2rem))] grid-cols-2 gap-2 max-[360px]:grid-cols-1 sm:mb-12 sm:flex sm:max-w-none sm:flex-wrap sm:justify-center sm:gap-3"
+            className="mx-auto mb-8 grid w-full max-w-[min(22rem,calc(100vw-2rem))] grid-cols-1 gap-2 min-[380px]:grid-cols-2 sm:mb-12 sm:flex sm:max-w-none sm:flex-wrap sm:justify-center sm:gap-3"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 1.2, duration: 0.5 }}
@@ -287,7 +289,7 @@ const Hero = () => {
               onMouseLeave={magBtn1.onMouseLeave}
               href="#projects"
               onClick={handleProjectJump}
-              className="btn-primary col-span-2 min-h-[50px] w-full whitespace-nowrap px-4 py-3 max-[360px]:col-span-1 sm:w-auto"
+              className="btn-primary min-h-[50px] w-full whitespace-nowrap px-4 py-3 min-[380px]:col-span-2 sm:w-auto"
               whileTap={{ scale: 0.97 }}
             >
               {isTurkish ? 'Projeleri incele' : 'View projects'}
@@ -321,7 +323,7 @@ const Hero = () => {
         </div>
 
         <motion.div
-          className="grid w-full grid-cols-2 gap-2.5 sm:grid-cols-2 sm:gap-3 lg:grid-cols-4"
+          className="grid w-full grid-cols-1 gap-2.5 min-[380px]:grid-cols-2 sm:gap-3 lg:grid-cols-4"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 1.45, duration: 0.5 }}

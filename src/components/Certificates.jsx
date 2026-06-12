@@ -11,7 +11,7 @@ const Certificates = () => {
   if (!CERTIFICATES.length) return null;
 
   return (
-    <section id="certificates" className="relative px-4 py-20 md:py-28">
+    <section id="certificates" className="relative px-4 py-16 sm:py-20 md:py-28">
       <div className="mx-auto max-w-6xl">
         <SectionHeader
           index="03"

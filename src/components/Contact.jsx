@@ -143,7 +143,7 @@ const ContactForm = ({ isTurkish }) => {
         tabIndex={-1}
         autoComplete="off"
         aria-hidden="true"
-        className="absolute -left-[9999px] top-auto h-px w-px opacity-0"
+        className="absolute -left-[9999px] top-auto h-0 w-0 overflow-hidden border-0 p-0 opacity-0"
       />
       <div className="relative">
         <p className="lab-mono mb-2 text-[11px] uppercase tracking-[0.2em] text-cyan-700 dark:text-aqua-200">
@@ -366,7 +366,7 @@ const Contact = () => {
   ];
 
   return (
-    <section id="contact" className="relative px-4 py-20 md:py-28">
+    <section id="contact" className="relative px-4 py-16 sm:py-20 md:py-28">
       <div className="mx-auto max-w-6xl">
         <SectionHeader
           index="04"
