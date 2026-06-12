@@ -20,7 +20,15 @@ import TextPressure from './TextPressure';
 import MorphBlob from './motion/MorphBlob';
 import { useMagnetic } from '../hooks/useMagnetic';
 
-const ZoneCard = ({ icon, title, link, detail, index, delay }) => {
+const fallbackAccent = {
+  primary: '#7c5cff',
+  secondary: '#27e0c4',
+  tertiary: '#ff5a36',
+  spotlight: 'rgba(124, 92, 255, 0.24)',
+  wash: 'rgba(39, 224, 196, 0.13)',
+};
+
+const ZoneCard = ({ icon, title, link, detail, index, delay, accent = fallbackAccent }) => {
   const reduce = useReducedMotion();
   const cardRef = useRef(null);
 
@@ -33,7 +41,7 @@ const ZoneCard = ({ icon, title, link, detail, index, delay }) => {
   // spotlight follow position (%)
   const glowX = useMotionValue(50);
   const glowY = useMotionValue(50);
-  const glow = useMotionTemplate`radial-gradient(170px circle at ${glowX}% ${glowY}%, rgba(124,92,255,0.22), rgba(39,224,196,0.12) 45%, transparent 70%)`;
+  const glow = useMotionTemplate`radial-gradient(190px circle at ${glowX}% ${glowY}%, ${accent.spotlight}, ${accent.wash} 46%, transparent 72%)`;
 
   const handlePointerMove = (event) => {
     if (reduce) return;
@@ -56,13 +64,20 @@ const ZoneCard = ({ icon, title, link, detail, index, delay }) => {
   };
 
   return (
-    <Link to={link} className="block h-full [perspective:900px]">
+    <Link to={link} className="hero-zone-link block h-full [perspective:900px] focus:outline-none">
       <motion.div
         ref={cardRef}
         onPointerMove={handlePointerMove}
         onPointerLeave={handlePointerLeave}
-        style={{ rotateX: springX, rotateY: springY, transformPerspective: 900 }}
-        className="group relative h-full min-h-[132px] overflow-hidden rounded-2xl border border-ink-200/70 bg-white/65 p-4 shadow-soft backdrop-blur-xl transition-colors dark:border-white/10 dark:bg-white/8 sm:min-h-[150px]"
+        style={{
+          rotateX: springX,
+          rotateY: springY,
+          transformPerspective: 900,
+          '--zone-accent-a': accent.primary,
+          '--zone-accent-b': accent.secondary,
+          '--zone-accent-c': accent.tertiary,
+        }}
+        className="hero-zone-card group relative isolate h-full min-h-[132px] overflow-hidden rounded-2xl p-4 backdrop-blur-xl transition-[background,border-color,box-shadow] sm:min-h-[150px]"
         initial={reduce ? { opacity: 0 } : { opacity: 0, y: 30, rotateX: -14 }}
         animate={reduce ? { opacity: 1 } : { opacity: 1, y: 0, rotateX: 0 }}
         transition={{ duration: 0.7, delay, ease: [0.22, 1, 0.36, 1] }}
@@ -70,17 +85,19 @@ const ZoneCard = ({ icon, title, link, detail, index, delay }) => {
       >
         {/* spotlight that follows the pointer */}
         <motion.span
-          className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+          className="pointer-events-none absolute inset-0 z-[2] opacity-0 transition-opacity duration-300 group-hover:opacity-100"
           style={{ background: glow }}
         />
-        {/* top accent bar grows on hover */}
-        <span className="pointer-events-none absolute inset-x-0 top-0 h-[2px] origin-left scale-x-0 bg-gradient-to-r from-violet-500 via-aqua-300 to-ember-400 transition-transform duration-500 group-hover:scale-x-100" />
+        <span
+          className="pointer-events-none absolute left-3 top-3 z-[4] h-1.5 w-1.5 rounded-full opacity-70 shadow-[0_0_18px_currentColor] transition-opacity duration-300 group-hover:opacity-100"
+          style={{ color: accent.primary }}
+        />
         {/* lab index */}
-        <span className="lab-mono pointer-events-none absolute right-3 top-2.5 text-[10px] font-bold tracking-[0.2em] text-ink-300 transition-colors group-hover:text-violet-500 dark:text-white/30 dark:group-hover:text-aqua-200">
+        <span className="lab-mono pointer-events-none absolute right-3 top-2.5 z-[4] text-[10px] font-bold tracking-[0.2em] text-ink-300 transition-colors group-hover:text-violet-500 dark:text-white/30 dark:group-hover:text-aqua-200">
           {String(index + 1).padStart(2, '0')}
         </span>
-        <div className="relative z-10 flex h-full flex-col [transform:translateZ(28px)]">
-          <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-xl border border-ink-200/70 bg-white/70 text-violet-600 transition-all duration-500 group-hover:-rotate-6 group-hover:border-violet-300 group-hover:text-violet-700 dark:border-white/10 dark:bg-white/10 dark:text-aqua-200 dark:group-hover:border-aqua-300/50 sm:mb-4 sm:h-11 sm:w-11">
+        <div className="relative z-[5] flex h-full flex-col [transform:translateZ(28px)]">
+          <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-xl border border-ink-200/70 bg-white/70 text-violet-600 shadow-[inset_0_1px_0_rgba(255,255,255,0.55)] transition-all duration-500 group-hover:-rotate-6 group-hover:border-violet-300 group-hover:text-violet-700 dark:border-white/10 dark:bg-white/10 dark:text-aqua-200 dark:group-hover:border-aqua-300/50 sm:mb-4 sm:h-11 sm:w-11">
             {icon}
           </div>
           <h3 className="text-base font-extrabold leading-snug text-ink-900 dark:text-white sm:text-h4">
@@ -161,6 +178,13 @@ const Hero = () => {
         ? 'Canlı web uygulamaları ve case studyler'
         : 'Live web apps and product case studies',
       link: '/web',
+      accent: {
+        primary: '#7c5cff',
+        secondary: '#27e0c4',
+        tertiary: '#ff5a36',
+        spotlight: 'rgba(124, 92, 255, 0.26)',
+        wash: 'rgba(39, 224, 196, 0.14)',
+      },
     },
     {
       id: 'android',
@@ -170,6 +194,13 @@ const Hero = () => {
         ? 'Google Play yayını ve native mobil deneyim'
         : 'Published mobile work and native Android UI',
       link: '/android',
+      accent: {
+        primary: '#10b981',
+        secondary: '#27e0c4',
+        tertiary: '#7c5cff',
+        spotlight: 'rgba(16, 185, 129, 0.25)',
+        wash: 'rgba(39, 224, 196, 0.14)',
+      },
     },
     {
       id: 'security',
@@ -179,6 +210,13 @@ const Hero = () => {
         ? 'CLI güvenlik aracı ve savunma odaklı kod'
         : 'CLI scanner work and defensive engineering',
       link: '/cybersecurity',
+      accent: {
+        primary: '#ff5a36',
+        secondary: '#7c5cff',
+        tertiary: '#27e0c4',
+        spotlight: 'rgba(255, 90, 54, 0.24)',
+        wash: 'rgba(124, 92, 255, 0.13)',
+      },
     },
     {
       id: 'data',
@@ -188,6 +226,13 @@ const Hero = () => {
         ? 'Sistemli öğrenme, deneyler ve notlar'
         : 'Structured learning, experiments, and notes',
       link: '/data-science',
+      accent: {
+        primary: '#27e0c4',
+        secondary: '#5cf0d8',
+        tertiary: '#ff5a36',
+        spotlight: 'rgba(39, 224, 196, 0.24)',
+        wash: 'rgba(255, 90, 54, 0.12)',
+      },
     },
   ];
 

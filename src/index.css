@@ -461,6 +461,118 @@ a {
   @apply border-white/10 bg-ink-800/80 shadow-soft;
 }
 
+.hero-zone-card {
+  --zone-accent-a: var(--violet);
+  --zone-accent-b: var(--aqua);
+  --zone-accent-c: var(--ember);
+  border: 1px solid rgba(196, 211, 228, 0.72);
+  background:
+    linear-gradient(145deg, rgba(255, 255, 255, 0.72), rgba(255, 255, 255, 0.38)),
+    radial-gradient(circle at 18% 0%, color-mix(in srgb, var(--zone-accent-a) 18%, transparent), transparent 38%),
+    radial-gradient(circle at 88% 110%, color-mix(in srgb, var(--zone-accent-b) 16%, transparent), transparent 42%);
+  box-shadow:
+    0 18px 48px -34px rgba(8, 8, 12, 0.45),
+    inset 0 1px 0 rgba(255, 255, 255, 0.5);
+}
+
+.dark .hero-zone-card {
+  border-color: rgba(255, 255, 255, 0.12);
+  background:
+    linear-gradient(145deg, rgba(17, 15, 24, 0.84), rgba(8, 8, 12, 0.62)),
+    radial-gradient(circle at 18% 0%, color-mix(in srgb, var(--zone-accent-a) 24%, transparent), transparent 38%),
+    radial-gradient(circle at 88% 110%, color-mix(in srgb, var(--zone-accent-b) 20%, transparent), transparent 42%);
+  box-shadow:
+    0 20px 56px -34px rgba(0, 0, 0, 0.86),
+    inset 0 1px 0 rgba(255, 255, 255, 0.11);
+}
+
+.hero-zone-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  border-radius: inherit;
+  background: conic-gradient(
+    from 0deg,
+    transparent 0deg,
+    transparent 78deg,
+    var(--zone-accent-a) 118deg,
+    var(--zone-accent-b) 164deg,
+    var(--zone-accent-c) 214deg,
+    transparent 278deg,
+    transparent 360deg
+  );
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+  animation: hero-zone-orbit 2.8s linear infinite;
+  animation-play-state: paused;
+}
+
+.hero-zone-card::after {
+  content: '';
+  position: absolute;
+  inset: 1.5px;
+  z-index: 1;
+  border-radius: calc(1rem - 1.5px);
+  background:
+    linear-gradient(120deg, rgba(255, 255, 255, 0.34), transparent 26%, transparent 64%, rgba(255, 255, 255, 0.2)),
+    repeating-linear-gradient(90deg, rgba(21, 19, 28, 0.035) 0 1px, transparent 1px 28px),
+    linear-gradient(
+      145deg,
+      color-mix(in srgb, #ffffff 92%, var(--zone-accent-a) 8%),
+      color-mix(in srgb, #ffffff 90%, var(--zone-accent-b) 10%) 56%,
+      color-mix(in srgb, #ffffff 94%, var(--zone-accent-c) 6%)
+    );
+  opacity: 1;
+  pointer-events: none;
+}
+
+.dark .hero-zone-card::after {
+  background:
+    linear-gradient(120deg, rgba(255, 255, 255, 0.08), transparent 26%, transparent 64%, rgba(255, 255, 255, 0.06)),
+    repeating-linear-gradient(90deg, rgba(244, 241, 233, 0.035) 0 1px, transparent 1px 28px),
+    linear-gradient(
+      145deg,
+      color-mix(in srgb, #111018 84%, var(--zone-accent-a) 16%),
+      color-mix(in srgb, #08080c 86%, var(--zone-accent-b) 14%) 56%,
+      color-mix(in srgb, #110f18 88%, var(--zone-accent-c) 12%)
+    );
+  opacity: 1;
+}
+
+.hero-zone-link:hover .hero-zone-card,
+.hero-zone-link:focus-visible .hero-zone-card {
+  border-color: color-mix(in srgb, var(--zone-accent-b) 54%, rgba(255, 255, 255, 0.55));
+  box-shadow:
+    0 28px 74px -38px color-mix(in srgb, var(--zone-accent-a) 52%, rgba(8, 8, 12, 0.3)),
+    0 12px 32px -22px color-mix(in srgb, var(--zone-accent-b) 42%, rgba(8, 8, 12, 0.2)),
+    inset 0 1px 0 rgba(255, 255, 255, 0.55);
+}
+
+.hero-zone-link:hover .hero-zone-card::before,
+.hero-zone-link:focus-visible .hero-zone-card::before {
+  opacity: 1;
+  animation-play-state: running;
+}
+
+.hero-zone-link:focus-visible .hero-zone-card {
+  outline: 2px solid var(--zone-accent-b);
+  outline-offset: 4px;
+}
+
+@keyframes hero-zone-orbit {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-zone-card::before {
+    animation: none;
+  }
+}
+
 /* lab-kicker === mono pill label with duotone edge (studio-kicker kept as alias) */
 .studio-kicker,
 .lab-kicker {
