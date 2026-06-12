@@ -32,7 +32,7 @@ const DEVICE_META = {
 };
 
 const FRAME_SPRING = { type: 'spring', stiffness: 130, damping: 22, mass: 0.9 };
-const AUTOPLAY_MS = 4500;
+const AUTOPLAY_MS = 3000;
 
 // ---------------------------------------------------------------------------
 // Screen content per platform
@@ -177,32 +177,25 @@ const ScreenContent = ({ project, isTurkish }) => {
 // Device frame (morphs via animate when `device` prop changes)
 // ---------------------------------------------------------------------------
 
-const DeviceFrame = ({ device, children, animateMorph = true, scale = 1 }) => {
+const DeviceFrame = ({ device, children, animateMorph = true, availableWidth = 604 }) => {
   const g = GEO[device];
   const isPhone = device === 'phone';
   const isLaptop = device === 'laptop';
-
-  // Calculate base dimensions
-  const baseW = g.w * scale;
-  const baseH = g.h * scale;
-
-  // Enforce viewport constraints directly in the calculation
-  const maxAllowedWidth =
-    typeof window !== 'undefined'
-      ? Math.min(window.innerWidth - 32, baseW) // 32px = 2rem padding
-      : baseW;
-
-  const w = Math.max(g.minW || 180, Math.min(maxAllowedWidth, baseW));
-  const h = Math.max(g.minH || 165, baseH * (w / baseW)); // maintain aspect ratio
-  const radius = g.radius * scale * (w / baseW);
+  const safeAvailableWidth = Math.max(160, availableWidth || g.w);
+  const laptopBaseExtra = isLaptop ? 64 : 0;
+  const fitScale = Math.min(1, safeAvailableWidth / (g.w + laptopBaseExtra));
+  const w = Math.round(g.w * fitScale);
+  const h = Math.round(g.h * fitScale);
+  const radius = Math.max(10, Math.round(g.radius * fitScale));
+  const laptopBaseWidth = Math.min(safeAvailableWidth, w + laptopBaseExtra * fitScale);
 
   return (
-    <div className="flex w-full flex-col items-center justify-center px-2 sm:px-0">
+    <div className="flex w-full min-w-0 flex-col items-center justify-center overflow-hidden">
       <motion.div
         initial={false}
         animate={{ width: w, height: h, borderRadius: radius }}
         transition={animateMorph ? FRAME_SPRING : { duration: 0 }}
-        className="relative border border-white/10 bg-[linear-gradient(145deg,#1b1b24,#0b0b11)] p-[10px] shadow-elevation"
+        className="relative max-w-full border border-white/10 bg-[linear-gradient(145deg,#1b1b24,#0b0b11)] p-[10px] shadow-elevation"
       >
         {/* phone notch */}
         <motion.span
@@ -224,77 +217,76 @@ const DeviceFrame = ({ device, children, animateMorph = true, scale = 1 }) => {
       <motion.div
         initial={false}
         animate={{
-          height: isLaptop ? 12 * scale : 0,
-          width: isLaptop ? Math.min(w + 64 * scale, maxAllowedWidth + 40) : w,
+          height: isLaptop ? Math.max(7, 12 * fitScale) : 0,
+          width: isLaptop ? laptopBaseWidth : w,
           opacity: isLaptop ? 1 : 0,
         }}
         transition={FRAME_SPRING}
-        className="-mt-px rounded-b-2xl border border-white/10 bg-[linear-gradient(180deg,#15151c,#0a0a0f)] shadow-lg"
+        className="-mt-px max-w-full rounded-b-2xl border border-white/10 bg-[linear-gradient(180deg,#15151c,#0a0a0f)] shadow-lg"
       />
     </div>
   );
 };
 
-// Largest device footprint (laptop frame + padding) used as the fit reference.
-const getFitReference = () => {
-  if (typeof window === 'undefined') return 560;
-  const vw = window.innerWidth;
-  if (vw < 360) return 280; // very small mobile
-  if (vw < 640) return 340; // mobile
-  return 560; // tablet+
-};
-
-// Measures an element's width and returns a downscale factor so the widest
-// device frame fits inside it (never upscales past 1). Keeps device proportions
-// intact on narrow screens instead of letting max-w-full squish the frame.
-const useFitScale = (ref) => {
-  const [scale, setScale] = useState(1);
+const useElementWidth = (ref) => {
+  const [width, setWidth] = useState(0);
 
   useEffect(() => {
     const node = ref.current;
     if (!node) return undefined;
-    const update = () => {
-      const vw = window.innerWidth;
-      const containerWidth = node.clientWidth;
-      const padding = 32; // 2rem total
-      const availableWidth = Math.min(containerWidth, vw - padding);
-
-      // Target width based on viewport
-      let targetWidth;
-      if (vw < 360) targetWidth = 260;
-      else if (vw < 640) targetWidth = Math.min(320, availableWidth);
-      else targetWidth = 540;
-
-      const computed = Math.min(1, availableWidth / targetWidth);
-      setScale(computed);
-    };
+    const update = () => setWidth(Math.floor(node.clientWidth));
     update();
 
-    const handleResize = () => update();
-    window.addEventListener('resize', handleResize);
+    window.addEventListener('resize', update);
 
     if (typeof ResizeObserver !== 'undefined') {
       const observer = new ResizeObserver(update);
       observer.observe(node);
       return () => {
         observer.disconnect();
-        window.removeEventListener('resize', handleResize);
+        window.removeEventListener('resize', update);
       };
     }
-    return () => window.removeEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', update);
   }, [ref]);
 
-  return scale;
+  return width;
+};
+
+const useElementVisibility = (ref) => {
+  const [isVisible, setIsVisible] = useState(false);
+
+  useEffect(() => {
+    const node = ref.current;
+    if (!node) return undefined;
+
+    if (typeof IntersectionObserver === 'undefined') {
+      setIsVisible(true);
+      return undefined;
+    }
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        setIsVisible(entry.isIntersecting && entry.intersectionRatio > 0.15);
+      },
+      { threshold: [0, 0.15, 0.5] },
+    );
+
+    observer.observe(node);
+    return () => observer.disconnect();
+  }, [ref]);
+
+  return isVisible;
 };
 
 // Self-measuring frame for the static (reduced-motion) layout.
 const ResponsiveDeviceFrame = ({ device, project, isTurkish }) => {
   const wrapRef = useRef(null);
-  const scale = useFitScale(wrapRef);
+  const availableWidth = useElementWidth(wrapRef);
 
   return (
-    <div ref={wrapRef} className="flex w-full justify-center">
-      <DeviceFrame device={device} animateMorph={false} scale={scale}>
+    <div ref={wrapRef} className="flex w-full min-w-0 justify-center overflow-hidden">
+      <DeviceFrame device={device} animateMorph={false} availableWidth={availableWidth}>
         <ScreenContent project={project} isTurkish={isTurkish} />
       </DeviceFrame>
     </div>
@@ -317,13 +309,13 @@ const screenVariants = {
 };
 
 const metaVariants = {
-  enter: ({ dir }) => ({ x: dir >= 0 ? 50 : -50, opacity: 0 }),
+  enter: ({ dir, motionX = 50 }) => ({ x: dir >= 0 ? motionX : -motionX, opacity: 0 }),
   center: { x: 0, opacity: 1 },
-  exit: ({ dir }) => ({ x: dir >= 0 ? -50 : 50, opacity: 0 }),
+  exit: ({ dir, motionX = 50 }) => ({ x: dir >= 0 ? -motionX : motionX, opacity: 0 }),
 };
 
 const ProjectMeta = ({ project, isTurkish }) => (
-  <div className="max-w-md">
+  <div className="w-full max-w-md">
     <div className="mb-3 flex flex-wrap items-center gap-2">
       <span className={`rounded-lg border px-3 py-1 text-xs font-extrabold ${project.badgeClass}`}>
         {project.category}
@@ -388,9 +380,10 @@ const MorphDeviceShowcase = ({ projects, isTurkish }) => {
   const count = deviceProjects.length;
 
   const [[active, dir], setState] = useState([0, 0]);
-  const [paused, setPaused] = useState(false);
+  const rootRef = useRef(null);
   const stageRef = useRef(null);
-  const stageScale = useFitScale(stageRef);
+  const stageWidth = useElementWidth(stageRef);
+  const isVisible = useElementVisibility(rootRef);
 
   const paginate = useCallback(
     (nextDir) => {
@@ -404,10 +397,10 @@ const MorphDeviceShowcase = ({ projects, isTurkish }) => {
   }, []);
 
   useEffect(() => {
-    if (reduce || paused) return undefined;
-    const id = window.setInterval(() => paginate(1), AUTOPLAY_MS);
-    return () => window.clearInterval(id);
-  }, [reduce, paused, paginate, active]);
+    if (reduce || !isVisible || count < 2) return undefined;
+    const id = window.setTimeout(() => paginate(1), AUTOPLAY_MS);
+    return () => window.clearTimeout(id);
+  }, [reduce, isVisible, count, paginate, active]);
 
   // reduced-motion: simple stacked list, no animation
   if (reduce) {
@@ -416,9 +409,9 @@ const MorphDeviceShowcase = ({ projects, isTurkish }) => {
         {deviceProjects.map((project) => (
           <div
             key={project.id}
-            className="flex flex-col items-center gap-6 rounded-3xl border border-ink-200/60 bg-white/50 p-6 dark:border-white/10 dark:bg-white/5 sm:flex-row"
+            className="flex min-w-0 flex-col items-center gap-6 overflow-hidden rounded-3xl border border-ink-200/60 bg-white/50 p-4 dark:border-white/10 dark:bg-white/5 sm:flex-row sm:p-6"
           >
-            <div className="w-full sm:w-[56%] sm:shrink-0">
+            <div className="w-full min-w-0 sm:w-[56%] sm:shrink-0">
               <ResponsiveDeviceFrame device={project.device} project={project} isTurkish={isTurkish} />
             </div>
             <ProjectMeta project={project} isTurkish={isTurkish} />
@@ -429,20 +422,17 @@ const MorphDeviceShowcase = ({ projects, isTurkish }) => {
   }
 
   const activeProject = deviceProjects[active];
+  const metaMotionX = stageWidth >= 640 ? 50 : 0;
 
   return (
-    <div
-      className="relative w-full"
-      onMouseEnter={() => setPaused(true)}
-      onMouseLeave={() => setPaused(false)}
-    >
-      <div className="grid w-full items-center gap-8 lg:grid-cols-[1.05fr_0.95fr]">
+    <div ref={rootRef} className="relative w-full min-w-0 overflow-hidden">
+      <div className="grid w-full min-w-0 items-center gap-6 sm:gap-8 lg:grid-cols-[1.05fr_0.95fr]">
         {/* device stage */}
         <div
           ref={stageRef}
-          className="relative flex w-full min-h-[280px] items-center justify-center [perspective:1400px] sm:min-h-[420px]"
+          className="relative flex min-h-[255px] w-full min-w-0 items-center justify-center overflow-hidden [perspective:1400px] sm:min-h-[420px]"
         >
-          <DeviceFrame device={activeProject.device} scale={stageScale}>
+          <DeviceFrame device={activeProject.device} availableWidth={stageWidth}>
             <AnimatePresence custom={{ device: activeProject.device, dir }} initial={false}>
               <motion.div
                 key={activeProject.id}
@@ -462,17 +452,17 @@ const MorphDeviceShowcase = ({ projects, isTurkish }) => {
         </div>
 
         {/* meta */}
-        <div className="relative min-h-[260px] lg:min-h-[280px]">
-          <AnimatePresence custom={{ dir }} initial={false}>
+        <div className="relative min-w-0 lg:min-h-[280px]">
+          <AnimatePresence custom={{ dir, motionX: metaMotionX }} initial={false} mode="wait">
             <motion.div
               key={activeProject.id}
-              custom={{ dir }}
+              custom={{ dir, motionX: metaMotionX }}
               variants={metaVariants}
               initial="enter"
               animate="center"
               exit="exit"
               transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-              className="absolute inset-0"
+              className="relative w-full lg:absolute lg:inset-0"
             >
               <ProjectMeta project={activeProject} isTurkish={isTurkish} />
             </motion.div>
