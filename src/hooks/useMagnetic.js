@@ -14,9 +14,14 @@ export const useMagnetic = (strength = 0.22) => {
   const springX = useSpring(x, { stiffness: 180, damping: 18 });
   const springY = useSpring(y, { stiffness: 180, damping: 18 });
 
+  const rectRef = React.useRef(null);
+
   const onMouseMove = (event) => {
     if (!ref.current) return;
-    const rect = ref.current.getBoundingClientRect();
+    if (!rectRef.current) {
+      rectRef.current = ref.current.getBoundingClientRect();
+    }
+    const rect = rectRef.current;
     x.set((event.clientX - (rect.left + rect.width / 2)) * strength);
     y.set((event.clientY - (rect.top + rect.height / 2)) * strength);
   };
@@ -24,7 +29,20 @@ export const useMagnetic = (strength = 0.22) => {
   const onMouseLeave = () => {
     x.set(0);
     y.set(0);
+    rectRef.current = null;
   };
+
+  React.useEffect(() => {
+    const handleScrollOrResize = () => {
+      rectRef.current = null;
+    };
+    window.addEventListener('scroll', handleScrollOrResize, { passive: true });
+    window.addEventListener('resize', handleScrollOrResize, { passive: true });
+    return () => {
+      window.removeEventListener('scroll', handleScrollOrResize);
+      window.removeEventListener('resize', handleScrollOrResize);
+    };
+  }, []);
 
   return { ref, style: { x: springX, y: springY }, onMouseMove, onMouseLeave };
 };

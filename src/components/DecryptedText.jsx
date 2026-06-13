@@ -29,47 +29,53 @@ export default function DecryptedText({
 
   const availableChars = useMemo(() => {
     return useOriginalCharsOnly
-      ? Array.from(new Set(text.split(''))).filter(char => char !== ' ')
+      ? Array.from(new Set(text.split(''))).filter((char) => char !== ' ')
       : characters.split('');
   }, [useOriginalCharsOnly, text, characters]);
 
-  const shuffleText = useCallback((originalText, currentRevealed) => {
-    return originalText
-      .split('')
-      .map((char, i) => {
-        if (char === ' ') return ' ';
-        if (currentRevealed.has(i)) return originalText[i];
-        return availableChars[Math.floor(Math.random() * availableChars.length)];
-      })
-      .join('');
-  }, [availableChars]);
+  const shuffleText = useCallback(
+    (originalText, currentRevealed) => {
+      return originalText
+        .split('')
+        .map((char, i) => {
+          if (char === ' ') return ' ';
+          if (currentRevealed.has(i)) return originalText[i];
+          return availableChars[Math.floor(Math.random() * availableChars.length)];
+        })
+        .join('');
+    },
+    [availableChars],
+  );
 
-  const computeOrder = useCallback(len => {
-    const order = [];
-    if (len <= 0) return order;
-    if (revealDirection === 'start') {
-      for (let i = 0; i < len; i++) order.push(i);
-      return order;
-    }
-    if (revealDirection === 'end') {
-      for (let i = len - 1; i >= 0; i--) order.push(i);
-      return order;
-    }
-    // center
-    const middle = Math.floor(len / 2);
-    let offset = 0;
-    while (order.length < len) {
-      if (offset % 2 === 0) {
-        const idx = middle + offset / 2;
-        if (idx >= 0 && idx < len) order.push(idx);
-      } else {
-        const idx = middle - Math.ceil(offset / 2);
-        if (idx >= 0 && idx < len) order.push(idx);
+  const computeOrder = useCallback(
+    (len) => {
+      const order = [];
+      if (len <= 0) return order;
+      if (revealDirection === 'start') {
+        for (let i = 0; i < len; i++) order.push(i);
+        return order;
       }
-      offset++;
-    }
-    return order.slice(0, len);
-  }, [revealDirection]);
+      if (revealDirection === 'end') {
+        for (let i = len - 1; i >= 0; i--) order.push(i);
+        return order;
+      }
+      // center
+      const middle = Math.floor(len / 2);
+      let offset = 0;
+      while (order.length < len) {
+        if (offset % 2 === 0) {
+          const idx = middle + offset / 2;
+          if (idx >= 0 && idx < len) order.push(idx);
+        } else {
+          const idx = middle - Math.ceil(offset / 2);
+          if (idx >= 0 && idx < len) order.push(idx);
+        }
+        offset++;
+      }
+      return order.slice(0, len);
+    },
+    [revealDirection],
+  );
 
   const fillAllIndices = useCallback(() => {
     const s = new Set();
@@ -127,7 +133,7 @@ export default function DecryptedText({
     let interval;
     let currentIteration = 0;
 
-    const getNextIndex = revealedSet => {
+    const getNextIndex = (revealedSet) => {
       const textLength = text.length;
       switch (revealDirection) {
         case 'start':
@@ -153,7 +159,7 @@ export default function DecryptedText({
     };
 
     interval = setInterval(() => {
-      setRevealedIndices(prevRevealed => {
+      setRevealedIndices((prevRevealed) => {
         if (sequential) {
           // Forward
           if (direction === 'forward') {
@@ -243,7 +249,7 @@ export default function DecryptedText({
     fillAllIndices,
     removeRandomIndices,
     characters,
-    useOriginalCharsOnly
+    useOriginalCharsOnly,
   ]);
 
   /* Click Behaviour */
@@ -290,8 +296,8 @@ export default function DecryptedText({
   useEffect(() => {
     if (animateOn !== 'view' && animateOn !== 'inViewHover') return;
 
-    const observerCallback = entries => {
-      entries.forEach(entry => {
+    const observerCallback = (entries) => {
+      entries.forEach((entry) => {
         if (entry.isIntersecting && !hasAnimated) {
           triggerDecrypt();
           setHasAnimated(true);
@@ -302,7 +308,7 @@ export default function DecryptedText({
     const observerOptions = {
       root: null,
       rootMargin: '0px',
-      threshold: 0.1
+      threshold: 0.1,
     };
 
     const observer = new IntersectionObserver(observerCallback, observerOptions);
@@ -331,11 +337,11 @@ export default function DecryptedText({
     animateOn === 'hover' || animateOn === 'inViewHover'
       ? {
           onMouseEnter: triggerHoverDecrypt,
-          onMouseLeave: resetToPlainText
+          onMouseLeave: resetToPlainText,
         }
       : animateOn === 'click'
         ? {
-            onClick: handleClick
+            onClick: handleClick,
           }
         : {};
 
@@ -344,7 +350,8 @@ export default function DecryptedText({
       ref={containerRef}
       className={`inline-block whitespace-pre-wrap ${parentClassName}`}
       {...animateProps}
-      {...props}>
+      {...props}
+    >
       <span className="sr-only">{displayText}</span>
       <span aria-hidden="true">
         {displayText.split('').map((char, index) => {

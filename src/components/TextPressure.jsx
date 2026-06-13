@@ -54,6 +54,8 @@ const TextPressure = ({
 
   const mouseRef = useRef({ x: 0, y: 0 });
   const cursorRef = useRef({ x: 0, y: 0 });
+  const centersRef = useRef([]);
+  const maxDistRef = useRef(0);
 
   const [fontSize, setFontSize] = useState(minFontSize);
   const [scaleY, setScaleY] = useState(1);
@@ -133,10 +135,18 @@ const TextPressure = ({
   }, [chars.length, maxFontSize, minFontSize, scale]);
 
   useEffect(() => {
-    const debouncedSetSize = debounce(setSize, 100);
+    const invalidateCache = () => {
+      centersRef.current = [];
+    };
+    const debouncedSetSize = debounce(() => {
+      setSize();
+      invalidateCache();
+    }, 100);
     debouncedSetSize();
     window.addEventListener('resize', debouncedSetSize);
-    return () => window.removeEventListener('resize', debouncedSetSize);
+    return () => {
+      window.removeEventListener('resize', debouncedSetSize);
+    };
   }, [setSize]);
 
   useEffect(() => {
@@ -146,16 +156,36 @@ const TextPressure = ({
       mouseRef.current.y += (cursorRef.current.y - mouseRef.current.y) / 15;
 
       if (titleRef.current) {
-        const titleRect = titleRef.current.getBoundingClientRect();
-        const maxDist = titleRect.width / 2;
+        if (centersRef.current.length === 0) {
+          const titleRect = titleRef.current.getBoundingClientRect();
+          maxDistRef.current = titleRect.width / 2;
 
-        spansRef.current.forEach((span) => {
+          const scrollX = window.scrollX;
+          const scrollY = window.scrollY;
+          const centers = [];
+          spansRef.current.forEach((span) => {
+            if (!span) return;
+            const rect = span.getBoundingClientRect();
+            centers.push({
+              docX: rect.left + rect.width / 2 + scrollX,
+              docY: rect.top + rect.height / 2 + scrollY,
+            });
+          });
+          centersRef.current = centers;
+        }
+
+        const maxDist = maxDistRef.current || 200;
+        const scrollX = window.scrollX;
+        const scrollY = window.scrollY;
+
+        spansRef.current.forEach((span, idx) => {
           if (!span) return;
+          const cached = centersRef.current[idx];
+          if (!cached) return;
 
-          const rect = span.getBoundingClientRect();
           const charCenter = {
-            x: rect.x + rect.width / 2,
-            y: rect.y + rect.height / 2,
+            x: cached.docX - scrollX,
+            y: cached.docY - scrollY,
           };
 
           const d = dist(mouseRef.current, charCenter);

@@ -33,12 +33,12 @@ const FadeContent = ({
     }
 
     const startPct = (1 - threshold) * 100;
-    const getSeconds = val => (val > 10 ? val / 1000 : val);
+    const getSeconds = (val) => (val > 10 ? val / 1000 : val);
 
     gsap.set(el, {
       autoAlpha: initialOpacity,
       filter: blur ? 'blur(10px)' : 'blur(0px)',
-      willChange: 'opacity, filter, transform'
+      willChange: 'opacity, filter, transform',
     });
 
     const tl = gsap.timeline({
@@ -53,17 +53,17 @@ const FadeContent = ({
             delay: getSeconds(disappearAfter),
             duration: getSeconds(disappearDuration),
             ease: disappearEase,
-            onComplete: () => onDisappearanceComplete?.()
+            onComplete: () => onDisappearanceComplete?.(),
           });
         }
-      }
+      },
     });
 
     tl.to(el, {
       autoAlpha: 1,
       filter: 'blur(0px)',
       duration: getSeconds(duration),
-      ease: ease
+      ease: ease,
     });
 
     const st = ScrollTrigger.create({
@@ -71,7 +71,7 @@ const FadeContent = ({
       scroller: scrollerTarget || window,
       start: `top ${startPct}%`,
       once: true,
-      onEnter: () => tl.play()
+      onEnter: () => tl.play(),
     });
 
     return () => {

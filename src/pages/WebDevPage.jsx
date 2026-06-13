@@ -378,9 +378,14 @@ const MagneticLink = ({ href, children, className = '' }) => {
   const x = useSpring(0, { stiffness: 260, damping: 20, mass: 0.5 });
   const y = useSpring(0, { stiffness: 260, damping: 20, mass: 0.5 });
 
+  const rectRef = useRef(null);
+
   const handleMove = (e) => {
     if (reduce || !ref.current) return;
-    const rect = ref.current.getBoundingClientRect();
+    if (!rectRef.current) {
+      rectRef.current = ref.current.getBoundingClientRect();
+    }
+    const rect = rectRef.current;
     x.set(((e.clientX - rect.left) / rect.width - 0.5) * 14);
     y.set(((e.clientY - rect.top) / rect.height - 0.5) * 10);
   };
@@ -388,7 +393,20 @@ const MagneticLink = ({ href, children, className = '' }) => {
   const handleLeave = () => {
     x.set(0);
     y.set(0);
+    rectRef.current = null;
   };
+
+  React.useEffect(() => {
+    const handleScrollOrResize = () => {
+      rectRef.current = null;
+    };
+    window.addEventListener('scroll', handleScrollOrResize, { passive: true });
+    window.addEventListener('resize', handleScrollOrResize, { passive: true });
+    return () => {
+      window.removeEventListener('scroll', handleScrollOrResize);
+      window.removeEventListener('resize', handleScrollOrResize);
+    };
+  }, []);
 
   return (
     <motion.a

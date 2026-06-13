@@ -1,7 +1,7 @@
-"use client";
+'use client';
 
-import React, { useEffect, useMemo, useRef } from "react";
-import { cn } from "@/lib/utils";
+import React, { useEffect, useMemo, useRef } from 'react';
+import { cn } from '@/lib/utils';
 
 interface CyberBackgroundProps {
   children?: React.ReactNode;
@@ -13,22 +13,18 @@ interface CyberBackgroundProps {
 
 function createNoise() {
   const permutation = [
-    151, 160, 137, 91, 90, 15, 131, 13, 201, 95, 96, 53, 194, 233, 7, 225, 140,
-    36, 103, 30, 69, 142, 8, 99, 37, 240, 21, 10, 23, 190, 6, 148, 247, 120,
-    234, 75, 0, 26, 197, 62, 94, 252, 219, 203, 117, 35, 11, 32, 57, 177, 33,
-    88, 237, 149, 56, 87, 174, 20, 125, 136, 171, 168, 68, 175, 74, 165, 71,
-    134, 139, 48, 27, 166, 77, 146, 158, 231, 83, 111, 229, 122, 60, 211, 133,
-    230, 220, 105, 92, 41, 55, 46, 245, 40, 244, 102, 143, 54, 65, 25, 63, 161,
-    1, 216, 80, 73, 209, 76, 132, 187, 208, 89, 18, 169, 200, 196, 135, 130,
-    116, 188, 159, 86, 164, 100, 109, 198, 173, 186, 3, 64, 52, 217, 226, 250,
-    124, 123, 5, 202, 38, 147, 118, 126, 255, 82, 85, 212, 207, 206, 59, 227,
-    47, 16, 58, 17, 182, 189, 28, 42, 223, 183, 170, 213, 119, 248, 152, 2, 44,
-    154, 163, 70, 221, 153, 101, 155, 167, 43, 172, 9, 129, 22, 39, 253, 19, 98,
-    108, 110, 79, 113, 224, 232, 178, 185, 112, 104, 218, 246, 97, 228, 251, 34,
-    242, 193, 238, 210, 144, 12, 191, 179, 162, 241, 81, 51, 145, 235, 249, 14,
-    239, 107, 49, 192, 214, 31, 181, 199, 106, 157, 184, 84, 204, 176, 115, 121,
-    50, 45, 127, 4, 150, 254, 138, 236, 205, 93, 222, 114, 67, 29, 24, 72, 243,
-    141, 128, 195, 78, 66, 215, 61, 156, 180,
+    151, 160, 137, 91, 90, 15, 131, 13, 201, 95, 96, 53, 194, 233, 7, 225, 140, 36, 103, 30, 69, 142, 8, 99,
+    37, 240, 21, 10, 23, 190, 6, 148, 247, 120, 234, 75, 0, 26, 197, 62, 94, 252, 219, 203, 117, 35, 11, 32,
+    57, 177, 33, 88, 237, 149, 56, 87, 174, 20, 125, 136, 171, 168, 68, 175, 74, 165, 71, 134, 139, 48, 27,
+    166, 77, 146, 158, 231, 83, 111, 229, 122, 60, 211, 133, 230, 220, 105, 92, 41, 55, 46, 245, 40, 244, 102,
+    143, 54, 65, 25, 63, 161, 1, 216, 80, 73, 209, 76, 132, 187, 208, 89, 18, 169, 200, 196, 135, 130, 116,
+    188, 159, 86, 164, 100, 109, 198, 173, 186, 3, 64, 52, 217, 226, 250, 124, 123, 5, 202, 38, 147, 118, 126,
+    255, 82, 85, 212, 207, 206, 59, 227, 47, 16, 58, 17, 182, 189, 28, 42, 223, 183, 170, 213, 119, 248, 152,
+    2, 44, 154, 163, 70, 221, 153, 101, 155, 167, 43, 172, 9, 129, 22, 39, 253, 19, 98, 108, 110, 79, 113,
+    224, 232, 178, 185, 112, 104, 218, 246, 97, 228, 251, 34, 242, 193, 238, 210, 144, 12, 191, 179, 162, 241,
+    81, 51, 145, 235, 249, 14, 239, 107, 49, 192, 214, 31, 181, 199, 106, 157, 184, 84, 204, 176, 115, 121,
+    50, 45, 127, 4, 150, 254, 138, 236, 205, 93, 222, 114, 67, 29, 24, 72, 243, 141, 128, 195, 78, 66, 215,
+    61, 156, 180,
   ];
 
   const p = new Array(512);
@@ -79,16 +75,8 @@ function createNoise() {
         ),
         lerp(
           v,
-          lerp(
-            u,
-            grad(p[AA + 1], x, y, z - 1),
-            grad(p[BA + 1], x - 1, y, z - 1),
-          ),
-          lerp(
-            u,
-            grad(p[AB + 1], x, y - 1, z - 1),
-            grad(p[BB + 1], x - 1, y - 1, z - 1),
-          ),
+          lerp(u, grad(p[AA + 1], x, y, z - 1), grad(p[BA + 1], x - 1, y, z - 1)),
+          lerp(u, grad(p[AB + 1], x, y - 1, z - 1), grad(p[BB + 1], x - 1, y - 1, z - 1)),
         ),
       );
     },
@@ -97,10 +85,10 @@ function createNoise() {
 
 const COLOR_SCHEME = {
   light: {
-    background: "rgba(255, 255, 255, 0.12)",
+    background: 'rgba(255, 255, 255, 0.12)',
   },
   dark: {
-    background: "rgba(0, 0, 0, 0.12)",
+    background: 'rgba(0, 0, 0, 0.12)',
   },
 } as const;
 
@@ -129,10 +117,10 @@ export const FluidParticlesBackground = ({
     const canvas = canvasRef.current;
     if (!canvas) return;
 
-    const ctx = canvas.getContext("2d", { alpha: true });
+    const ctx = canvas.getContext('2d', { alpha: true });
     if (!ctx) return;
 
-    const reducedMotionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const reducedMotionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
 
     const resizeCanvas = () => {
       canvas.width = window.innerWidth;
@@ -142,8 +130,8 @@ export const FluidParticlesBackground = ({
     resizeCanvas();
 
     const renderStaticBackground = () => {
-      const isDark = document.documentElement.classList.contains("dark");
-      ctx.fillStyle = isDark ? "#000000" : "#ffffff";
+      const isDark = document.documentElement.classList.contains('dark');
+      ctx.fillStyle = isDark ? '#000000' : '#ffffff';
       ctx.fillRect(0, 0, canvas.width, canvas.height);
     };
 
@@ -159,14 +147,44 @@ export const FluidParticlesBackground = ({
     let rafId = 0;
     let isPaused = document.hidden || reducedMotionQuery.matches;
 
+    const cols = 20;
+    const rows = 15;
+    const flowX = new Float32Array(cols * rows);
+    const flowY = new Float32Array(cols * rows);
+    const isVioletGrid = new Uint8Array(cols * rows);
+
     const animate = () => {
-      const isDark = document.documentElement.classList.contains("dark");
+      const isDark = document.documentElement.classList.contains('dark');
       const scheme = isDark ? COLOR_SCHEME.dark : COLOR_SCHEME.light;
 
       ctx.fillStyle = scheme.background;
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-      for (const particle of particles) {
+      const cellWidth = canvas.width / cols;
+      const cellHeight = canvas.height / rows;
+      const time = Date.now() * 0.000035;
+
+      // Update flow field grid and precompute forces/colors
+      for (let r = 0; r < rows; r++) {
+        const py = r * cellHeight;
+        const rowOffset = r * cols;
+        for (let c = 0; c < cols; c++) {
+          const px = c * cellWidth;
+          const idx = rowOffset + c;
+          const n = noise.simplex3(px * noiseIntensity, py * noiseIntensity, time);
+          const angle = n * Math.PI * 2.6;
+          flowX[idx] = Math.cos(angle) * 0.85;
+          flowY[idx] = Math.sin(angle) * 0.85;
+          isVioletGrid[idx] = n > 0 ? 1 : 0;
+        }
+      }
+
+      // Group particles into bins for batched drawing
+      // 8 bins: 2 colors (violet, aqua) * 4 opacity levels
+      const bins: Particle[][] = Array.from({ length: 8 }, () => []);
+
+      for (let i = 0; i < particles.length; i++) {
+        const particle = particles[i];
         particle.life += 1;
         if (particle.life > particle.maxLife) {
           particle.life = 0;
@@ -174,18 +192,13 @@ export const FluidParticlesBackground = ({
           particle.y = Math.random() * canvas.height;
         }
 
-        const opacity =
-          Math.sin((particle.life / particle.maxLife) * Math.PI) * 0.15;
+        // Determine particle cell in the flow field grid
+        const gridC = Math.max(0, Math.min(cols - 1, Math.floor(particle.x / cellWidth)));
+        const gridR = Math.max(0, Math.min(rows - 1, Math.floor(particle.y / cellHeight)));
+        const gridIdx = gridR * cols + gridC;
 
-        const n = noise.simplex3(
-          particle.x * noiseIntensity,
-          particle.y * noiseIntensity,
-          Date.now() * 0.000035,
-        );
-
-        const angle = n * Math.PI * 2.6;
-        particle.velocity.x = Math.cos(angle) * 0.85;
-        particle.velocity.y = Math.sin(angle) * 0.85;
+        particle.velocity.x = flowX[gridIdx];
+        particle.velocity.y = flowY[gridIdx];
 
         particle.x += particle.velocity.x;
         particle.y += particle.velocity.y;
@@ -195,12 +208,35 @@ export const FluidParticlesBackground = ({
         if (particle.y < 0) particle.y = canvas.height;
         if (particle.y > canvas.height) particle.y = 0;
 
-        // NOCTURNE LAB duotone: noise field shifts particles between violet & aqua
-        const violet = isDark ? "172, 148, 255" : "124, 92, 255";
-        const aqua = isDark ? "92, 240, 216" : "14, 197, 171";
-        ctx.fillStyle = `rgba(${n > 0 ? violet : aqua}, ${opacity})`;
+        // Fast parabolic approximation of sin(pi * x): 4 * x * (1 - x)
+        const lifeRatio = particle.life / particle.maxLife;
+        const opacity = 0.6 * lifeRatio * (1 - lifeRatio);
+
+        // 4 opacity bins
+        const opacityBin = Math.max(0, Math.min(3, Math.floor((opacity / 0.15) * 4)));
+        const isViolet = isVioletGrid[gridIdx] === 1;
+        const binIndex = (isViolet ? 0 : 4) + opacityBin;
+        bins[binIndex].push(particle);
+      }
+
+      const violetColor = isDark ? '172, 148, 255' : '124, 92, 255';
+      const aquaColor = isDark ? '92, 240, 216' : '14, 197, 171';
+
+      for (let b = 0; b < 8; b++) {
+        const bin = bins[b];
+        if (bin.length === 0) continue;
+
+        const isViolet = b < 4;
+        const opacityBin = b % 4;
+        const alpha = ((opacityBin + 1) / 4) * 0.15;
+
+        ctx.fillStyle = `rgba(${isViolet ? violetColor : aquaColor}, ${alpha})`;
         ctx.beginPath();
-        ctx.arc(particle.x, particle.y, particle.size, 0, Math.PI * 2);
+        for (let i = 0; i < bin.length; i++) {
+          const p = bin[i];
+          ctx.moveTo(p.x + p.size, p.y);
+          ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+        }
         ctx.fill();
       }
 
@@ -254,20 +290,20 @@ export const FluidParticlesBackground = ({
       if (reducedMotionQuery.matches) renderStaticBackground();
     };
 
-    window.addEventListener("resize", handleResize);
-    document.addEventListener("visibilitychange", handleVisibilityChange);
+    window.addEventListener('resize', handleResize);
+    document.addEventListener('visibilitychange', handleVisibilityChange);
     if (reducedMotionQuery.addEventListener) {
-      reducedMotionQuery.addEventListener("change", handleMotionPreferenceChange);
+      reducedMotionQuery.addEventListener('change', handleMotionPreferenceChange);
     } else {
       reducedMotionQuery.addListener(handleMotionPreferenceChange);
     }
 
     return () => {
       stop();
-      window.removeEventListener("resize", handleResize);
-      document.removeEventListener("visibilitychange", handleVisibilityChange);
+      window.removeEventListener('resize', handleResize);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
       if (reducedMotionQuery.removeEventListener) {
-        reducedMotionQuery.removeEventListener("change", handleMotionPreferenceChange);
+        reducedMotionQuery.removeEventListener('change', handleMotionPreferenceChange);
       } else {
         reducedMotionQuery.removeListener(handleMotionPreferenceChange);
       }
@@ -275,18 +311,10 @@ export const FluidParticlesBackground = ({
   }, [maxParticleSize, minParticleSize, noise, noiseIntensity, particleCount]);
 
   return (
-    <div
-      className={cn(
-        "relative h-screen w-full overflow-hidden",
-        "bg-white dark:bg-black",
-        className,
-      )}
-    >
+    <div className={cn('relative h-screen w-full overflow-hidden', 'bg-white dark:bg-black', className)}>
       <canvas ref={canvasRef} className="absolute inset-0 h-full w-full" />
 
-      <div className="relative z-10 flex h-full w-full items-center justify-center">
-        {children}
-      </div>
+      <div className="relative z-10 flex h-full w-full items-center justify-center">{children}</div>
     </div>
   );
 };

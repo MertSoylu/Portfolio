@@ -23,9 +23,14 @@ const NumberedCard = ({ index, delay = 0, className = '', children }) => {
   const glowY = useMotionValue(50);
   const glow = useMotionTemplate`radial-gradient(220px circle at ${glowX}% ${glowY}%, rgba(124,92,255,0.18), rgba(39,224,196,0.10) 45%, transparent 72%)`;
 
+  const rectRef = useRef(null);
+
   const handleMove = (event) => {
     if (reduce || !ref.current) return;
-    const rect = ref.current.getBoundingClientRect();
+    if (!rectRef.current) {
+      rectRef.current = ref.current.getBoundingClientRect();
+    }
+    const rect = rectRef.current;
     const px = (event.clientX - rect.left) / rect.width;
     const py = (event.clientY - rect.top) / rect.height;
     rotY.set((px - 0.5) * 10);
@@ -39,7 +44,20 @@ const NumberedCard = ({ index, delay = 0, className = '', children }) => {
     rotY.set(0);
     glowX.set(50);
     glowY.set(50);
+    rectRef.current = null;
   };
+
+  React.useEffect(() => {
+    const handleScrollOrResize = () => {
+      rectRef.current = null;
+    };
+    window.addEventListener('scroll', handleScrollOrResize, { passive: true });
+    window.addEventListener('resize', handleScrollOrResize, { passive: true });
+    return () => {
+      window.removeEventListener('scroll', handleScrollOrResize);
+      window.removeEventListener('resize', handleScrollOrResize);
+    };
+  }, []);
 
   const revealVariants = reduce
     ? { hidden: { opacity: 0 }, visible: { opacity: 1, transition: { duration: 0.4 } } }

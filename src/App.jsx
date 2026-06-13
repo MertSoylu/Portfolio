@@ -92,14 +92,14 @@ const HomePage = () => (
 /* Directional wipe transitions per route */
 const ROUTE_DIRECTIONS = {
   '/': 'fade',
-  '/android': 'left',
-  '/web': 'right',
-  '/cybersecurity': 'up',
-  '/data-science': 'left',
-  '/case-study/mnemosyne': 'right',
-  '/case-study/typesprint': 'right',
-  '/case-study/walkkittie': 'left',
-  '/case-study/msscan': 'up',
+  '/android': 'fade',
+  '/web': 'fade',
+  '/cybersecurity': 'fade',
+  '/data-science': 'fade',
+  '/case-study/mnemosyne': 'fade',
+  '/case-study/typesprint': 'fade',
+  '/case-study/walkkittie': 'fade',
+  '/case-study/msscan': 'fade',
 };
 
 const ROUTE_OVERLAYS = {

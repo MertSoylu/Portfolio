@@ -32,7 +32,7 @@ const DEVICE_META = {
 };
 
 const FRAME_SPRING = { type: 'spring', stiffness: 130, damping: 22, mass: 0.9 };
-const AUTOPLAY_MS = 3000;
+const AUTOPLAY_MS = 5000;
 
 // ---------------------------------------------------------------------------
 // Screen content per platform
