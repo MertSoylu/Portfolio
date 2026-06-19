@@ -3,7 +3,6 @@ import { test, expect } from '@playwright/test';
 const visualCases = [
   { route: '/case-study/mnemosyne', image: '/previews/mnemosyne-live.png' },
   { route: '/case-study/typesprint', image: '/previews/typesprint-live.png' },
-  { route: '/case-study/walkkittie', image: '/previews/walkkittie.png' },
 ];
 
 test.describe('Case study visuals', () => {
@@ -14,6 +13,13 @@ test.describe('Case study visuals', () => {
       await expect(page.locator(`img[src="${item.image}"]`).first()).toBeVisible();
     });
   }
+
+  test('/case-study/walkkittie shows animated octopus pet', async ({ page }) => {
+    await page.goto('/case-study/walkkittie');
+
+    await expect(page.getByTestId('walkkittie-octopus-pet').first()).toBeVisible();
+    await expect(page.getByText(/Pixel Ahtapot|Pixel Octopus/).first()).toBeVisible();
+  });
 
   test('msscan shows terminal product surface', async ({ page }) => {
     await page.goto('/case-study/msscan');

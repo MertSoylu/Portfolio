@@ -1,35 +1,19 @@
-import React from 'react';
 import { HiCode, HiShieldCheck } from 'react-icons/hi';
 import { useLanguage } from '../../context/LanguageContext';
 import CaseStudyLayout from '../../components/CaseStudyLayout';
-import FadeContent from '../../components/FadeContent';
+import Reveal from '../../components/ui/Reveal';
 
 const InfoCard = ({ title, children }) => (
-  <div className="card-raised p-6">
-    <h2 className="mb-3 text-h3 text-ink-900 dark:text-white">{title}</h2>
-    <div className="text-body text-ink-600 dark:text-ink-200">{children}</div>
+  <div className="card p-6">
+    <h2 className="mb-3 text-h3 text-fg">{title}</h2>
+    <div className="text-body text-muted">{children}</div>
   </div>
 );
 
+const chip = 'rounded-full border border-line/12 bg-surface2 px-2.5 py-1 text-xs font-medium text-muted';
+
 const MsscanCaseStudy = () => {
   const { isTurkish } = useLanguage();
-
-  const terminalContent = (
-    <>
-      <p>
-        <span className="text-cyan-300">msscan&gt;</span> set url https://example.com
-      </p>
-      <p>
-        <span className="text-cyan-300">msscan&gt;</span> set modules xss,sqli,headers
-      </p>
-      <p>
-        <span className="text-cyan-300">msscan&gt;</span> scan
-      </p>
-      <p className="text-cyan-200">[*] Context-aware checks running</p>
-      <p className="text-accent-300">[+] Findings grouped by severity</p>
-      <p className="text-emerald-300">[✓] HTML report ready</p>
-    </>
-  );
 
   const facts = isTurkish
     ? [
@@ -69,10 +53,8 @@ const MsscanCaseStudy = () => {
       currentId="msscan"
       isTurkish={isTurkish}
       facts={facts}
-      previewVariant="terminal"
-      terminalContent={terminalContent}
     >
-      <FadeContent duration={700} blur threshold={0.1}>
+      <Reveal>
         <div className="grid gap-5 md:grid-cols-2">
           <InfoCard title={isTurkish ? 'Problem' : 'Problem'}>
             {isTurkish
@@ -85,47 +67,40 @@ const MsscanCaseStudy = () => {
               : 'msscan groups different security checks into async modules. Console output and HTML reports make findings easier to read.'}
           </InfoCard>
         </div>
-      </FadeContent>
+      </Reveal>
 
-      <FadeContent duration={700} blur threshold={0.1}>
-        <div className="card-prominent p-6 sm:p-8">
-          <div className="mb-5 flex items-center gap-3">
-            <HiShieldCheck className="h-6 w-6 text-accent-600 dark:text-accent-200" />
-            <h2 className="text-h3 text-ink-900 dark:text-white">
-              {isTurkish ? 'Teknik kararlar' : 'Technical decisions'}
-            </h2>
-          </div>
-          <ul className="grid gap-3">
-            {decisions.map((item) => (
-              <li
-                key={item}
-                className="flex gap-3 rounded-lg border border-ink-200/70 bg-white/50 p-4 text-body-sm font-semibold text-ink-600 dark:border-white/10 dark:bg-white/10 dark:text-ink-200"
-              >
-                <HiCode className="mt-0.5 h-5 w-5 shrink-0 text-cyan-500" />
-                {item}
-              </li>
-            ))}
-          </ul>
+      <Reveal className="card-prominent p-6 sm:p-8">
+        <div className="mb-5 flex items-center gap-3">
+          <HiShieldCheck className="h-6 w-6 text-accent" />
+          <h2 className="text-h3 text-fg">{isTurkish ? 'Teknik kararlar' : 'Technical decisions'}</h2>
         </div>
-      </FadeContent>
+        <ul className="grid gap-3">
+          {decisions.map((item) => (
+            <li
+              key={item}
+              className="flex gap-3 rounded-xl border border-line/10 bg-surface2 p-4 text-body-sm font-medium text-muted"
+            >
+              <HiCode className="mt-0.5 h-5 w-5 shrink-0 text-accent" />
+              {item}
+            </li>
+          ))}
+        </ul>
+      </Reveal>
 
-      <FadeContent duration={700} blur threshold={0.1}>
+      <Reveal>
         <InfoCard title={isTurkish ? 'Sonuç' : 'Result'}>
           {isTurkish
             ? 'msscan, güvenlik öğrenimini ürünleştiren bir araç: yalnızca teorik açık listesi değil, terminalden çalıştırılabilir ve rapora dökülebilir bir pratik alanı.'
             : 'msscan productizes security learning: not only a theoretical list of vulnerabilities, but a terminal workflow that can produce reports.'}
           <div className="mt-4 flex flex-wrap gap-2">
             {['Python', 'Async execution', 'Rate limiting', 'HTML reports'].map((tag) => (
-              <span
-                key={tag}
-                className="rounded-lg border border-cyan-300/50 bg-cyan-50 px-2.5 py-1 text-xs font-bold text-cyan-700 dark:border-cyan-300/20 dark:bg-cyan-300/10 dark:text-cyan-200"
-              >
+              <span key={tag} className={chip}>
                 {tag}
               </span>
             ))}
           </div>
         </InfoCard>
-      </FadeContent>
+      </Reveal>
     </CaseStudyLayout>
   );
 };
