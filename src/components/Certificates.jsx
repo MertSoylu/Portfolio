@@ -1,9 +1,9 @@
-import React from 'react';
 import { HiAcademicCap, HiExternalLink } from 'react-icons/hi';
 import { useLanguage } from '../context/LanguageContext';
 import { CERTIFICATES } from '../utils/constants';
 import SectionHeader from './home/SectionHeader';
-import NumberedCard from './home/NumberedCard';
+import Reveal from './ui/Reveal';
+import TiltedCard from './ui/TiltedCard';
 
 const Certificates = () => {
   const { isTurkish } = useLanguage();
@@ -11,72 +11,65 @@ const Certificates = () => {
   if (!CERTIFICATES.length) return null;
 
   return (
-    <section id="certificates" className="relative px-4 py-16 sm:py-20 md:py-28">
-      <div className="mx-auto max-w-6xl">
+    <section id="certificates" className="relative px-5 py-12 sm:py-20 md:py-24">
+      <div className="container-wide">
         <SectionHeader
-          index="03"
           kicker={isTurkish ? 'Eğitim' : 'Training'}
           kickerIcon={<HiAcademicCap className="h-4 w-4" />}
           title={isTurkish ? 'Sertifikalar' : 'Certificates'}
           lead={
             isTurkish
-              ? 'Öğrenme sürecimi destekleyen, güvenlik ve yazılım temelini güçlendiren eğitimler.'
-              : 'Training that supports my learning path and strengthens security and software fundamentals.'
-          }
-          aside={
-            <div className="text-left lg:text-right">
-              <div className="gradient-text text-4xl font-extrabold leading-none md:text-5xl">
-                {String(CERTIFICATES.length).padStart(2, '0')}
-              </div>
-              <div className="lab-mono mt-2 text-[10px] uppercase tracking-[0.18em] text-ink-500 dark:text-ink-300">
-                {isTurkish ? 'Belge' : 'Records'}
-              </div>
-            </div>
+              ? 'Güvenlik ve yazılım temelimi güçlendiren eğitimler.'
+              : 'Training that strengthens my security and software fundamentals.'
           }
         />
 
-        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+        <div className="grid gap-3 sm:gap-4 md:grid-cols-2 xl:grid-cols-3">
           {CERTIFICATES.map((cert, index) => (
-            <NumberedCard key={cert.id} index={index + 1} delay={index * 0.07} className="p-6">
-              <div className="mb-5 flex items-start justify-between gap-4">
-                <div className="flex h-12 w-12 items-center justify-center rounded-xl border border-violet-300/50 bg-violet-50 text-violet-700 transition-transform duration-500 group-hover:rotate-6 dark:border-aqua-300/25 dark:bg-aqua-300/10 dark:text-aqua-200">
-                  <HiAcademicCap className="h-6 w-6" />
-                </div>
-                <span className="lab-mono rounded-lg border border-ink-200/70 bg-white/50 px-3 py-1 text-[11px] font-bold text-ink-500 dark:border-white/10 dark:bg-white/10 dark:text-ink-300">
-                  {cert.date}
-                </span>
-              </div>
-
-              <h4 className="mb-2 text-h4 text-ink-900 dark:text-white">
-                {isTurkish ? cert.title.tr : cert.title.en}
-              </h4>
-              <p className="mb-4 text-body-sm font-semibold text-ink-600 dark:text-ink-200">{cert.issuer}</p>
-
-              {cert.skills?.length > 0 && (
-                <div className="mb-5 flex flex-wrap gap-2">
-                  {cert.skills.map((skill) => (
-                    <span
-                      key={skill}
-                      className="rounded-lg border border-accent-300/40 bg-accent-50 px-2.5 py-1 text-xs font-bold text-accent-700 dark:border-accent-300/20 dark:bg-accent-300/10 dark:text-accent-200"
-                    >
-                      {skill}
+            <Reveal key={cert.id} delay={index * 0.07} className="h-full">
+              <TiltedCard className="h-full" rotateAmplitude={4} scaleOnHover={1.01}>
+                <div className="card card-hover group flex h-full flex-col p-4 sm:p-5">
+                  <div className="mb-3 flex items-start justify-between gap-3">
+                    <div className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-surface2 text-accent">
+                      <HiAcademicCap className="h-5 w-5" />
+                    </div>
+                    <span className="rounded-full border border-line/12 bg-surface2 px-2.5 py-0.5 text-[11px] font-semibold text-muted">
+                      {cert.date}
                     </span>
-                  ))}
-                </div>
-              )}
+                  </div>
 
-              {cert.fileUrl && (
-                <a
-                  href={cert.fileUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="mt-auto inline-flex items-center gap-1.5 text-sm font-extrabold text-cyan-700 transition-colors hover:text-accent-600 dark:text-cyan-200 dark:hover:text-accent-200"
-                >
-                  {isTurkish ? 'Sertifikayı gör' : 'View certificate'}
-                  <HiExternalLink className="h-4 w-4 transition-transform group-hover:translate-x-1" />
-                </a>
-              )}
-            </NumberedCard>
+                  <h4 className="mb-1.5 font-display text-base font-semibold leading-snug text-fg sm:text-lg">
+                    {isTurkish ? cert.title.tr : cert.title.en}
+                  </h4>
+                  <p className="mb-3 text-xs font-medium text-muted sm:text-sm">{cert.issuer}</p>
+
+                  {cert.skills?.length > 0 && (
+                    <div className="mb-4 flex flex-wrap gap-1.5">
+                      {cert.skills.map((skill) => (
+                        <span
+                          key={skill}
+                          className="rounded-full border border-line/12 bg-surface2 px-2 py-0.5 text-[10px] font-medium text-muted"
+                        >
+                          {skill}
+                        </span>
+                      ))}
+                    </div>
+                  )}
+
+                  {cert.fileUrl && (
+                    <a
+                      href={cert.fileUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="mt-auto inline-flex items-center gap-1.5 text-sm font-semibold text-accent hover:text-accent-strong"
+                    >
+                      {isTurkish ? 'Sertifikayı gör' : 'View certificate'}
+                      <HiExternalLink className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+                    </a>
+                  )}
+                </div>
+              </TiltedCard>
+            </Reveal>
           ))}
         </div>
       </div>

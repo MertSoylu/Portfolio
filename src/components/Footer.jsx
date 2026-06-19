@@ -1,22 +1,6 @@
-import React from 'react';
-import { motion } from 'framer-motion';
 import { HiMail } from 'react-icons/hi';
 import { FiGithub, FiLinkedin } from 'react-icons/fi';
 import { useLanguage } from '../context/LanguageContext';
-
-const footerGrid = {
-  hidden: {},
-  visible: { transition: { staggerChildren: 0.1, delayChildren: 0.05 } },
-};
-
-const footerColumn = {
-  hidden: { opacity: 0, y: 20 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.5, ease: [0.22, 1, 0.36, 1] },
-  },
-};
 
 const Footer = () => {
   const { isTurkish } = useLanguage();
@@ -33,83 +17,70 @@ const Footer = () => {
   ];
 
   return (
-    <footer className="mt-20 border-t border-ink-200/70 bg-white/50 px-4 py-12 backdrop-blur-xl dark:border-white/10 dark:bg-white/5">
-      <div className="mx-auto max-w-6xl">
-        <div className="studio-rule mb-10" />
-
-        <motion.div
-          variants={footerGrid}
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, margin: '-30px' }}
-          className="grid gap-8 md:grid-cols-[1.4fr_1fr_1fr]"
-        >
-          <motion.div variants={footerColumn}>
-            <p className="mb-2 text-caption text-cyan-700 dark:text-cyan-200">Product studio portfolio</p>
-            <h3 className="text-h2 gradient-text mb-3">Mert Soylu</h3>
-            <p className="max-w-sm text-sm leading-relaxed text-ink-600 dark:text-ink-200">
+    <footer className="mt-12 border-t border-line/10 px-5 py-14">
+      <div className="container-wide">
+        <div className="grid gap-10 md:grid-cols-[1.5fr_1fr_1fr]">
+          <div>
+            <h3 className="mb-3 font-display text-2xl font-semibold text-fg">Mert Soylu</h3>
+            <p className="max-w-sm text-sm leading-relaxed text-muted">
               {isTurkish
                 ? 'Web, Android, güvenlik ve yapay zeka alanlarında ürüne dönüşen projeler geliştiriyorum.'
                 : 'Building product-minded projects across web, Android, security, and AI.'}
             </p>
-          </motion.div>
+          </div>
 
-          <motion.div variants={footerColumn}>
-            <h4 className="mb-4 text-sm font-extrabold text-ink-900 dark:text-white">
+          <div>
+            <h4 className="mb-4 text-xs font-semibold uppercase tracking-[0.18em] text-muted">
               {isTurkish ? 'Sayfalar' : 'Pages'}
             </h4>
-            <ul className="space-y-2">
+            <ul className="space-y-2.5">
               {[
-                { name: isTurkish ? 'Hakkimda' : 'About', href: '#about' },
-                { name: isTurkish ? 'Projeler' : 'Projects', href: '#projects' },
-                { name: isTurkish ? 'İletişim' : 'Contact', href: '#contact' },
+                { name: isTurkish ? 'Hakkımda' : 'About', href: '/#about' },
+                { name: isTurkish ? 'Projeler' : 'Projects', href: '/#projects' },
+                { name: isTurkish ? 'İletişim' : 'Contact', href: '/#contact' },
               ].map((link) => (
                 <li key={link.name}>
                   <a
                     href={link.href}
-                    className="inline-flex rounded-lg px-1 py-1 text-sm font-semibold text-ink-600 hover:text-cyan-700 dark:text-ink-200 dark:hover:text-cyan-100"
+                    className="text-sm font-medium text-muted transition-colors hover:text-fg"
                   >
                     {link.name}
                   </a>
                 </li>
               ))}
             </ul>
-          </motion.div>
+          </div>
 
-          <motion.div variants={footerColumn}>
-            <h4 className="mb-4 text-sm font-extrabold text-ink-900 dark:text-white">
-              {isTurkish ? 'Baglantilar' : 'Connect'}
+          <div>
+            <h4 className="mb-4 text-xs font-semibold uppercase tracking-[0.18em] text-muted">
+              {isTurkish ? 'Bağlantılar' : 'Connect'}
             </h4>
             <div className="flex gap-3">
               {socialLinks.map((link) => (
-                <motion.a
+                <a
                   key={link.name}
                   href={link.href}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex h-11 w-11 items-center justify-center rounded-lg border border-ink-200/70 bg-white/50 text-ink-600 shadow-soft hover:border-cyan-300 hover:text-cyan-700 dark:border-white/10 dark:bg-white/10 dark:text-ink-100 dark:hover:text-cyan-100"
-                  whileHover={{ scale: 1.08, y: -2 }}
-                  whileTap={{ scale: 0.94 }}
+                  className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-line/12 bg-surface text-fg transition-colors hover:border-line/25 hover:bg-surface2"
                   title={link.name}
                   aria-label={link.name}
                 >
                   {link.icon}
-                </motion.a>
+                </a>
               ))}
             </div>
-          </motion.div>
-        </motion.div>
+          </div>
+        </div>
 
-        <div className="mt-10 flex flex-col justify-between gap-3 border-t border-ink-200/70 pt-6 text-sm text-ink-500 dark:border-white/10 dark:text-ink-300 md:flex-row">
+        <div className="mt-12 flex flex-col justify-between gap-3 border-t border-line/10 pt-6 text-sm text-muted md:flex-row">
           <p>
             {isTurkish
-              ? `© ${currentYear} Mert Soylu. Tum haklari saklidir.`
+              ? `© ${currentYear} Mert Soylu. Tüm hakları saklıdır.`
               : `© ${currentYear} Mert Soylu. All rights reserved.`}
           </p>
           <p>
-            {isTurkish
-              ? 'React, Tailwind CSS ve Framer Motion ile gelistirildi'
-              : 'Built with React, Tailwind CSS, and Framer Motion'}
+            {isTurkish ? 'React ve Tailwind CSS ile geliştirildi.' : 'Built with React and Tailwind CSS.'}
           </p>
         </div>
       </div>
