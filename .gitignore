@@ -42,3 +42,6 @@ Thumbs.db
 # Tools
 .playwright-mcp/
 .superpowers/
+
+# Backup files
+*.bak
