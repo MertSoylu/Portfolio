@@ -79,7 +79,7 @@ export const SECTIONS = {
 };
 
 export const HERO_ROLES = {
-  tr: ['React Developer', 'Full-Stack Developer', 'AI Developer', 'Security-Minded'],
+  tr: ['React Geliştiricisi', 'Full-Stack Geliştirici', 'Yapay Zekâ Geliştiricisi', 'Güvenlik Odaklı'],
   en: ['React Developer', 'Full-Stack Developer', 'AI Developer', 'Security-Minded'],
 };
 

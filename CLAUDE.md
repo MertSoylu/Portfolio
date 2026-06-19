@@ -1,60 +1,67 @@
 # CLAUDE.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+React 18 SPA portfolio. React Router v6, Tailwind CSS v3, Framer Motion v10. `@` → `src/`.
 
 ## Commands
 
 ```bash
-npm run dev            # Vite dev server (port 3000, auto-opens)
-npm run build          # Production build
-npm run build:analyze  # Build + open rollup bundle visualizer (dist/stats.html)
-npm run preview        # Preview production build
-npm run lint           # ESLint on .js/.jsx
-npm run format         # Prettier write src + root files
-npm run test           # Vitest run (unit, jsdom)
-npm run test:watch     # Vitest watch
-npm run e2e            # Playwright e2e
+npm run dev        # Vite dev server port 3000
+npm run build      # Production build
+npm run lint       # ESLint .js/.jsx
+npm run format     # Prettier write
+npm run test       # Vitest
+npm run e2e        # Playwright
 ```
 
-Run single unit test: `npx vitest run tests/unit/seo-meta.test.js`
-Run single e2e: `npx playwright test tests/e2e/smoke.spec.js`
+Single unit: `npx vitest run tests/unit/<file>`
+Single e2e: `npx playwright test tests/e2e/<file>`
 
-Pre-commit: husky + lint-staged auto-runs `eslint --fix` + prettier on staged files. Commit messages enforced by commitlint (Conventional Commits).
+Pre-commit: husky + lint-staged runs eslint --fix + prettier on staged. commitlint enforces Conventional Commits.
 
 ## Architecture
 
-React 18 SPA. React Router v6, Tailwind CSS, Framer Motion. `@` aliases `src/` (vite + works in imports).
-
-**Entry** (`src/main.jsx`): `HelmetProvider` > `BrowserRouter` > `App`. Forces manual scroll restoration + scroll-to-top on load. `initWebVitals()` reports Core Web Vitals.
-
-**Provider stack** (`src/App.jsx`, outer→inner): `ErrorBoundary` > `MotionConfig reducedMotion="user"` > `DarkModeProvider` > `LanguageProvider` > `CommandPaletteProvider` > `AppContent`. `Toaster` (react-hot-toast) + deferred Vercel Analytics/SpeedInsights siblings.
+**Provider stack** (`src/App.jsx`, outer→inner): `ErrorBoundary` > `MotionConfig` > `DarkModeProvider` > `LanguageProvider` > `AppContent`. `Toaster` + deferred Vercel Analytics/SpeedInsights siblings.
 
 - `DarkModeContext` — `isDark` + toggle; `.dark` class on root div
-- `LanguageContext` — `useLanguage()` returns `{ language, isTurkish, toggleLanguage }`; persists to localStorage, sets `<html lang>` + `data-lang`. Strings live in `src/utils/constants.js`
-- `CommandPalette` (kbar) — ⌘K command palette
+- `LanguageContext` — `useLanguage()` returns `{ language, isTurkish, toggleLanguage }`; persists to localStorage, sets `<html lang>`. Strings in `src/utils/constants.js`
 
-**Routing** (`src/App.jsx`): `HomePage` (`/`) = `Hero` + lazy `About`/`Certificates`/`Projects`/`Contact` under one `Suspense`, joined by `SectionDivider`. Standalone pages: `/web`, `/android`, `/cybersecurity`, `/data-science`. Case studies: `/case-study/{mnemosyne,typesprint,walkkittie,msscan}`. `*` → `NotFoundPage`.
+**Routing**: Lazy pages via `lazyWithRetry()` — catches chunk load failures, does one-time sessionStorage-guarded page reload. `HomePage` (`/`) = `Hero` + lazy `About`/`Certificates`/`Projects`/`Contact` stacked with `SectionDivider`. Standalone: `/web`, `/android`, `/cybersecurity`, `/data-science`. Case studies: `/case-study/{mnemosyne,typesprint,walkkittie,msscan}`.
 
-**Lazy loading**: every route + heavy component loaded via `lazyWithRetry` — on chunk load failure it does a one-time `sessionStorage`-guarded page reload (handles stale-deploy chunk 404s) before throwing. Add new pages through this helper, not bare `lazy()`.
+**Per-route transitions**: `src/App.jsx` — `<PageTransition>` motion wrapper with fade+slide. Collapses to plain opacity fade when `prefersReducedMotion`. No ROUTE_DIRECTIONS/ROUTE_OVERLAYS/ROUTE_PARTICLES (removed in ReactBits migration).
 
-**Per-route motion config** (objects keyed by pathname in `App.jsx`): `ROUTE_DIRECTIONS` (wipe direction), `ROUTE_OVERLAYS` (gradient tint classes), `ROUTE_PARTICLES` (particle count + noise). When adding a route, add matching entries to all three. `PageTransition` does clip-path wipe transitions; collapses to simple fade when `prefersReducedMotion`.
+**Homepage sections**: Hero (ASCIIText name + RotatingText roles + GradientText CTA), About (MagicBento bento grid), Projects (2×2 project card grid + compact GitHub feed), LogoLoop (infinite tech icon marquee), Certificates (TiltedCard), Contact (form + channels).
 
-**Background**: `FluidParticlesBackground` (`src/components/ui/fluid-particles-background.tsx`, ogl/WebGL) — lazy + deferred (`DeferredParticlesBackground` waits for window load + idle, disabled on reduced-motion, downscaled particle count on mobile). This replaced the old SandBackground/CustomCursor.
+**Background**: Aurora (WebGL ogl, fixed, top 65vh) + Noise (canvas grain) + ClickSpark (canvas burst). All continuous RAF.
 
-**Motion/effect components**: `src/components/motion/` (`KineticHeadline`, `MorphBlob`, `ScrollScene`) + many reusable text/card effects in `src/components/` (`DecryptedText`, `SplitFlapText`, `TextPressure`, `ScrollReveal`, `TiltCard`, `SpotlightCard`, `ElectricBorder`, etc.). GSAP + Lenis (smooth scroll) available.
+## ReactBits Components
 
-**Page scaffolds**: `SpecialtyPageLayout` (specialty pages), `CaseStudyLayout` (case studies), `PageMeta` (per-route SEO via Helmet).
+All copy-pasted from [reactbits.dev](https://reactbits.dev) (not npm).
 
-**Data** (`src/utils/githubApi.js`): GitHub REST via native `fetch` (no axios). Stale-while-revalidate — `fetchGitHubRepos` returns cached repos immediately, revalidates in background, notifies subscribers via `onReposUpdate`. Client-side rate limiting (20 req/min) + server 403/429 cooldown honoring `x-ratelimit-reset`. Caches in memory + sessionStorage. Env: `VITE_GITHUB_USERNAME` (default `MertSoylu`), optional `VITE_GITHUB_TOKEN`.
+| Component     | File                                  | Notes                                                  |
+| ------------- | ------------------------------------- | ------------------------------------------------------ |
+| Aurora        | `src/components/ui/Aurora.jsx`        | WebGL (ogl). ColorStops, speed, blend, amplitude.      |
+| ClickSpark    | `src/components/ui/ClickSpark.jsx`    | Canvas spark on click.                                 |
+| Noise         | `src/components/ui/Noise.jsx`         | Canvas grain overlay, 1024×1024, continuous RAF.       |
+| SpotlightCard | `src/components/ui/SpotlightCard.jsx` | Radial gradient on mouse move. Project cards.          |
+| TiltedCard    | `src/components/ui/TiltedCard.jsx`    | 3D tilt on hover. Certificate cards.                   |
+| RotatingText  | `src/components/RotatingText.jsx`     | Auto-cycling text (framer-motion). Hero roles.         |
+| ShinyText     | `src/components/ui/ShinyText.jsx`     | CSS gradient shimmer. SectionHeader eyebrows.          |
+| ASCIIText     | `src/components/ui/ASCIIText.jsx`     | Canvas→ASCII pixel rendering. Hero name.               |
+| GradientText  | `src/components/ui/GradientText.jsx`  | Animated gradient text via motion value. Hero CTA.     |
+| LogoLoop      | `src/components/ui/LogoLoop.jsx`      | RAF-driven infinite logo marquee. Below Projects.      |
+| Magnet        | `src/components/ui/Magnet.jsx`        | Mouse-track translate3d pull. Navbar links.            |
+| MagicBento    | `src/components/ui/MagicBento.jsx`    | Bento grid with mouse-follow spotlight. About section. |
 
-**Build** (`vite.config.js`): manual vendor chunks (react, motion, ogl, gsap, lenis, icons, vercel). PWA via `vite-plugin-pwa` (autoUpdate SW, runtime caching for Cloudinary images / GitHub API / Google Fonts; `cv.pdf` + `/certificates/` denied from navigate-fallback).
+**Performance-sensitive**: Aurora (WebGL 60fps, full viewport), Noise (canvas 60fps, 1024px). Both run continuous RAF.
 
-## Security Headers
+## Data
 
-`vercel.json` — defense-in-depth (fixes security audit findings):
+`src/utils/githubApi.js`: GitHub REST via native `fetch`. Stale-while-revalidate — `fetchGitHubRepos` returns cached repos immediately, revalidates in background. Rate limiting (20 req/min) + 403/429 cooldown. Caches in memory + sessionStorage. Env: `VITE_GITHUB_USERNAME` (default `MertSoylu`), optional `VITE_GITHUB_TOKEN`.
 
-- **CSP**: strict (self-hosted scripts/styles, GitHub API access)
-- **X-Frame-Options**: DENY (clickjacking)
-- **X-Content-Type-Options**: nosniff
-- **Referrer-Policy**: strict-origin-when-cross-origin
-- **Permissions-Policy**: browser APIs disabled (geolocation, mic, camera, payment, etc.)
+## Pitfalls
+
+- `DarkModeContext` toggles `dark` class on root div. Affects Tailwind `dark:` selectors.
+- Changing `vercel.json` CSP requires syncing `netlify.toml` security headers.
+- Vite chunk splitting in `vite.config.js` hardcodes vendor bundles. `chunkSizeWarningLimit: 600` kB.
+- GSAP remains bundled (`vendor-gsap` chunk) but no components currently use it.
+- Route transition edits affect only `src/App.jsx` `<PageTransition>`.

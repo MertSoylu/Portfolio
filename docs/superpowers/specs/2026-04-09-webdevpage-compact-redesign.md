@@ -25,6 +25,8 @@ Gradient başlık bandı **tamamen kaldırılır**. Her kart yatay düzende üç
 └─────────────────────────────────────────────────────────┘
 ```
 
+<!-- aislopfixer: Bold-lead bullet list (5/5 items) — AI feature-list shape -->
+
 - **Thumbnail:** `SitePreview` bileşeni `w-28 h-20` boyutunda, projenin accent rengiyle border
 - **Başlık alanı:** Proje adı (bold), URL (muted text), sağda "Ziyaret Et" butonu
 - **Açıklama:** Sadece `description` alanı gösterilir (`longDesc` toggle arkasına gizlenir)
@@ -39,13 +41,13 @@ Gradient başlık bandı **tamamen kaldırılır**. Her kart yatay düzende üç
 
 ### Sayfa Genel Düzeni
 
-| Alan | Önce | Sonra |
-|------|------|-------|
-| Container genişliği | `max-w-5xl` | `max-w-3xl` |
-| Hero alt boşluk | `mb-16` | `mb-8` |
-| Kartlar arası boşluk | `space-y-20` | `space-y-4` |
-| Başlık font | `text-6xl` | `text-4xl md:text-5xl` |
-| Açıklama font | `text-lg` | `text-base` |
+| Alan                 | Önce         | Sonra                  |
+| -------------------- | ------------ | ---------------------- |
+| Container genişliği  | `max-w-5xl`  | `max-w-3xl`            |
+| Hero alt boşluk      | `mb-16`      | `mb-8`                 |
+| Kartlar arası boşluk | `space-y-20` | `space-y-4`            |
+| Başlık font          | `text-6xl`   | `text-4xl md:text-5xl` |
+| Açıklama font        | `text-lg`    | `text-base`            |
 
 ### Animasyonlar ve Etkileşimler
 

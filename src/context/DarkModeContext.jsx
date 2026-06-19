@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import { createContext, useContext, useState, useEffect } from 'react';
 
 const DarkModeContext = createContext();
 
@@ -13,9 +13,9 @@ export const DarkModeProvider = ({ children }) => {
     try {
       const saved = localStorage.getItem('darkMode');
       if (saved !== null) return JSON.parse(saved);
-      return window.matchMedia('(prefers-color-scheme: dark)').matches;
+      return true; // default to dark theme
     } catch {
-      return false;
+      return true;
     }
   });
 

@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState, lazy, Suspense } from 'react';
+import React, { useEffect, useState, lazy, Suspense } from 'react';
 import { Routes, Route, useLocation } from 'react-router-dom';
 import { AnimatePresence, motion, MotionConfig, useReducedMotion } from 'framer-motion';
 import { DarkModeProvider, useDarkMode } from './context/DarkModeContext';
@@ -9,7 +9,12 @@ import Footer from './components/Footer';
 import LoadingSpinner from './components/LoadingSpinner';
 import ErrorBoundary from './components/ErrorBoundary';
 import PageMeta from './components/PageMeta';
-import CommandPaletteProvider from './components/CommandPalette';
+import { DiReact, DiNodejsSmall, DiPython, DiAndroid, DiGit, DiDocker } from 'react-icons/di';
+import { SiTypescript, SiTailwindcss, SiKotlin, SiPostgresql, SiFigma, SiFirebase } from 'react-icons/si';
+import Aurora from './components/ui/Aurora';
+import ClickSpark from './components/ui/ClickSpark';
+import Noise from './components/ui/Noise';
+import LogoLoop from './components/ui/LogoLoop';
 import { Toaster } from 'react-hot-toast';
 
 const lazyWithRetry = (importer, cacheKey) =>
@@ -33,13 +38,6 @@ const lazyWithRetry = (importer, cacheKey) =>
     }
   });
 
-const LazyFluidParticlesBackground = lazyWithRetry(
-  () =>
-    import('@/components/ui/fluid-particles-background').then((module) => ({
-      default: module.FluidParticlesBackground,
-    })),
-  'lazy-retry-fluid-particles',
-);
 const WebDevPage = lazyWithRetry(() => import('./pages/WebDevPage'), 'lazy-retry-web');
 const AndroidPage = lazyWithRetry(() => import('./pages/AndroidPage'), 'lazy-retry-android');
 const CyberSecurityPage = lazyWithRetry(() => import('./pages/CyberSecurityPage'), 'lazy-retry-cyber');
@@ -67,20 +65,52 @@ const MsscanCaseStudy = lazyWithRetry(
 const NotFoundPage = lazyWithRetry(() => import('./pages/NotFoundPage'), 'lazy-retry-404');
 
 const SectionDivider = () => (
-  <div className="mx-auto flex h-14 w-full max-w-6xl items-center px-4">
-    <div className="studio-rule w-full" />
+  <div className="container-wide py-2">
+    <div className="rule" />
   </div>
 );
+
+const techLogos = [
+  <DiReact key="react" className="text-[#61DAFB]" />,
+  <DiNodejsSmall key="node" className="text-[#339933]" />,
+  <SiTypescript key="ts" className="text-[#3178C6]" />,
+  <SiTailwindcss key="tw" className="text-[#06B6D4]" />,
+  <DiPython key="py" className="text-[#3776AB]" />,
+  <DiAndroid key="android" className="text-[#3DDC84]" />,
+  <SiKotlin key="kotlin" className="text-[#7F52FF]" />,
+  <DiGit key="git" className="text-[#F05032]" />,
+  <DiDocker key="docker" className="text-[#2496ED]" />,
+  <SiPostgresql key="pg" className="text-[#4169E1]" />,
+  <SiFigma key="figma" className="text-[#F24E1E]" />,
+  <SiFirebase key="firebase" className="text-[#FFCA28]" />,
+];
 
 const HomePage = () => (
   <>
     <PageMeta route="/" />
     <Hero />
     <Suspense fallback={null}>
-      <SectionDivider />
       <About />
       <SectionDivider />
       <Projects />
+      <SectionDivider />
+      <section className="py-9 sm:py-10">
+        <div className="container-wide">
+          <p className="mb-5 text-center text-xs font-semibold uppercase tracking-[0.2em] text-muted sm:mb-6">
+            Tech stack
+          </p>
+          <LogoLoop
+            logos={techLogos}
+            speed={70}
+            direction="right"
+            logoHeight={30}
+            gap={36}
+            hoverSpeed={18}
+            fadeOut
+            scaleOnHover
+          />
+        </div>
+      </section>
       <SectionDivider />
       <Certificates />
       <SectionDivider />
@@ -89,80 +119,10 @@ const HomePage = () => (
   </>
 );
 
-/* Directional wipe transitions per route */
-const ROUTE_DIRECTIONS = {
-  '/': 'fade',
-  '/android': 'fade',
-  '/web': 'fade',
-  '/cybersecurity': 'fade',
-  '/data-science': 'fade',
-  '/case-study/mnemosyne': 'fade',
-  '/case-study/typesprint': 'fade',
-  '/case-study/walkkittie': 'fade',
-  '/case-study/msscan': 'fade',
-};
+const EASE = [0.22, 1, 0.36, 1];
 
-const ROUTE_OVERLAYS = {
-  '/': 'from-white/70 via-violet-50/45 to-white/70 dark:from-ink-900/90 dark:via-violet-900/25 dark:to-ink-900/90',
-  '/web':
-    'from-white/70 via-cyan-50/40 to-white/70 dark:from-ink-900/80 dark:via-ink-800/70 dark:to-ink-900/80',
-  '/android':
-    'from-white/70 via-emerald-50/40 to-white/70 dark:from-ink-900/80 dark:via-emerald-950/30 dark:to-ink-900/80',
-  '/cybersecurity':
-    'from-white/75 via-accent-50/40 to-white/75 dark:from-ink-900/90 dark:via-accent-950/25 dark:to-ink-900/90',
-  '/data-science':
-    'from-white/70 via-ink-50/40 to-white/70 dark:from-ink-900/90 dark:via-ink-800/70 dark:to-ink-900/90',
-  '/case-study/mnemosyne':
-    'from-white/70 via-cyan-50/40 to-white/70 dark:from-ink-900/80 dark:via-cyan-950/25 dark:to-ink-900/80',
-  '/case-study/typesprint':
-    'from-white/70 via-accent-50/40 to-white/70 dark:from-ink-900/80 dark:via-accent-950/20 dark:to-ink-900/80',
-  '/case-study/walkkittie':
-    'from-white/70 via-cyan-50/40 to-white/70 dark:from-ink-900/80 dark:via-cyan-950/20 dark:to-ink-900/80',
-  '/case-study/msscan':
-    'from-white/75 via-ink-50/40 to-white/75 dark:from-ink-900/90 dark:via-ink-800/75 dark:to-ink-900/90',
-};
-
-const ROUTE_PARTICLES = {
-  '/': { particleCount: 950, noiseIntensity: 0.0024 },
-  '/web': { particleCount: 780, noiseIntensity: 0.0021 },
-  '/android': { particleCount: 900, noiseIntensity: 0.0023 },
-  '/cybersecurity': { particleCount: 1150, noiseIntensity: 0.0028 },
-  '/data-science': { particleCount: 720, noiseIntensity: 0.0018 },
-  '/case-study/mnemosyne': { particleCount: 820, noiseIntensity: 0.0022 },
-  '/case-study/typesprint': { particleCount: 820, noiseIntensity: 0.0022 },
-  '/case-study/walkkittie': { particleCount: 880, noiseIntensity: 0.0024 },
-  '/case-study/msscan': { particleCount: 1050, noiseIntensity: 0.0027 },
-};
-
-const getClipPath = (direction, state) => {
-  const clips = {
-    left: {
-      initial: 'inset(0 100% 0 0)',
-      animate: 'inset(0 0% 0 0)',
-      exit: 'inset(0 0 0 100%)',
-    },
-    right: {
-      initial: 'inset(0 0 0 100%)',
-      animate: 'inset(0 0 0 0%)',
-      exit: 'inset(0 100% 0 0)',
-    },
-    up: {
-      initial: 'inset(100% 0 0 0)',
-      animate: 'inset(0% 0 0 0)',
-      exit: 'inset(0 0 100% 0)',
-    },
-    fade: {
-      initial: 'inset(0 0 0 0)',
-      animate: 'inset(0 0 0 0)',
-      exit: 'inset(0 0 0 0)',
-    },
-  };
-  return clips[direction]?.[state] || clips.fade[state];
-};
-
-const PageTransition = ({ children, direction = 'fade' }) => {
+const PageTransition = ({ children }) => {
   const prefersReducedMotion = useReducedMotion();
-  const isFade = direction === 'fade';
 
   if (prefersReducedMotion) {
     return (
@@ -179,23 +139,9 @@ const PageTransition = ({ children, direction = 'fade' }) => {
 
   return (
     <motion.div
-      initial={{
-        opacity: 0,
-        clipPath: getClipPath(direction, 'initial'),
-        ...(isFade && { y: 24, scale: 0.98, filter: 'blur(14px)' }),
-      }}
-      animate={{
-        opacity: 1,
-        clipPath: getClipPath(direction, 'animate'),
-        ...(isFade && { y: 0, scale: 1, filter: 'blur(0px)' }),
-        transition: { duration: isFade ? 0.6 : 0.5, ease: [0.22, 1, 0.36, 1] },
-      }}
-      exit={{
-        opacity: 0,
-        clipPath: getClipPath(direction, 'exit'),
-        ...(isFade && { y: -16, scale: 1.01, filter: 'blur(10px)' }),
-        transition: { duration: 0.3, ease: [0.55, 0, 1, 0.45] },
-      }}
+      initial={{ opacity: 0, y: 14 }}
+      animate={{ opacity: 1, y: 0, transition: { duration: 0.45, ease: EASE } }}
+      exit={{ opacity: 0, y: -10, transition: { duration: 0.25, ease: EASE } }}
     >
       {children}
     </motion.div>
@@ -241,7 +187,6 @@ const scrollToHashTarget = (hash, behavior = 'smooth', attempts = 10) => {
   };
 };
 
-/* Scroll to top or hash on route change */
 const ScrollToTop = () => {
   const { pathname, hash } = useLocation();
   const isInitialMount = React.useRef(true);
@@ -264,101 +209,23 @@ const ScrollToTop = () => {
   return null;
 };
 
-const DeferredParticlesBackground = ({ particleCount, ...props }) => {
-  const prefersReducedMotion = useReducedMotion();
-  const [shouldRender, setShouldRender] = useState(false);
-
-  useEffect(() => {
-    if (prefersReducedMotion || particleCount <= 0) return undefined;
-
-    let cancelled = false;
-    let removeLoadListener = null;
-    let cancelScheduledLoad = null;
-
-    const enableParticles = () => {
-      if (!cancelled) setShouldRender(true);
-    };
-
-    const scheduleLoad = () => {
-      const timeoutId = window.setTimeout(enableParticles, 1800);
-      cancelScheduledLoad = () => window.clearTimeout(timeoutId);
-    };
-
-    if (document.readyState === 'complete') {
-      scheduleLoad();
-    } else {
-      const handleLoad = () => scheduleLoad();
-      window.addEventListener('load', handleLoad, { once: true });
-      removeLoadListener = () => window.removeEventListener('load', handleLoad);
-    }
-
-    return () => {
-      cancelled = true;
-      if (removeLoadListener) removeLoadListener();
-      if (cancelScheduledLoad) cancelScheduledLoad();
-    };
-  }, [particleCount, prefersReducedMotion]);
-
-  if (!shouldRender) return null;
-
-  return (
-    <Suspense fallback={null}>
-      <LazyFluidParticlesBackground particleCount={particleCount} {...props} />
-    </Suspense>
-  );
-};
-
 const AppContent = () => {
   const { isDark } = useDarkMode();
   const location = useLocation();
-  const prefersReducedMotion = useReducedMotion();
-  const [isMobile, setIsMobile] = useState(false);
-  const overlayClass = ROUTE_OVERLAYS[location.pathname] || ROUTE_OVERLAYS['/'];
-  const routeDirection = ROUTE_DIRECTIONS[location.pathname] || 'fade';
-  const particleSettings = ROUTE_PARTICLES[location.pathname] || ROUTE_PARTICLES['/'];
-  const particleCount = prefersReducedMotion
-    ? 0
-    : isMobile
-      ? Math.max(180, Math.min(220, Math.round(particleSettings.particleCount * 0.22)))
-      : particleSettings.particleCount;
-  const particleNoiseIntensity = prefersReducedMotion
-    ? 0
-    : isMobile
-      ? particleSettings.noiseIntensity * 0.75
-      : particleSettings.noiseIntensity;
-  const particleSize = useMemo(
-    () => (isMobile ? { min: 0.45, max: 1.05 } : { min: 0.5, max: 2 }),
-    [isMobile],
-  );
-
-  useEffect(() => {
-    const mediaQuery = window.matchMedia('(max-width: 767px)');
-    const handleChange = (event) => setIsMobile(event.matches);
-
-    setIsMobile(mediaQuery.matches);
-
-    if (mediaQuery.addEventListener) {
-      mediaQuery.addEventListener('change', handleChange);
-      return () => mediaQuery.removeEventListener('change', handleChange);
-    }
-
-    mediaQuery.addListener(handleChange);
-    return () => mediaQuery.removeListener(handleChange);
-  }, []);
 
   return (
-    <div className={`relative overflow-x-hidden transition-colors duration-300 ${isDark ? 'dark' : ''}`}>
-      <DeferredParticlesBackground
-        particleCount={particleCount}
-        noiseIntensity={particleNoiseIntensity}
-        particleSize={particleSize}
-        className="pointer-events-none fixed inset-0 z-0 h-full bg-transparent dark:bg-transparent"
-      />
-      <div className={`pointer-events-none fixed inset-0 z-[1] bg-gradient-to-b ${overlayClass}`} />
-      <div className="relative z-10">
+    <div className={`relative overflow-x-hidden ${isDark ? 'dark' : ''}`}>
+      <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
+        <div className="absolute inset-0 max-h-[65vh]">
+          <Aurora />
+        </div>
+        <div className="absolute inset-x-0 top-[50vh] h-[40vh] bg-gradient-to-b from-transparent to-canvas pointer-events-none" />
+      </div>
+      <Noise />
+      <ClickSpark>
         <a
           href="#main"
-          className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[9999] focus:rounded-lg focus:bg-accent-500 focus:px-4 focus:py-2 focus:text-white focus:shadow-lg"
+          className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[9999] focus:rounded-lg focus:bg-accent focus:px-4 focus:py-2 focus:text-white focus:shadow-lift"
         >
           Skip to main content
         </a>
@@ -370,7 +237,7 @@ const AppContent = () => {
               <Route
                 path="/"
                 element={
-                  <PageTransition direction={routeDirection}>
+                  <PageTransition>
                     <HomePage />
                   </PageTransition>
                 }
@@ -379,7 +246,7 @@ const AppContent = () => {
                 path="/android"
                 element={
                   <Suspense fallback={<LoadingSpinner />}>
-                    <PageTransition direction={routeDirection}>
+                    <PageTransition>
                       <AndroidPage />
                     </PageTransition>
                   </Suspense>
@@ -389,7 +256,7 @@ const AppContent = () => {
                 path="/web"
                 element={
                   <Suspense fallback={<LoadingSpinner />}>
-                    <PageTransition direction={routeDirection}>
+                    <PageTransition>
                       <WebDevPage />
                     </PageTransition>
                   </Suspense>
@@ -399,7 +266,7 @@ const AppContent = () => {
                 path="/cybersecurity"
                 element={
                   <Suspense fallback={<LoadingSpinner />}>
-                    <PageTransition direction={routeDirection}>
+                    <PageTransition>
                       <CyberSecurityPage />
                     </PageTransition>
                   </Suspense>
@@ -409,7 +276,7 @@ const AppContent = () => {
                 path="/data-science"
                 element={
                   <Suspense fallback={<LoadingSpinner />}>
-                    <PageTransition direction={routeDirection}>
+                    <PageTransition>
                       <DataSciencePage />
                     </PageTransition>
                   </Suspense>
@@ -419,7 +286,7 @@ const AppContent = () => {
                 path="/case-study/mnemosyne"
                 element={
                   <Suspense fallback={<LoadingSpinner />}>
-                    <PageTransition direction={routeDirection}>
+                    <PageTransition>
                       <MnemosyneCaseStudy />
                     </PageTransition>
                   </Suspense>
@@ -429,7 +296,7 @@ const AppContent = () => {
                 path="/case-study/typesprint"
                 element={
                   <Suspense fallback={<LoadingSpinner />}>
-                    <PageTransition direction={routeDirection}>
+                    <PageTransition>
                       <TypeSprintCaseStudy />
                     </PageTransition>
                   </Suspense>
@@ -439,7 +306,7 @@ const AppContent = () => {
                 path="/case-study/walkkittie"
                 element={
                   <Suspense fallback={<LoadingSpinner />}>
-                    <PageTransition direction={routeDirection}>
+                    <PageTransition>
                       <WalkKittieCaseStudy />
                     </PageTransition>
                   </Suspense>
@@ -449,7 +316,7 @@ const AppContent = () => {
                 path="/case-study/msscan"
                 element={
                   <Suspense fallback={<LoadingSpinner />}>
-                    <PageTransition direction={routeDirection}>
+                    <PageTransition>
                       <MsscanCaseStudy />
                     </PageTransition>
                   </Suspense>
@@ -459,7 +326,7 @@ const AppContent = () => {
                 path="*"
                 element={
                   <Suspense fallback={<LoadingSpinner />}>
-                    <PageTransition direction={routeDirection}>
+                    <PageTransition>
                       <NotFoundPage />
                     </PageTransition>
                   </Suspense>
@@ -469,7 +336,7 @@ const AppContent = () => {
           </AnimatePresence>
         </main>
         <Footer />
-      </div>
+      </ClickSpark>
     </div>
   );
 };
@@ -592,22 +459,21 @@ function App() {
       <MotionConfig reducedMotion="user">
         <DarkModeProvider>
           <LanguageProvider>
-            <CommandPaletteProvider>
-              <AppContent />
-              <Toaster
-                position="top-center"
-                toastOptions={{
-                  duration: 3000,
-                  style: {
-                    background: 'rgba(20, 20, 20, 0.92)',
-                    color: '#fafafa',
-                    border: '1px solid rgba(240, 125, 45, 0.4)',
-                    borderRadius: '0.75rem',
-                    fontSize: '0.875rem',
-                  },
-                }}
-              />
-            </CommandPaletteProvider>
+            <AppContent />
+            <Toaster
+              position="top-center"
+              toastOptions={{
+                duration: 3000,
+                style: {
+                  background: 'rgb(var(--surface))',
+                  color: 'rgb(var(--fg))',
+                  border: '1px solid rgb(var(--line) / 0.16)',
+                  borderRadius: '0.85rem',
+                  fontSize: '0.875rem',
+                  boxShadow: '0 18px 48px -22px rgba(20,16,12,0.28)',
+                },
+              }}
+            />
             <DeferredAnalytics />
             <DeferredSpeedInsights />
           </LanguageProvider>

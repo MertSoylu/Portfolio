@@ -1,53 +1,59 @@
 # AGENTS.md
 
-Compact guidance for OpenCode agents on this repo. See `CLAUDE.md` for architecture details.
+Compact guidance for OpenCode agents on this repo.
 
-## Quick Start
+## Commands
 
 ```bash
-npm run dev        # Vite server on port 3000 (auto-opens)
-npm run build      # Production build to ./dist
-npm run lint       # ESLint .js/.jsx files only
-npm run preview    # Preview production build locally
+npm run dev        # Vite dev server port 3000
+npm run build      # Production build → ./dist
+npm run lint       # ESLint .js/.jsx
+npm run format     # Prettier write
+npm run test       # Vitest
+npm run e2e        # Playwright
 ```
 
-No test suite. No pre-commit hooks.
+Single unit: `npx vitest run tests/unit/<file>`
+Single e2e: `npx playwright test tests/e2e/<file>`
 
-## Key Quirks
+Pre-commit: husky + lint-staged runs eslint --fix + prettier on staged files. Commit messages enforced by commitlint (Conventional Commits). `format` before commit if lint-staged errors.
 
-### Routing & Lazy Loading
+## Architecture
 
-- Home (`/`) is composed of section components stacked with dividers.
-- Some pages use custom `lazyWithRetry()` wrapper (Android, CyberSecurity, NotFound) that catches chunk load failures and reloads page once. Direct imports for `/web` and `/data-science`.
-- Each route has **hardcoded directional transitions** in `src/App.jsx` (`ROUTE_DIRECTIONS`, `ROUTE_OVERLAYS`, `ROUTE_PARTICLES` objects). Changing route animations requires editing all three.
-- Mobile adjusts particle count to 65% of desktop setting per `ROUTE_PARTICLES`.
+**Stack**: React 18 SPA, React Router v6, Tailwind CSS v3, Framer Motion. `@` → `src/`.
 
-### Build & Chunks
+**Provider stack** (`src/App.jsx`, outer→inner): `ErrorBoundary` > `MotionConfig` > `DarkModeProvider` > `LanguageProvider` > `AppContent`. `Toaster` + deferred Vercel Analytics/SpeedInsights siblings.
 
-- **Vite chunk splitting** in `vite.config.js` hardcodes vendor bundles: `vendor-react`, `vendor-motion`, `vendor-icons`, `vendor-ogl`, `vendor-gsap`, `vendor-lenis`, `vendor-vercel`, `vendor-common`.
-- **chunkSizeWarningLimit: 600** (non-default). Exceeding this triggers build warnings.
-- Import alias: `@/` → `./src/`
+**Routing**: Lazy pages via `lazyWithRetry()` wrapper — catches chunk load failures, does one-time sessionStorage-guarded page reload. `HomePage` (`/`) = `Hero` + lazy `About`/`Certificates`/`Projects`/`Contact` stacked with `SectionDivider`. Standalone: `/web`, `/android`, `/cybersecurity`, `/data-science`. Case studies: `/case-study/{mnemosyne,typesprint,walkkittie,msscan}`. Add new routes through `lazyWithRetry`.
 
-### Global Contexts
+**Per-route transitions**: `src/App.jsx` — `<PageTransition>` motion wrapper with fade+slide. Collapses to plain opacity fade when `prefersReducedMotion`. **No more** `ROUTE_DIRECTIONS`/`ROUTE_OVERLAYS`/`ROUTE_PARTICLES` objects (removed in ReactBits migration).
 
-- `DarkModeContext`: Toggles `dark` class on root div. Affects Tailwind dark: selectors and inline opacity values.
-- `LanguageContext`: Turkish/English i18n. Strings in `src/utils/constants.js`. Add new keys to both language objects to avoid undefined rendering.
+**i18n** (`src/utils/constants.js`): Turkish/English via `LanguageContext`. Add keys to both language objects.
 
-### Analytics & Performance
+## ReactBits Components
 
-- Vercel Analytics deferred-loaded via `requestIdleCallback` after page load. Will not appear in dev server test runs unless load complete.
-- `FluidParticlesBackground` (custom OGL/GSAP component) runs on all pages. Expensive on low-end devices; mobile detection built in.
+These are copy-pasted from [reactbits.dev](https://reactbits.dev) (not npm).
 
-### Deployment
+| Component     | File                                  | Notes                                                                                |
+| ------------- | ------------------------------------- | ------------------------------------------------------------------------------------ |
+| Aurora        | `src/components/ui/Aurora.jsx`        | WebGL (ogl) background. Config: colorStops, speed, blend, amplitude. Full-res 60fps. |
+| ClickSpark    | `src/components/ui/ClickSpark.jsx`    | Canvas spark burst on click.                                                         |
+| Noise         | `src/components/ui/Noise.jsx`         | Canvas grain overlay. 1024×1024, continuous RAF.                                     |
+| SpotlightCard | `src/components/ui/SpotlightCard.jsx` | Spotlight radial gradient on mouse move. Used on project cards.                      |
+| TiltedCard    | `src/components/ui/TiltedCard.jsx`    | 3D perspective tilt on hover. Used on certificate cards.                             |
+| RotatingText  | `src/components/RotatingText.jsx`     | Auto-cycling text animation (framer-motion). Used in Hero for roles.                 |
+| ShinyText     | `src/components/ui/ShinyText.jsx`     | CSS gradient shimmer. Used in SectionHeader eyebrows.                                |
+| ASCIIText     | `src/components/ui/ASCIIText.jsx`     | Canvas→ASCII pixel rendering. Used in Hero for name.                                 |
+| GradientText  | `src/components/ui/GradientText.jsx`  | Animated gradient text via motion value. Used in Hero CTA button.                    |
+| LogoLoop      | `src/components/ui/LogoLoop.jsx`      | RAF-driven infinite logo marquee. Used below Projects.                               |
+| Magnet        | `src/components/ui/Magnet.jsx`        | Mouse-track translate3d pull. Used on navbar links.                                  |
 
-- **Vercel**: `vercel.json` defines strict CSP, caching per asset type, SPA rewrite.
-- **Netlify**: `netlify.toml` defines environment contexts (production, deploy-preview, branch-deploy) that set `VITE_ENV`. Build command same.
-- Both configs assume `npm run build` outputs to `./dist`.
+**Performance-sensitive**: `Aurora` (WebGL 60fps, full viewport), `Noise` (canvas 60fps, 1024px). Both run continuous RAF loops. Be mindful when adding features.
 
-## Common Pitfalls
+## Pitfalls
 
-- Adding UI to a lazy page without wrapping in `<Suspense fallback={<LoadingSpinner />}>` → chunk errors may not show fallback.
-- Editing route transition settings in only one of three objects → inconsistent animation behavior.
-- Modifying `ROUTE_PARTICLES` values without testing on mobile → particles may disappear or tank performance on low-end phones.
-- Adding new i18n strings only to one language object → other language will show undefined or keys.
-- Modifying CSP in `vercel.json` without syncing `netlify.toml` security headers → inconsistent security across deployments.
+- `DarkModeContext` toggles `dark` class on root div. Affects Tailwind `dark:` selectors.
+- Changing `vercel.json` CSP requires syncing `netlify.toml` security headers.
+- Vite chunk splitting in `vite.config.js` hardcodes vendor bundles. `chunkSizeWarningLimit: 600` kB.
+- GSAP files remain bundled (`vendor-gsap` chunk) but no components currently use it.
+- Route transition edits affect only `src/App.jsx` `<PageTransition>` now.

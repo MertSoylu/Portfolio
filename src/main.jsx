@@ -15,6 +15,7 @@ window.scrollTo(0, 0);
 
 if (typeof window !== 'undefined' && import.meta.env.PROD) {
   console.log(
+    // eslint-disable-line no-console
     '%cMert Soylu %cgithub.com/MertSoylu',
     'font-size: 18px; font-weight: 700; color: #f07d2d;',
     'font-size: 13px; color: #888;',

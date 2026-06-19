@@ -2,12 +2,25 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
+    <script>
+      // Apply theme before first paint (default dark) to avoid a flash.
+      (function () {
+        try {
+          var saved = localStorage.getItem('darkMode');
+          var dark = saved !== null ? JSON.parse(saved) : true;
+          if (dark) document.documentElement.classList.add('dark');
+        } catch (e) {
+          document.documentElement.classList.add('dark');
+        }
+      })();
+    </script>
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="apple-touch-icon" href="/favicon.svg" />
     <link rel="manifest" href="/manifest.webmanifest" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <meta name="description" content="Mert Soylu - Full-Stack Developer & AI Developer Portfolio">
-    <meta name="theme-color" content="#08080c">
+    <meta name="theme-color" content="#faf8f4" media="(prefers-color-scheme: light)">
+    <meta name="theme-color" content="#13110f" media="(prefers-color-scheme: dark)">
     <title>Mert Soylu | Full-Stack Developer & AI Developer</title>
 
     <!-- Open Graph / Facebook -->
@@ -37,8 +50,8 @@
     <link rel="dns-prefetch" href="//api.github.com" />
     <link rel="preconnect" href="https://api.emailjs.com" />
     <link rel="dns-prefetch" href="//api.emailjs.com" />
-    <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@500;600;700;800&family=Manrope:wght@400;500;600;700;800&family=Space+Mono:wght@400;700&family=Syne:wght@600;700;800&display=swap" rel="stylesheet" media="print" onload="this.media='all'" />
-    <noscript><link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@500;600;700;800&family=Manrope:wght@400;500;600;700;800&family=Space+Mono:wght@400;700&family=Syne:wght@600;700;800&display=swap" rel="stylesheet" /></noscript>
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400..700;1,9..144,400..600&family=Inter:wght@400..700&display=swap" rel="stylesheet" media="print" onload="this.media='all'" />
+    <noscript><link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400..700;1,9..144,400..600&family=Inter:wght@400..700&display=swap" rel="stylesheet" /></noscript>
 
     <!-- Structured data: Person -->
     <script type="application/ld+json">
