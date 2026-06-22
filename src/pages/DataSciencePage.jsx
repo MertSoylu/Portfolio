@@ -93,9 +93,8 @@ const LearningCurveChart = ({ reduce, isTurkish }) => (
 
 const SkillMeter = ({ pct, levelLabel, reduce, delay = 0 }) => (
   <div>
-    <div className="mb-1.5 flex items-baseline justify-between">
+    <div className="mb-1.5">
       <span className="text-[11px] font-semibold uppercase tracking-wide text-muted">{levelLabel}</span>
-      <span className="text-xs font-semibold text-accent">{pct}%</span>
     </div>
     <div
       className="h-2 overflow-hidden rounded-full bg-surface2"
