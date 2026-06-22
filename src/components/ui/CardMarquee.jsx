@@ -23,7 +23,7 @@ const CardMarquee = ({
   const offsetRef = useRef(0);
   const halfRef = useRef(0);
   const pausedRef = useRef(false);
-  const drag = useRef({ active: false, startX: 0, startOffset: 0, moved: false, pointerId: null });
+  const drag = useRef({ active: false, startX: 0, startOffset: 0, moved: false });
 
   const measure = useCallback(() => {
     const el = innerRef.current;
@@ -77,18 +77,12 @@ const CardMarquee = ({
         startX: e.clientX,
         startOffset: offsetRef.current,
         moved: false,
-        pointerId: e.pointerId,
       };
-      try {
-        el.setPointerCapture(e.pointerId);
-      } catch {
-        /* ignore */
-      }
     };
     const onMove = (e) => {
       if (!drag.current.active) return;
       const dx = e.clientX - drag.current.startX;
-      if (Math.abs(dx) > 5) drag.current.moved = true;
+      if (Math.abs(dx) > 12) drag.current.moved = true;
       offsetRef.current = drag.current.startOffset + dx;
     };
     const onUp = () => {
@@ -102,15 +96,15 @@ const CardMarquee = ({
       }
     };
     el.addEventListener('pointerdown', onDown);
-    el.addEventListener('pointermove', onMove);
-    el.addEventListener('pointerup', onUp);
-    el.addEventListener('pointercancel', onUp);
+    window.addEventListener('pointermove', onMove);
+    window.addEventListener('pointerup', onUp);
+    window.addEventListener('pointercancel', onUp);
     el.addEventListener('click', onClick, true);
     return () => {
       el.removeEventListener('pointerdown', onDown);
-      el.removeEventListener('pointermove', onMove);
-      el.removeEventListener('pointerup', onUp);
-      el.removeEventListener('pointercancel', onUp);
+      window.removeEventListener('pointermove', onMove);
+      window.removeEventListener('pointerup', onUp);
+      window.removeEventListener('pointercancel', onUp);
       el.removeEventListener('click', onClick, true);
     };
   }, [reduce, items.length]);
