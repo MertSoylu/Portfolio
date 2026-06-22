@@ -40,7 +40,7 @@ const ASCIIText = ({ text = 'Mert Soylu', asciiFontSize = 11, enableWaves = true
       // names never overflow/clip on narrow (mobile) canvases.
       let fontSize = Math.round(h * 0.78);
       ctx.font = `900 ${fontSize}px Inter, system-ui, sans-serif`;
-      const maxTextW = w * 0.94;
+      const maxTextW = w * 0.99;
       const measured = ctx.measureText(text).width;
       if (measured > maxTextW) {
         fontSize = Math.max(10, Math.floor((fontSize * maxTextW) / measured));
@@ -50,20 +50,26 @@ const ASCIIText = ({ text = 'Mert Soylu', asciiFontSize = 11, enableWaves = true
       ctx.textBaseline = 'middle';
 
       const wave = enableWaves ? Math.sin(state.time) * 3 : 0;
-      ctx.fillText(text, w / 2 + wave, h / 2 + Math.cos(state.time * 0.7) * 2);
+      const bob = enableWaves ? Math.cos(state.time * 0.7) * 2 : 0;
+      ctx.fillText(text, w / 2 + wave, h / 2 + bob);
 
       const cols = Math.floor(w / (asciiFontSize * 0.7));
       const rows = Math.floor(h / asciiFontSize);
 
-      const imgData = ctx.getImageData(0, 0, w, h);
+      // Sample the full device-pixel buffer. Canvas is scaled by dpr, so reading
+      // only the CSS-px region (w×h) would grab the top-left 1/dpr² of the glyphs
+      // — text ends up clipped/off-center on dpr>1 screens (most phones).
+      const cw = canvas.width;
+      const ch = canvas.height;
+      const imgData = ctx.getImageData(0, 0, cw, ch);
       const data = imgData.data;
 
       let str = '';
       for (let y = 0; y < rows; y++) {
         for (let x = 0; x < cols; x++) {
-          const px = Math.floor((x / cols) * w);
-          const py = Math.floor((y / rows) * h);
-          const i = (px + py * w) * 4;
+          const px = Math.floor((x / cols) * cw);
+          const py = Math.floor((y / rows) * ch);
+          const i = (px + py * cw) * 4;
           const r = data[i] || 0;
           const g = data[i + 1] || 0;
           const b = data[i + 2] || 0;

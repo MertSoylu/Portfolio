@@ -338,17 +338,19 @@ const Projects = () => {
 
   return (
     <section id="projects" className="relative px-5 py-12 sm:py-20 md:py-24">
-      <div className="container-wide">
-        <SectionHeader
-          kicker={isTurkish ? 'Çalışmalar' : 'Work'}
-          kickerIcon={<HiCollection className="h-4 w-4" />}
-          title={isTurkish ? 'Projeler' : 'Projects'}
-          lead={
-            isTurkish
-              ? 'Canlı ürünler, yayınladığım mobil uygulamalar ve açık kaynak araçlar.'
-              : 'Live products, published mobile apps, and open-source tools.'
-          }
-        />
+      <div className="container-wide max-w-screen-2xl">
+        <div className="mx-auto w-full max-w-6xl">
+          <SectionHeader
+            kicker={isTurkish ? 'Çalışmalar' : 'Work'}
+            kickerIcon={<HiCollection className="h-4 w-4" />}
+            title={isTurkish ? 'Projeler' : 'Projects'}
+            lead={
+              isTurkish
+                ? 'Canlı ürünler, yayınladığım mobil uygulamalar ve açık kaynak araçlar.'
+                : 'Live products, published mobile apps, and open-source tools.'
+            }
+          />
+        </div>
 
         <CardMarquee
           ariaLabel={isTurkish ? 'Öne çıkan projeler' : 'Featured projects'}
@@ -362,61 +364,63 @@ const Projects = () => {
           ))}
         </CardMarquee>
 
-        <div className="mt-16 border-t border-line/10 pt-10">
-          <div className="mb-6 flex flex-col justify-between gap-3 sm:flex-row sm:items-end">
-            <div>
-              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-accent">
-                {isTurkish ? 'Açık kaynak' : 'Open source'}
-              </p>
-              <h3 className="mt-1 text-h3 text-fg">
-                {isTurkish ? 'GitHub repoları' : 'GitHub repositories'}
-              </h3>
-            </div>
-            <a
-              href={getGitHubProfileUrl()}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="btn-secondary px-4 py-2 text-xs"
-            >
-              <HiExternalLink className="h-4 w-4" />
-              GitHub
-            </a>
-          </div>
-
-          {status === 'error' && (
-            <div className="mb-4 rounded-xl border border-accent/30 bg-accent/5 p-4 text-sm text-fg">
-              <p className="mb-3 font-semibold">
-                {isTurkish
-                  ? 'GitHub akışı yüklenemedi; yedek liste gösteriliyor.'
-                  : 'GitHub feed could not load; showing fallback list.'}
-              </p>
-              {errorMessage && <p className="mb-3 text-muted">{errorMessage}</p>}
-              <button
-                type="button"
-                onClick={() => {
-                  clearRateLimitState();
-                  setStatus('loading');
-                  setErrorMessage('');
-                  fetchGitHubRepos()
-                    .then((r) => {
-                      setRepos(r.length ? r : FALLBACK_PROJECTS);
-                      setStatus(r.length ? 'success' : 'fallback');
-                    })
-                    .catch((e) => {
-                      setRepos(FALLBACK_PROJECTS);
-                      setStatus('error');
-                      setErrorMessage(e.message);
-                    });
-                }}
+        <div className="mt-16">
+          <div className="mx-auto w-full max-w-6xl border-t border-line/10 pt-10">
+            <div className="mb-6 flex flex-col justify-between gap-3 sm:flex-row sm:items-end">
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-[0.2em] text-accent">
+                  {isTurkish ? 'Açık kaynak' : 'Open source'}
+                </p>
+                <h3 className="mt-1 text-h3 text-fg">
+                  {isTurkish ? 'GitHub repoları' : 'GitHub repositories'}
+                </h3>
+              </div>
+              <a
+                href={getGitHubProfileUrl()}
+                target="_blank"
+                rel="noopener noreferrer"
                 className="btn-secondary px-4 py-2 text-xs"
               >
-                {isTurkish ? 'Tekrar dene' : 'Retry'}
-              </button>
+                <HiExternalLink className="h-4 w-4" />
+                GitHub
+              </a>
             </div>
-          )}
+
+            {status === 'error' && (
+              <div className="mb-4 rounded-xl border border-accent/30 bg-accent/5 p-4 text-sm text-fg">
+                <p className="mb-3 font-semibold">
+                  {isTurkish
+                    ? 'GitHub akışı yüklenemedi; yedek liste gösteriliyor.'
+                    : 'GitHub feed could not load; showing fallback list.'}
+                </p>
+                {errorMessage && <p className="mb-3 text-muted">{errorMessage}</p>}
+                <button
+                  type="button"
+                  onClick={() => {
+                    clearRateLimitState();
+                    setStatus('loading');
+                    setErrorMessage('');
+                    fetchGitHubRepos()
+                      .then((r) => {
+                        setRepos(r.length ? r : FALLBACK_PROJECTS);
+                        setStatus(r.length ? 'success' : 'fallback');
+                      })
+                      .catch((e) => {
+                        setRepos(FALLBACK_PROJECTS);
+                        setStatus('error');
+                        setErrorMessage(e.message);
+                      });
+                  }}
+                  className="btn-secondary px-4 py-2 text-xs"
+                >
+                  {isTurkish ? 'Tekrar dene' : 'Retry'}
+                </button>
+              </div>
+            )}
+          </div>
 
           {status === 'loading' ? (
-            <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+            <div className="mx-auto w-full max-w-6xl grid gap-4 md:grid-cols-2 xl:grid-cols-3">
               {Array.from({ length: 3 }).map((_, index) => (
                 <div key={index} className="card h-36 animate-pulse p-5">
                   <div className="mb-4 h-5 w-2/3 rounded-lg bg-surface2" />

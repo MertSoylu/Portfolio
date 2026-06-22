@@ -14,6 +14,7 @@ const CardMarquee = ({
   direction = 'right',
   gapClassName = 'gap-4 sm:gap-5',
   itemClassName = 'w-[280px] sm:w-[340px]',
+  fadeWidth = 64,
   ariaLabel,
 }) => {
   const reduce = useReducedMotion();
@@ -129,9 +130,12 @@ const CardMarquee = ({
     );
   }
 
+  const edgeMask = `linear-gradient(to right, transparent 0, #000 ${fadeWidth}px, #000 calc(100% - ${fadeWidth}px), transparent 100%)`;
+
   return (
     <div
-      className="relative overflow-hidden"
+      className="relative overflow-hidden px-3 sm:px-6"
+      style={{ WebkitMaskImage: edgeMask, maskImage: edgeMask }}
       onMouseEnter={() => {
         pausedRef.current = true;
       }}

@@ -64,8 +64,8 @@ const MsscanCaseStudy = lazyWithRetry(
 );
 const NotFoundPage = lazyWithRetry(() => import('./pages/NotFoundPage'), 'lazy-retry-404');
 
-const SectionDivider = () => (
-  <div className="container-wide py-2">
+const SectionDivider = ({ className = '' }) => (
+  <div className={`container-wide py-2 ${className}`}>
     <div className="rule" />
   </div>
 );
@@ -93,25 +93,20 @@ const HomePage = () => (
       <About />
       <SectionDivider />
       <Projects />
-      <SectionDivider />
+      <SectionDivider className="max-w-screen-2xl" />
       <section className="py-9 sm:py-10">
-        <div className="container-wide">
-          <p className="mb-5 text-center text-xs font-semibold uppercase tracking-[0.2em] text-muted sm:mb-6">
-            Tech stack
-          </p>
-          <LogoLoop
-            logos={techLogos}
-            speed={70}
-            direction="right"
-            logoHeight={30}
-            gap={36}
-            hoverSpeed={18}
-            fadeOut
-            scaleOnHover
-          />
-        </div>
+        <LogoLoop
+          logos={techLogos}
+          speed={70}
+          direction="right"
+          logoHeight={30}
+          gap={36}
+          hoverSpeed={18}
+          fadeOut
+          scaleOnHover
+        />
       </section>
-      <SectionDivider />
+      <SectionDivider className="max-w-screen-2xl" />
       <Certificates />
       <SectionDivider />
       <Contact />

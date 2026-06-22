@@ -23,7 +23,17 @@ const item = {
 const Hero = () => {
   const { isTurkish } = useLanguage();
   const [repoCount, setRepoCount] = useState(null);
+  const [asciiWaves, setAsciiWaves] = useState(false);
   const roles = isTurkish ? HERO_ROLES.tr : HERO_ROLES.en;
+
+  // Wave the ASCII name only on sm+ (desktop). Keep it static on mobile.
+  useEffect(() => {
+    const mq = window.matchMedia('(min-width: 640px)');
+    const update = () => setAsciiWaves(mq.matches);
+    update();
+    mq.addEventListener('change', update);
+    return () => mq.removeEventListener('change', update);
+  }, []);
 
   useEffect(() => {
     fetchGitHubRepos()
@@ -64,19 +74,13 @@ const Hero = () => {
 
           <motion.div variants={item} className="mb-1 w-full sm:mb-2">
             <h1 className="sr-only">Mert Soylu</h1>
-            {/* Mobile: crisp, legible serif wordmark. sm+: ASCII signature. */}
-            <p
-              aria-hidden="true"
-              className="text-center font-display text-[2.65rem] font-semibold leading-[1.04] tracking-tight text-fg sm:hidden"
-            >
-              Mert Soylu
-            </p>
-            <div aria-hidden="true" className="hidden justify-center sm:flex">
+            {/* ASCII signature on every breakpoint; component auto-shrinks text to fit narrow widths. */}
+            <div aria-hidden="true" className="-mx-5 flex justify-center sm:mx-0">
               <ASCIIText
                 text="Mert Soylu"
-                asciiFontSize={10}
-                enableWaves
-                className="w-full max-w-2xl h-32 sm:h-40"
+                asciiFontSize={asciiWaves ? 10 : 6}
+                enableWaves={asciiWaves}
+                className="w-full max-w-2xl h-28 sm:h-40"
               />
             </div>
           </motion.div>
