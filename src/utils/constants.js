@@ -1,12 +1,12 @@
 // Site metadata
-export const SITE_TITLE = 'Mert Soylu | Full-Stack Developer & AI Developer';
+export const SITE_TITLE = 'Mert Soylu | Junior Full-Stack Developer';
 export const SITE_DESCRIPTION =
-  'Full-Stack Developer & AI Developer - Web Development, Android Development, Cybersecurity, Data Science and Deep Learning';
+  'Junior Full-Stack Developer focused on web and Android, with a growing interest in cybersecurity and AI.';
 
 // Personal information
 export const PERSONAL_INFO = {
   name: 'Mert Soylu',
-  title: 'Full-Stack Developer & AI Developer',
+  title: 'Junior Full-Stack Developer',
   university: 'Kütahya Dumlupınar University',
   email: 's6ylumert@gmail.com',
   github: 'https://github.com/MertSoylu',
@@ -25,7 +25,7 @@ export const SKILLS = [
 export const TECHNOLOGIES = {
   frontend: ['React', 'JavaScript', 'Tailwind CSS', 'HTML/CSS', 'Vite', 'Framer Motion'],
   backend: ['Node.js', 'Express'],
-  mobile: ['Java', 'Android Studio'],
+  mobile: ['Kotlin', 'Jetpack Compose', 'Android Studio'],
   tools: ['Git', 'GitHub', 'VS Code', 'Linux'],
 };
 
@@ -79,8 +79,8 @@ export const SECTIONS = {
 };
 
 export const HERO_ROLES = {
-  tr: ['React Geliştiricisi', 'Full-Stack Geliştirici', 'Yapay Zekâ Geliştiricisi', 'Güvenlik Odaklı'],
-  en: ['React Developer', 'Full-Stack Developer', 'AI Developer', 'Security-Minded'],
+  tr: ['React Geliştiricisi', 'Junior Full-Stack Geliştirici', 'Android Geliştiricisi', 'Yapay Zekâya Meraklı'],
+  en: ['React Developer', 'Junior Full-Stack Developer', 'Android Developer', 'AI Enthusiast'],
 };
 
 export const CV_LABEL = {
@@ -109,7 +109,7 @@ export const SKILLS_DESCRIPTIONS = {
       tr: 'Native Android, Compose ve günlük kullanım akışlarına odaklanan mobil işler geliştiriyorum.',
       en: 'Building mobile work around native Android, Compose, and daily-use flows.',
     },
-    technologies: ['Kotlin', 'React Native', 'Android Studio', 'Mobile UI/UX'],
+    technologies: ['Kotlin', 'Jetpack Compose', 'Android Studio', 'Material 3'],
     proficiency: 65,
     link: '/android',
   },
@@ -154,13 +154,13 @@ const DEFAULT_OG_IMAGE = `${SITE_URL}/og-image.png`;
 export const SEO_META = {
   '/': {
     tr: {
-      title: 'Mert Soylu | Full-Stack Developer & AI Developer',
-      description: 'Full-Stack Developer & AI Developer. Web, mobil, siber güvenlik ve yapay zeka projeleri.',
+      title: 'Mert Soylu | Junior Full-Stack Developer',
+      description: 'Junior Full-Stack Developer. Web ve Android projeleri; siber güvenlik ve yapay zekaya ilgi.',
     },
     en: {
-      title: 'Mert Soylu | Full-Stack Developer & AI Developer',
+      title: 'Mert Soylu | Junior Full-Stack Developer',
       description:
-        'Full-Stack Developer & AI Developer building projects in web, mobile, cybersecurity, and AI.',
+        'Junior Full-Stack Developer building web and Android projects, with a growing interest in cybersecurity and AI.',
     },
     canonical: `${SITE_URL}/`,
     ogImage: DEFAULT_OG_IMAGE,
@@ -239,9 +239,9 @@ export const FALLBACK_PROJECTS = [
   {
     id: 'fallback-2',
     name: 'Android App Projects',
-    description: 'Mobile projects focused on Java and Android Studio development practices.',
+    description: 'Mobile projects built with Kotlin and Jetpack Compose on Android Studio.',
     html_url: 'https://github.com/MertSoylu',
-    language: 'Java',
+    language: 'Kotlin',
     stargazers_count: 0,
   },
   {
