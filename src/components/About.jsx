@@ -150,7 +150,7 @@ const About = () => {
       className: 'bento-stats',
       content: (
         <div className="p-6 flex items-center gap-8">
-          <CountStat end={repoCount} suffix="+" label={isTurkish ? 'Public repo' : 'Public repos'} />
+          <CountStat end={repoCount} label={isTurkish ? 'Public repo' : 'Public repos'} />
           <CountStat end={4} label={isTurkish ? 'Odak alanı' : 'Focus areas'} />
         </div>
       ),

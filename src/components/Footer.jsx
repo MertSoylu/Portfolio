@@ -1,6 +1,7 @@
 import { HiMail } from 'react-icons/hi';
 import { FiGithub, FiLinkedin } from 'react-icons/fi';
 import { useLanguage } from '../context/LanguageContext';
+import { PERSONAL_INFO } from '../utils/constants';
 
 const Footer = () => {
   const { isTurkish } = useLanguage();
@@ -13,7 +14,7 @@ const Footer = () => {
       icon: <FiLinkedin className="h-5 w-5" />,
       href: 'https://www.linkedin.com/in/mert-soylu-b8b6a1341/',
     },
-    { name: 'Email', icon: <HiMail className="h-5 w-5" />, href: 'mailto:s6ylumert@gmail.com' },
+    { name: 'Email', icon: <HiMail className="h-5 w-5" />, href: `mailto:${PERSONAL_INFO.email}` },
   ];
 
   return (
