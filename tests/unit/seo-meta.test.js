@@ -22,6 +22,12 @@ describe('SEO_META', () => {
     });
   });
 
+  it('all routes reference the single og-image asset', () => {
+    REQUIRED_ROUTES.forEach((route) => {
+      expect(SEO_META[route].ogImage).toMatch(/\/og-image\.png$/);
+    });
+  });
+
   it('canonical URLs match route paths', () => {
     expect(SEO_META['/'].canonical).toMatch(/\/$/);
     expect(SEO_META['/web'].canonical).toMatch(/\/web$/);

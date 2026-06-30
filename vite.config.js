@@ -16,7 +16,7 @@ export default defineConfig(({ mode }) => ({
       workbox: {
         globPatterns: ['**/*.{js,css,html,svg,woff2,png,webp,jpg,jpeg}'],
         navigateFallback: '/index.html',
-        navigateFallbackDenylist: [/^\/api\//, /^\/cv\.pdf$/, /^\/certificates\//],
+        navigateFallbackDenylist: [/^\/api\//, /^\/cv\.pdf$/, /^\/certificates\//, /^\/og-image\.png$/],
         runtimeCaching: [
           {
             urlPattern: ({ url }) => url.origin === 'https://res.cloudinary.com',
@@ -74,8 +74,6 @@ export default defineConfig(({ mode }) => ({
           if (/[\\/]node_modules[\\/]react-icons[\\/]/.test(id)) return 'vendor-icons';
           if (/[\\/]node_modules[\\/]framer-motion[\\/]/.test(id)) return 'vendor-motion';
           if (/[\\/]node_modules[\\/]ogl[\\/]/.test(id)) return 'vendor-ogl';
-          if (/[\\/]node_modules[\\/]gsap[\\/]/.test(id)) return 'vendor-gsap';
-          if (/[\\/]node_modules[\\/]lenis[\\/]/.test(id)) return 'vendor-lenis';
           if (/[\\/]node_modules[\\/](three|@react-three)[\\/]/.test(id)) return 'vendor-three';
           if (/[\\/]node_modules[\\/]@vercel[\\/]/.test(id)) return 'vendor-vercel';
           if (

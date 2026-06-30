@@ -5,7 +5,7 @@ import toast from 'react-hot-toast';
 import { HiArrowRight, HiCheckCircle, HiDownload, HiMail, HiXCircle } from 'react-icons/hi';
 import { FiGithub, FiLinkedin, FiMapPin } from 'react-icons/fi';
 import { useLanguage } from '../context/LanguageContext';
-import { CV_LABEL, CV_PATH } from '../utils/constants';
+import { CV_LABEL, CV_PATH, PERSONAL_INFO } from '../utils/constants';
 import SectionHeader from './home/SectionHeader';
 import Reveal from './ui/Reveal';
 
@@ -286,8 +286,8 @@ const Contact = () => {
     {
       icon: <HiMail className="h-5 w-5" />,
       label: isTurkish ? 'E-posta' : 'Email',
-      value: 's6ylumert@gmail.com',
-      href: 'mailto:s6ylumert@gmail.com',
+      value: PERSONAL_INFO.email,
+      href: `mailto:${PERSONAL_INFO.email}`,
     },
     {
       icon: <FiLinkedin className="h-5 w-5" />,

@@ -8,7 +8,7 @@ const CACHE_TTL = 15 * 60 * 1000; // 15 minutes — shorter for fresher data
 const RATE_LIMIT_KEY = 'github_api_rate_limit';
 const README_CACHE_PREFIX = 'github_readme_cache';
 const README_NOT_FOUND_SENTINEL = '__README_NOT_FOUND__';
-const MAX_REQUESTS_PER_MINUTE = 20;
+const MAX_REQUESTS_PER_MINUTE = 10;
 const RATE_LIMIT_WINDOW_MS = 60 * 1000;
 let reposMemoryCache = null;
 let reposInFlightRequest = null;
@@ -146,7 +146,7 @@ const applyServerRateLimitCooldown = (error) => {
   setRateLimitState(nextState);
 };
 
-const getGitHubErrorMessage = (error, username = GITHUB_USERNAME) => {
+export const getGitHubErrorMessage = (error, username = GITHUB_USERNAME) => {
   if (!error?.response) {
     return error?.message || 'Failed to fetch repositories from GitHub.';
   }
@@ -158,11 +158,11 @@ const getGitHubErrorMessage = (error, username = GITHUB_USERNAME) => {
   }
 
   if (status === 403) {
-    return 'GitHub API rate limit reached. Please try again later.';
+    return 'GitHub API rate limit reached (60/hour for unauthenticated requests). Try again later.';
   }
 
   if (status === 429) {
-    return 'Too many GitHub API requests. Please wait and try again.';
+    return 'Local request budget reached. Please wait 60 seconds.';
   }
 
   if (status === 404) {

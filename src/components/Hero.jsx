@@ -89,15 +89,18 @@ const Hero = () => {
             variants={item}
             className="mt-3 font-display text-xl font-medium sm:mt-4 sm:text-2xl lg:text-3xl"
           >
-            <RotatingText
-              texts={roles}
-              rotationInterval={3000}
-              mainClassName="text-accent"
-              splitBy="characters"
-              staggerDuration={0.02}
-              staggerFrom="last"
-              transition={{ type: 'spring', damping: 25, stiffness: 260 }}
-            />
+            <span aria-hidden="true">
+              <RotatingText
+                texts={roles}
+                rotationInterval={3000}
+                mainClassName="text-accent"
+                splitBy="characters"
+                staggerDuration={0.02}
+                staggerFrom="last"
+                transition={{ type: 'spring', damping: 25, stiffness: 260 }}
+              />
+            </span>
+            <span className="sr-only">{roles[0]}</span>
           </motion.p>
 
           <motion.p variants={item} className="mt-4 mx-auto max-w-xl text-body-lg text-muted sm:mt-6">
@@ -137,8 +140,8 @@ const Hero = () => {
           >
             {repoCount != null && (
               <span className="inline-flex items-center gap-2">
-                <span className="font-display text-base font-semibold text-fg">{repoCount}+</span>
-                {isTurkish ? 'public repo' : 'public repos'}
+                <span className="font-display text-base font-semibold text-fg">{repoCount}</span>
+                {isTurkish ? 'public repo' : repoCount === 1 ? 'public repo' : 'public repos'}
               </span>
             )}
             <span className="inline-flex items-center gap-2">

@@ -79,7 +79,12 @@ export const SECTIONS = {
 };
 
 export const HERO_ROLES = {
-  tr: ['React Geliştiricisi', 'Junior Full-Stack Geliştirici', 'Android Geliştiricisi', 'Yapay Zekâya Meraklı'],
+  tr: [
+    'React Geliştiricisi',
+    'Junior Full-Stack Geliştirici',
+    'Android Geliştiricisi',
+    'Yapay Zekâya Meraklı',
+  ],
   en: ['React Developer', 'Junior Full-Stack Developer', 'Android Developer', 'AI Enthusiast'],
 };
 
@@ -155,7 +160,8 @@ export const SEO_META = {
   '/': {
     tr: {
       title: 'Mert Soylu | Junior Full-Stack Developer',
-      description: 'Junior Full-Stack Developer. Web ve Android projeleri; siber güvenlik ve yapay zekaya ilgi.',
+      description:
+        'Junior Full-Stack Developer. Web ve Android projeleri; siber güvenlik ve yapay zekaya ilgi.',
     },
     en: {
       title: 'Mert Soylu | Junior Full-Stack Developer',
@@ -175,7 +181,7 @@ export const SEO_META = {
       description: 'Fast, accessible web projects built with React, Tailwind CSS, and Vite.',
     },
     canonical: `${SITE_URL}/web`,
-    ogImage: `${SITE_URL}/og-web.png`,
+    ogImage: DEFAULT_OG_IMAGE,
   },
   '/android': {
     tr: {
@@ -187,7 +193,7 @@ export const SEO_META = {
       description: 'Android apps built with Kotlin and clean architecture.',
     },
     canonical: `${SITE_URL}/android`,
-    ogImage: `${SITE_URL}/og-android.png`,
+    ogImage: DEFAULT_OG_IMAGE,
   },
   '/cybersecurity': {
     tr: {
@@ -199,7 +205,7 @@ export const SEO_META = {
       description: 'Secure coding, network security, and defense-oriented projects.',
     },
     canonical: `${SITE_URL}/cybersecurity`,
-    ogImage: `${SITE_URL}/og-cyber.png`,
+    ogImage: DEFAULT_OG_IMAGE,
   },
   '/data-science': {
     tr: {
@@ -211,7 +217,7 @@ export const SEO_META = {
       description: 'AI, deep learning, and data science learning journey.',
     },
     canonical: `${SITE_URL}/data-science`,
-    ogImage: `${SITE_URL}/og-data.png`,
+    ogImage: DEFAULT_OG_IMAGE,
   },
   '/404': {
     tr: {
