@@ -154,6 +154,7 @@ export const CERTIFICATES = [
 ];
 
 const SITE_URL = 'https://mertsoylu.dev';
+export const FOREST_SITE_URL = 'https://orman.mertsoylu.dev';
 const DEFAULT_OG_IMAGE = `${SITE_URL}/og-image.png`;
 
 export const SEO_META = {

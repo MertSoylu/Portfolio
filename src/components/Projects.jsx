@@ -2,14 +2,24 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
-import { HiCollection, HiExternalLink, HiStar, HiX, HiBookOpen, HiCode, HiShieldCheck } from 'react-icons/hi';
+import {
+  HiCollection,
+  HiExternalLink,
+  HiSparkles,
+  HiStar,
+  HiX,
+  HiBookOpen,
+  HiCode,
+  HiShieldCheck,
+} from 'react-icons/hi';
 import { HiDevicePhoneMobile } from 'react-icons/hi2';
 import { clearRateLimitState, fetchGitHubRepos, getGitHubProfileUrl } from '../utils/githubApi';
-import { FALLBACK_PROJECTS } from '../utils/constants';
+import { FALLBACK_PROJECTS, FOREST_SITE_URL } from '../utils/constants';
 import { useLanguage } from '../context/LanguageContext';
 import SectionHeader from './home/SectionHeader';
-import SpotlightCard from './ui/SpotlightCard';
 import CardMarquee from './ui/CardMarquee';
+import Reveal from './ui/Reveal';
+import SpotlightCard from './ui/SpotlightCard';
 
 const chipClass = 'rounded-full border border-line/12 bg-surface2 px-2.5 py-1 text-xs font-medium text-muted';
 
@@ -371,9 +381,22 @@ const Projects = () => {
                 <p className="text-xs font-semibold uppercase tracking-[0.2em] text-accent">
                   {isTurkish ? 'Açık kaynak' : 'Open source'}
                 </p>
-                <h3 className="mt-1 text-h3 text-fg">
-                  {isTurkish ? 'GitHub repoları' : 'GitHub repositories'}
-                </h3>
+                <div className="mt-1 flex flex-wrap items-center gap-x-4 gap-y-2">
+                  <h3 className="text-h3 text-fg">{isTurkish ? 'GitHub repoları' : 'GitHub repositories'}</h3>
+                  <Reveal
+                    as="a"
+                    href={FOREST_SITE_URL}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    delay={0.05}
+                    className="group btn-secondary px-4 py-2 text-xs"
+                    aria-label={isTurkish ? 'cv-orman 3D ormanını aç' : 'Open cv-orman 3D forest'}
+                  >
+                    <HiSparkles className="h-4 w-4 text-accent transition-transform duration-300 group-hover:rotate-12" />
+                    {isTurkish ? '3D orman' : '3D forest'}
+                    <HiExternalLink className="h-3.5 w-3.5 transition-transform duration-300 group-hover:translate-x-0.5" />
+                  </Reveal>
+                </div>
               </div>
               <a
                 href={getGitHubProfileUrl()}
