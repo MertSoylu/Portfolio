@@ -52,7 +52,7 @@ const TypeSprintCaseStudy = () => {
       currentId="typesprint"
       isTurkish={isTurkish}
       facts={facts}
-      previewSnapshotSrc="/previews/typesprint-live.png"
+      previewSnapshotSrc="/previews/typesprint-live.webp"
     >
       <Reveal>
         <div className="grid gap-5 md:grid-cols-2">

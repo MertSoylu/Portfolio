@@ -10,6 +10,8 @@ export const CASE_STUDIES = [
   { id: 'typesprint', title: 'TypeSprint', path: '/case-study/typesprint', category: 'Web' },
   { id: 'walkkittie', title: 'WalkKittie', path: '/case-study/walkkittie', category: 'Android' },
   { id: 'msscan', title: 'msscan', path: '/case-study/msscan', category: 'Security' },
+  { id: 'biztoplulugu', title: 'Biz Topluluğu', path: '/case-study/biztoplulugu', category: 'Web' },
+  { id: 'harita', title: 'BİZ Şehir Haritası', path: '/case-study/harita', category: 'Web' },
 ];
 
 export const CaseStudyNav = ({ currentId, isTurkish }) => (

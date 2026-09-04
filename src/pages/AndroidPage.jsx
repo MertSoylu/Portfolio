@@ -131,7 +131,7 @@ const AndroidPage = () => {
           ))}
         </div>
         <div className="lg:order-1">
-          <PhoneFrame src="/previews/walkkittie.png" alt="WalkKittie" title="WalkKittie" />
+          <PhoneFrame src="/previews/walkkittie.webp" alt="WalkKittie" title="WalkKittie" />
         </div>
       </Reveal>
 

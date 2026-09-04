@@ -220,6 +220,32 @@ export const SEO_META = {
     canonical: `${SITE_URL}/data-science`,
     ogImage: DEFAULT_OG_IMAGE,
   },
+  '/case-study/biztoplulugu': {
+    tr: {
+      title: 'Biz Topluluğu Case Study | Mert Soylu',
+      description: 'MDX tabanlı içerik arşiviyle, build sırasında statik üretilen topluluk kurumsal sitesi.',
+    },
+    en: {
+      title: 'Biz Topluluğu Case Study | Mert Soylu',
+      description:
+        'A community organization site with an MDX-based archive, statically generated at build time.',
+    },
+    canonical: `${SITE_URL}/case-study/biztoplulugu`,
+    ogImage: DEFAULT_OG_IMAGE,
+  },
+  '/case-study/harita': {
+    tr: {
+      title: 'BİZ Şehir Haritası Case Study | Mert Soylu',
+      description:
+        '81 ilden gelen sorun bildirimlerini haritada toplayan, Supabase destekli topluluk platformu.',
+    },
+    en: {
+      title: 'BİZ Şehir Haritası Case Study | Mert Soylu',
+      description: 'A Supabase-backed community platform that maps issue reports from all 81 provinces.',
+    },
+    canonical: `${SITE_URL}/case-study/harita`,
+    ogImage: DEFAULT_OG_IMAGE,
+  },
   '/404': {
     tr: {
       title: 'Sayfa Bulunamadı | Mert Soylu',

@@ -63,7 +63,7 @@ const WebDevPage = () => {
       caseStudyPath: '/case-study/mnemosyne',
       title: 'Mnemosyne',
       url: 'https://m-nemosyne.live',
-      snapshotSrc: '/previews/mnemosyne-live.png',
+      snapshotSrc: '/previews/mnemosyne-live.webp',
       description: isTurkish
         ? 'Konumlara bırakılan anılar fikrini, harita ve zaman katmanlarıyla çalışan canlı web deneyimine dönüştürdüm.'
         : 'Turned location-based memories into a live web experience built around maps and time layers.',
@@ -82,7 +82,7 @@ const WebDevPage = () => {
       caseStudyPath: '/case-study/typesprint',
       title: 'TypeSprint',
       url: 'https://typesprint.online',
-      snapshotSrc: '/previews/typesprint-live.png',
+      snapshotSrc: '/previews/typesprint-live.webp',
       description: isTurkish
         ? 'Yazma hızı ölçümünü doğruluk, ritim ve çok dilli kelime havuzu üzerinden kurgulayan WPM uygulaması.'
         : 'A WPM app designed around accuracy, rhythm, and multilingual word pools.',
@@ -90,6 +90,34 @@ const WebDevPage = () => {
       decision: isTurkish
         ? 'Odak: yanlış girişte akışı durdurarak ölçümü daha dürüst hale getirmek.'
         : 'Focus: make measurement more honest by stopping progress on wrong input.',
+    },
+    {
+      id: 'biztoplulugu',
+      caseStudyPath: '/case-study/biztoplulugu',
+      title: 'Biz Topluluğu',
+      url: 'https://biztoplulugu.com.tr',
+      snapshotSrc: '/previews/biztoplulugu-live.webp',
+      description: isTurkish
+        ? 'Etkinlik, rapor ve duyuru arşivini MDX ile taşıyan, build sırasında statik üretilen topluluk kurumsal sitesi.'
+        : 'A community organization site carrying the event, report, and announcement archive via MDX, statically generated at build.',
+      tags: ['Next.js', 'MDX', 'Tailwind v4', isTurkish ? 'Statik üretim' : 'Static generation'],
+      decision: isTurkish
+        ? 'Odak: veritabanısız mimariyle içerik ağırlıklı arşivi hızlı ve düşük maliyetli tutmak.'
+        : 'Focus: keep a content-heavy archive fast and low-cost with a database-free architecture.',
+    },
+    {
+      id: 'harita',
+      caseStudyPath: '/case-study/harita',
+      title: 'BİZ Şehir Haritası',
+      url: 'https://harita.biztoplulugu.com.tr',
+      snapshotSrc: '/previews/harita-live.webp',
+      description: isTurkish
+        ? '81 ilden gelen sorun bildirimlerini haritada toplayan, Supabase destekli topluluk platformu.'
+        : 'A community platform backed by Supabase that maps issue reports from all 81 provinces.',
+      tags: ['Next.js 16', 'Supabase', 'd3-geo', 'PostgreSQL'],
+      decision: isTurkish
+        ? 'Odak: haritayı kütüphanesiz SVG ile üreterek hafif ve hızlı bir veri yüzeyi kurmak.'
+        : 'Focus: render the map as library-free SVG for a lightweight, fast data surface.',
     },
   ];
 

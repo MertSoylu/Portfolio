@@ -276,7 +276,7 @@ const Projects = () => {
         caseStudyPath: '/case-study/mnemosyne',
         category: 'Web',
         status: isTurkish ? 'Canlı' : 'Live',
-        snapshotSrc: '/previews/mnemosyne-live.png',
+        snapshotSrc: '/previews/mnemosyne-live.webp',
         description: isTurkish
           ? 'Konum bazlı anıları harita ve zaman katmanlarıyla sunan canlı web uygulaması.'
           : 'A live web app for location-based memories, built around maps and time layers.',
@@ -294,7 +294,7 @@ const Projects = () => {
         caseStudyPath: '/case-study/typesprint',
         category: 'Web',
         status: isTurkish ? 'Canlı' : 'Live',
-        snapshotSrc: '/previews/typesprint-live.png',
+        snapshotSrc: '/previews/typesprint-live.webp',
         description: isTurkish
           ? 'Yazma hızını doğrulukla ölçen, çok dilli kelime havuzlu WPM uygulaması.'
           : 'A typing-speed app built around accuracy and multilingual word pools.',
@@ -307,7 +307,7 @@ const Projects = () => {
         caseStudyPath: '/case-study/walkkittie',
         category: 'Android',
         status: 'Google Play',
-        snapshotSrc: '/previews/walkkittie.png',
+        snapshotSrc: '/previews/walkkittie.webp',
         description: isTurkish
           ? "Adım sayacı, su takibi ve piksel pet bakımını birleştiren, Google Play'de yayında bir Android uygulaması."
           : 'A Google Play Android app combining step tracking, water tracking, and pixel-pet care.',
@@ -325,6 +325,32 @@ const Projects = () => {
           ? 'XSS, SQLi, CSRF, header ve subdomain kontrolleri için async Python CLI güvenlik tarayıcısı.'
           : 'An async Python CLI security scanner for XSS, SQLi, CSRF, headers, SSRF, and subdomains.',
         tags: ['Python', 'CLI', 'Async', isTurkish ? 'Raporlama' : 'Reports'],
+      },
+      {
+        id: 'biztoplulugu',
+        title: 'Biz Topluluğu',
+        url: 'https://biztoplulugu.com.tr',
+        caseStudyPath: '/case-study/biztoplulugu',
+        category: 'Web',
+        status: isTurkish ? 'Canlı' : 'Live',
+        snapshotSrc: '/previews/biztoplulugu-live.webp',
+        description: isTurkish
+          ? 'MDX tabanlı içerik arşiviyle topluluk kurumsal sitesi; build sırasında statik üretilir.'
+          : 'Community organization site with an MDX-based content archive, statically generated at build time.',
+        tags: ['Next.js', 'MDX', 'Tailwind v4', isTurkish ? 'Statik' : 'Static'],
+      },
+      {
+        id: 'harita',
+        title: 'BİZ Şehir Haritası',
+        url: 'https://harita.biztoplulugu.com.tr',
+        caseStudyPath: '/case-study/harita',
+        category: 'Web',
+        status: isTurkish ? 'Canlı' : 'Live',
+        snapshotSrc: '/previews/harita-live.webp',
+        description: isTurkish
+          ? '81 ilden gelen sorun bildirimlerini haritada toplayan, Supabase destekli topluluk platformu.'
+          : 'A community platform backed by Supabase that maps issue reports from all 81 provinces.',
+        tags: ['Next.js', 'Supabase', 'd3-geo', 'PostgreSQL'],
       },
     ],
     [isTurkish],

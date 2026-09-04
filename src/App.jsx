@@ -62,6 +62,14 @@ const MsscanCaseStudy = lazyWithRetry(
   () => import('./pages/case-studies/MsscanCaseStudy'),
   'lazy-retry-msscan-case',
 );
+const BizTopluluguCaseStudy = lazyWithRetry(
+  () => import('./pages/case-studies/BizTopluluguCaseStudy'),
+  'lazy-retry-biztoplulugu-case',
+);
+const HaritaCaseStudy = lazyWithRetry(
+  () => import('./pages/case-studies/HaritaCaseStudy'),
+  'lazy-retry-harita-case',
+);
 const NotFoundPage = lazyWithRetry(() => import('./pages/NotFoundPage'), 'lazy-retry-404');
 
 const SectionDivider = ({ className = '' }) => (
@@ -313,6 +321,26 @@ const AppContent = () => {
                   <Suspense fallback={<LoadingSpinner />}>
                     <PageTransition>
                       <MsscanCaseStudy />
+                    </PageTransition>
+                  </Suspense>
+                }
+              />
+              <Route
+                path="/case-study/biztoplulugu"
+                element={
+                  <Suspense fallback={<LoadingSpinner />}>
+                    <PageTransition>
+                      <BizTopluluguCaseStudy />
+                    </PageTransition>
+                  </Suspense>
+                }
+              />
+              <Route
+                path="/case-study/harita"
+                element={
+                  <Suspense fallback={<LoadingSpinner />}>
+                    <PageTransition>
+                      <HaritaCaseStudy />
                     </PageTransition>
                   </Suspense>
                 }

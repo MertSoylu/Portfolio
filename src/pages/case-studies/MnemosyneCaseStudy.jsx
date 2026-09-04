@@ -52,7 +52,7 @@ const MnemosyneCaseStudy = () => {
       currentId="mnemosyne"
       isTurkish={isTurkish}
       facts={facts}
-      previewSnapshotSrc="/previews/mnemosyne-live.png"
+      previewSnapshotSrc="/previews/mnemosyne-live.webp"
     >
       <Reveal>
         <div className="grid gap-5 md:grid-cols-2">

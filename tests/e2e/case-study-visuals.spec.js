@@ -1,8 +1,8 @@
 import { test, expect } from '@playwright/test';
 
 const visualCases = [
-  { route: '/case-study/mnemosyne', image: '/previews/mnemosyne-live.png' },
-  { route: '/case-study/typesprint', image: '/previews/typesprint-live.png' },
+  { route: '/case-study/mnemosyne', image: '/previews/mnemosyne-live.webp' },
+  { route: '/case-study/typesprint', image: '/previews/typesprint-live.webp' },
 ];
 
 test.describe('Case study visuals', () => {

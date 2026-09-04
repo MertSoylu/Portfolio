@@ -54,7 +54,7 @@ const WalkKittieCaseStudy = () => {
       currentId="walkkittie"
       isTurkish={isTurkish}
       facts={facts}
-      previewSnapshotSrc="/previews/walkkittie.png"
+      previewSnapshotSrc="/previews/walkkittie.webp"
     >
       <Reveal>
         <div className="grid gap-5 md:grid-cols-2">
