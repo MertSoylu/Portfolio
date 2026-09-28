@@ -43,23 +43,6 @@ export const PROJECTS = [
     tags: ['Rust', 'ratatui', 'PTY / ConPTY', 'crates.io'],
   },
   {
-    id: 'mnemosyne',
-    title: 'Mnemosyne',
-    category: 'Web',
-    status: LIVE,
-    liveUrl: 'https://m-nemosyne.live',
-    preview: { kind: 'browser', src: '/previews/mnemosyne-live.webp' },
-    summary: {
-      tr: 'Konum bazlı anıları harita ve zaman katmanlarıyla sunan canlı web uygulaması.',
-      en: 'A live web app for location-based memories, built around maps and time layers.',
-    },
-    focus: {
-      tr: 'Odak: anı paylaşımını klasik galeri yerine mekân ve zaman bağlamıyla okutmak.',
-      en: 'Focus: make memory sharing readable through place and time, not a plain gallery.',
-    },
-    tags: ['React', 'PWA', { tr: 'Konum', en: 'Location' }, { tr: 'Zaman katmanları', en: 'Time layers' }],
-  },
-  {
     id: 'typesprint',
     title: 'TypeSprint',
     category: 'Web',

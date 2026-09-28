@@ -134,53 +134,6 @@ export const CASE_STUDIES = {
     resultTags: ['Rust', 'ratatui', 'crossterm', 'portable-pty', 'vt100', 'sysinfo'],
   },
 
-  mnemosyne: {
-    subtitle: {
-      tr: 'Konumlara bırakılan anılar fikrini harita, keşif ve zaman katmanlarıyla çalışan bir web deneyimine dönüştüren proje.',
-      en: 'A project that turns location-based memories into a web experience built around maps, discovery, and time layers.',
-    },
-    facts: [
-      {
-        label: { tr: 'Yüzey', en: 'Surface' },
-        value: { tr: 'Canlı web uygulaması', en: 'Live web application' },
-      },
-      {
-        label: { tr: 'Odak', en: 'Focus' },
-        value: { tr: 'Konum + zaman katmanları', en: 'Location + time layers' },
-      },
-      {
-        label: { tr: 'Rol', en: 'Role' },
-        value: { tr: 'Ürün arayüzü ve uygulama akışı', en: 'Product UI and app flow' },
-      },
-    ],
-    problem: {
-      tr: 'Anılar sosyal akışlarda hızla kayboluyor. Bir yerin geçmişte nasıl göründüğünü, orada kimlerin ne bıraktığını ve mekânın zamanla nasıl değiştiğini tek bağlamda görmek zor.',
-      en: 'Memories disappear quickly in social feeds. It is hard to see how a place looked before, what people left there, and how that location changed over time in one context.',
-    },
-    solution: {
-      tr: 'Deneyimi konum etrafında kurdum: kullanıcılar harita üzerinden keşfe başlar, anıları yer bağlamında okur ve zaman katmanlarıyla mekânın dönüşümünü takip eder.',
-      en: 'I built the experience around location: users start from the map, read memories in place context, and follow transformation through time layers.',
-    },
-    decisionsTitle: DECISIONS.design,
-    decisions: {
-      tr: [
-        'Harita, projenin dekoru değil ana navigasyon yüzeyi olarak ele alındı.',
-        'Anılar tekil kartlardan çok, mekânın zaman içindeki değişimini gösterecek şekilde kurgulandı.',
-        'PWA yaklaşımı, uygulamayı klasik web sayfasından daha kalıcı bir deneyime yaklaştırdı.',
-      ],
-      en: [
-        'The map is treated as the main navigation surface, not decoration.',
-        'Memories are framed around how places change over time, not only as isolated cards.',
-        'The PWA approach makes the experience feel more persistent than a static website.',
-      ],
-    },
-    result: {
-      tr: 'Mnemosyne, web tarafındaki ürün düşüncemi iyi gösteren bir iş: görsel fikir, navigasyon modeli ve kullanıcı motivasyonu aynı ürün dili içinde birleşiyor.',
-      en: 'Mnemosyne is a good example of my product thinking on the web: visual concept, navigation model, and user motivation sit inside one cohesive product language.',
-    },
-    resultTags: ['React', 'PWA', 'Map-first UI', 'Time layers'],
-  },
-
   typesprint: {
     subtitle: {
       tr: 'Yazma hızını sadece hız değil, doğruluk ve akış kontrolüyle ölçen canlı web uygulaması.',
