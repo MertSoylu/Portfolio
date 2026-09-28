@@ -1,46 +1,53 @@
 import { test, expect } from '@playwright/test';
 
-const visualCases = [
+const screenshotCases = [
+  { route: '/case-study/noble', image: '/previews/noble-live.webp' },
   { route: '/case-study/mnemosyne', image: '/previews/mnemosyne-live.webp' },
   { route: '/case-study/typesprint', image: '/previews/typesprint-live.webp' },
+  { route: '/case-study/walkkittie', image: '/previews/walkkittie.webp' },
 ];
 
-test.describe('Case study visuals', () => {
-  for (const item of visualCases) {
+test.describe('Case study pages', () => {
+  for (const item of screenshotCases) {
     test(`${item.route} shows product screenshot`, async ({ page }) => {
       await page.goto(item.route);
-
       await expect(page.locator(`img[src="${item.image}"]`).first()).toBeVisible();
     });
   }
 
-  test('/case-study/walkkittie shows animated octopus pet', async ({ page }) => {
-    await page.goto('/case-study/walkkittie');
-
-    await expect(page.getByTestId('walkkittie-octopus-pet').first()).toBeVisible();
-    await expect(page.getByText(/Pixel Ahtapot|Pixel Octopus/).first()).toBeVisible();
-  });
-
-  test('msscan shows terminal product surface', async ({ page }) => {
+  test('msscan shows terminal preview', async ({ page }) => {
     await page.goto('/case-study/msscan');
-
     await expect(page.getByText('msscan>').first()).toBeVisible();
     await expect(page.getByText('HTML report ready').first()).toBeVisible();
   });
 
-  test('desktop hero copy starts near product preview', async ({ page }) => {
-    await page.setViewportSize({ width: 1440, height: 1000 });
-    await page.goto('/case-study/typesprint');
+  test('noble shows promo video and screen gallery', async ({ page }) => {
+    await page.goto('/case-study/noble');
+    const video = page.locator('video');
+    await expect(video).toHaveAttribute('preload', 'none');
+    await expect(page.locator('img[src^="/previews/noble/"]')).toHaveCount(5);
+  });
 
-    const kicker = page.locator('.lab-kicker').first();
-    const preview = page.locator('.preview-shell').first();
+  test('case study canonical points at its own route', async ({ page }) => {
+    await page.goto('/case-study/harita');
+    await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
+      'href',
+      'https://mertsoylu.dev/case-study/harita',
+    );
+  });
 
-    await expect(kicker).toBeVisible();
-    await expect(preview).toBeVisible();
+  test('prev/next navigation moves between case studies', async ({ page }) => {
+    await page.goto('/case-study/noble');
+    await page
+      .getByRole('navigation', { name: /Proje gezinme|Project navigation/ })
+      .getByRole('link')
+      .last()
+      .click();
+    await expect(page).toHaveURL(/\/case-study\/mnemosyne$/);
+  });
 
-    const kickerBox = await kicker.boundingBox();
-    const previewBox = await preview.boundingBox();
-
-    expect(kickerBox.y - previewBox.y).toBeLessThan(64);
+  test('unknown case study renders 404', async ({ page }) => {
+    await page.goto('/case-study/does-not-exist');
+    await expect(page.getByText('404')).toBeVisible();
   });
 });

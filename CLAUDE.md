@@ -14,7 +14,7 @@ npm run e2e        # Playwright
 ```
 
 Single unit: `npx vitest run tests/unit/<file>`
-Single e2e: `npx playwright test tests/e2e/<file>`
+Single e2e: `npx playwright test tests/e2e/<file>` (no downloaded browsers? prefix `PW_CHANNEL=chrome`)
 
 Pre-commit: husky + lint-staged runs eslint --fix + prettier on staged. commitlint enforces Conventional Commits.
 
@@ -25,13 +25,21 @@ Pre-commit: husky + lint-staged runs eslint --fix + prettier on staged. commitli
 - `DarkModeContext` — `isDark` + toggle; `.dark` class on root div
 - `LanguageContext` — `useLanguage()` returns `{ language, isTurkish, toggleLanguage }`; persists to localStorage, sets `<html lang>`. Strings in `src/utils/constants.js`
 
-**Routing**: Lazy pages via `lazyWithRetry()` — catches chunk load failures, does one-time sessionStorage-guarded page reload. `HomePage` (`/`) = `Hero` + lazy `About`/`Certificates`/`Projects`/`Contact` stacked with `SectionDivider`. Standalone: `/web`, `/android`, `/cybersecurity`, `/data-science`. Case studies: `/case-study/{mnemosyne,typesprint,walkkittie,msscan}`.
+**Routing**: Lazy pages via `lazyWithRetry()` — catches chunk load failures, does one-time sessionStorage-guarded page reload. `HomePage` (`/`) = `Hero` + lazy `About`/`Certificates`/`Projects`/`Contact` stacked with `SectionDivider`. Other routes live in the `LAZY_ROUTES` table in `src/App.jsx`: `/web`, `/android`, `/cybersecurity`, `/data-science`, `/case-study/:id`, `*`.
 
 **Per-route transitions**: `src/App.jsx` — `<PageTransition>` motion wrapper with fade+slide. Collapses to plain opacity fade when `prefersReducedMotion`. No ROUTE_DIRECTIONS/ROUTE_OVERLAYS/ROUTE_PARTICLES (removed in ReactBits migration).
 
-**Homepage sections**: Hero (ASCIIText name + RotatingText roles + GradientText CTA), About (MagicBento bento grid), Projects (2×2 project card grid + compact GitHub feed), LogoLoop (infinite tech icon marquee), Certificates (TiltedCard), Contact (form + channels).
+**Homepage sections**: Hero ("New" badge → NOBLE, ASCIIText name + RotatingText roles + GradientText CTA), About (MagicBento bento grid), Projects (featured wide card + 3-col project grid + GitHub repo CardMarquee), LogoLoop (infinite tech icon marquee), Certificates (TiltedCard), Contact (form + channels).
 
 **Background**: Aurora (WebGL ogl, fixed, top 65vh) + Noise (canvas grain) + ClickSpark (canvas burst). All continuous RAF.
+
+## Projects & case studies
+
+- `src/data/projects.js` — single source for every project: card data, links, `preview` (`browser` | `phone` | `window` | `terminal`), `featured` flag. Feeds home Projects, `/web`, case study nav, SEO_META and tests. Bilingual fields are `{ tr, en }`, read via `pick(value, isTurkish)`.
+- `src/data/caseStudies.js` — detail text keyed by project id (facts, problem/solution, decisions, optional `features`, `gallery`, `video`). Only imported by the case study chunk.
+- `src/pages/CaseStudyPage.jsx` — one generic page for `/case-study/:id`; unknown id renders `NotFoundPage`.
+- Add a project: entry in `projects.js` + entry in `caseStudies.js` + `<loc>` in `public/sitemap.xml`. SEO meta is generated automatically; `tests/unit/seo-meta.test.js` checks both files stay in sync.
+- Assets: `public/previews/*.webp` (cards), `public/previews/noble/` + `public/media/` (case-study only; excluded from PWA precache in `vite.config.js`).
 
 ## ReactBits Components
 

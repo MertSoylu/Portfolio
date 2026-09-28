@@ -124,12 +124,9 @@ const RotatingText = forwardRef(function RotatingText(
   }, [next, rotationInterval, auto]);
 
   return (
-    <motion.span
-      className={cn('inline-flex flex-wrap whitespace-pre-wrap relative', mainClassName)}
-      {...rest}
-      layout
-      transition={transition}
-    >
+    // Not: `layout` animasyonu bilerek yok. Hero'da y animasyonu yapan bir üst öğe içinde
+    // framer-motion projeksiyonu metni eğip kaydırıyordu; genişlik değişimi artık anında olur.
+    <span className={cn('inline-flex flex-wrap whitespace-pre-wrap relative', mainClassName)} {...rest}>
       <span className="sr-only">{texts[currentTextIndex]}</span>
       <AnimatePresence mode={animatePresenceMode} initial={animatePresenceInitial}>
         <motion.span
@@ -137,7 +134,6 @@ const RotatingText = forwardRef(function RotatingText(
           className={cn(
             splitBy === 'lines' ? 'flex flex-col w-full' : 'flex flex-wrap whitespace-pre-wrap relative',
           )}
-          layout
           aria-hidden="true"
         >
           {elements.map((wordObj, wordIndex, array) => {
@@ -170,7 +166,7 @@ const RotatingText = forwardRef(function RotatingText(
           })}
         </motion.span>
       </AnimatePresence>
-    </motion.span>
+    </span>
   );
 });
 

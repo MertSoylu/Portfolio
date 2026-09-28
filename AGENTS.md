@@ -14,7 +14,7 @@ npm run e2e        # Playwright
 ```
 
 Single unit: `npx vitest run tests/unit/<file>`
-Single e2e: `npx playwright test tests/e2e/<file>`
+Single e2e: `npx playwright test tests/e2e/<file>` (no downloaded browsers? prefix `PW_CHANNEL=chrome`)
 
 Pre-commit: husky + lint-staged runs eslint --fix + prettier on staged files. Commit messages enforced by commitlint (Conventional Commits). `format` before commit if lint-staged errors.
 
@@ -24,11 +24,19 @@ Pre-commit: husky + lint-staged runs eslint --fix + prettier on staged files. Co
 
 **Provider stack** (`src/App.jsx`, outer→inner): `ErrorBoundary` > `MotionConfig` > `DarkModeProvider` > `LanguageProvider` > `AppContent`. `Toaster` + deferred Vercel Analytics/SpeedInsights siblings.
 
-**Routing**: Lazy pages via `lazyWithRetry()` wrapper — catches chunk load failures, does one-time sessionStorage-guarded page reload. `HomePage` (`/`) = `Hero` + lazy `About`/`Certificates`/`Projects`/`Contact` stacked with `SectionDivider`. Standalone: `/web`, `/android`, `/cybersecurity`, `/data-science`. Case studies: `/case-study/{mnemosyne,typesprint,walkkittie,msscan}`. Add new routes through `lazyWithRetry`.
+**Routing**: Lazy pages via `lazyWithRetry()` — catches chunk load failures, does one-time sessionStorage-guarded page reload. `HomePage` (`/`) = `Hero` + lazy `About`/`Certificates`/`Projects`/`Contact` stacked with `SectionDivider`. Other routes live in the `LAZY_ROUTES` table in `src/App.jsx`: `/web`, `/android`, `/cybersecurity`, `/data-science`, `/case-study/:id`, `*`.
 
 **Per-route transitions**: `src/App.jsx` — `<PageTransition>` motion wrapper with fade+slide. Collapses to plain opacity fade when `prefersReducedMotion`. **No more** `ROUTE_DIRECTIONS`/`ROUTE_OVERLAYS`/`ROUTE_PARTICLES` objects (removed in ReactBits migration).
 
 **i18n** (`src/utils/constants.js`): Turkish/English via `LanguageContext`. Add keys to both language objects.
+
+## Projects & case studies
+
+- `src/data/projects.js` — single source for every project: card data, links, `preview` (`browser` | `phone` | `window` | `terminal`), `featured` flag. Feeds home Projects, `/web`, case study nav, SEO_META and tests. Bilingual fields are `{ tr, en }`, read via `pick(value, isTurkish)`.
+- `src/data/caseStudies.js` — detail text keyed by project id (facts, problem/solution, decisions, optional `features`, `gallery`, `video`). Only imported by the case study chunk.
+- `src/pages/CaseStudyPage.jsx` — one generic page for `/case-study/:id`; unknown id renders `NotFoundPage`.
+- Add a project: entry in `projects.js` + entry in `caseStudies.js` + `<loc>` in `public/sitemap.xml`. SEO meta is generated automatically; `tests/unit/seo-meta.test.js` checks both files stay in sync.
+- Assets: `public/previews/*.webp` (cards), `public/previews/noble/` + `public/media/` (case-study only; excluded from PWA precache in `vite.config.js`).
 
 ## ReactBits Components
 

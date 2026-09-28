@@ -1,7 +1,18 @@
 import { describe, expect, it } from 'vitest';
 import { SEO_META } from '../../src/utils/constants';
+import { PROJECTS, caseStudyPath } from '../../src/data/projects';
+import { CASE_STUDIES } from '../../src/data/caseStudies';
 
-const REQUIRED_ROUTES = ['/', '/web', '/android', '/cybersecurity', '/data-science', '/404'];
+const CASE_STUDY_ROUTES = PROJECTS.map((project) => caseStudyPath(project.id));
+const REQUIRED_ROUTES = [
+  '/',
+  '/web',
+  '/android',
+  '/cybersecurity',
+  '/data-science',
+  '/404',
+  ...CASE_STUDY_ROUTES,
+];
 
 describe('SEO_META', () => {
   it('defines all expected routes', () => {
@@ -34,5 +45,31 @@ describe('SEO_META', () => {
     expect(SEO_META['/android'].canonical).toMatch(/\/android$/);
     expect(SEO_META['/cybersecurity'].canonical).toMatch(/\/cybersecurity$/);
     expect(SEO_META['/data-science'].canonical).toMatch(/\/data-science$/);
+  });
+
+  it('every case study canonical matches its own route', () => {
+    CASE_STUDY_ROUTES.forEach((route) => {
+      expect(SEO_META[route].canonical).toBe(`https://mertsoylu.dev${route}`);
+    });
+  });
+});
+
+describe('project data', () => {
+  it('every project has a case study with bilingual content', () => {
+    PROJECTS.forEach((project) => {
+      const study = CASE_STUDIES[project.id];
+      expect(study, project.id).toBeDefined();
+      ['subtitle', 'problem', 'solution', 'result'].forEach((field) => {
+        expect(study[field].tr, `${project.id}.${field}.tr`).toBeTruthy();
+        expect(study[field].en, `${project.id}.${field}.en`).toBeTruthy();
+      });
+      expect(study.decisions.tr.length).toBe(study.decisions.en.length);
+    });
+  });
+
+  it('project ids are unique and exactly one project is featured', () => {
+    const ids = PROJECTS.map((project) => project.id);
+    expect(new Set(ids).size).toBe(ids.length);
+    expect(PROJECTS.filter((project) => project.featured)).toHaveLength(1);
   });
 });

@@ -1,7 +1,4 @@
-// Site metadata
-export const SITE_TITLE = 'Mert Soylu | Junior Full-Stack Developer';
-export const SITE_DESCRIPTION =
-  'Junior Full-Stack Developer focused on web and Android, with a growing interest in cybersecurity and AI.';
+import { PROJECTS, caseStudyPath } from '../data/projects';
 
 // Personal information
 export const PERSONAL_INFO = {
@@ -11,71 +8,6 @@ export const PERSONAL_INFO = {
   email: 's6ylumert@gmail.com',
   github: 'https://github.com/MertSoylu',
   location: 'İzmir, Turkey',
-};
-
-// Skills and expertise
-export const SKILLS = [
-  'Web Development',
-  'Android Development',
-  'Cybersecurity',
-  'Data Science',
-  'Deep Learning',
-];
-
-export const TECHNOLOGIES = {
-  frontend: ['React', 'JavaScript', 'Tailwind CSS', 'HTML/CSS', 'Vite', 'Framer Motion'],
-  backend: ['Node.js', 'Express'],
-  mobile: ['Kotlin', 'Jetpack Compose', 'Android Studio'],
-  tools: ['Git', 'GitHub', 'VS Code', 'Linux'],
-};
-
-// Color palette
-export const COLORS = {
-  sand: {
-    50: '#faf8f3',
-    100: '#f5f1e8',
-    200: '#ede6db',
-    300: '#e0d5c7',
-    400: '#d4c4af',
-    500: '#c9b8a0',
-    600: '#b8a08c',
-    700: '#9d8872',
-    800: '#7a6a5c',
-    900: '#5a4a42',
-  },
-  warm: {
-    50: '#fffbf5',
-    100: '#fff8f0',
-    200: '#ffe8d6',
-    300: '#ffd4b3',
-    400: '#ffb88a',
-    500: '#ff9a5c',
-    600: '#f07d2d',
-    700: '#d45e1f',
-    800: '#a84617',
-    900: '#7a3410',
-  },
-};
-
-// Animation timings
-export const ANIMATION_TIMINGS = {
-  fast: 0.3,
-  normal: 0.6,
-  slow: 1,
-};
-
-// Navigation links
-export const NAV_LINKS = [
-  { name: 'About', href: '#about' },
-  { name: 'Projects', href: '#projects' },
-  { name: 'Contact', href: '#contact' },
-];
-
-// Sections
-export const SECTIONS = {
-  about: 'about',
-  projects: 'projects',
-  contact: 'contact',
 };
 
 export const HERO_ROLES = {
@@ -220,32 +152,20 @@ export const SEO_META = {
     canonical: `${SITE_URL}/data-science`,
     ogImage: DEFAULT_OG_IMAGE,
   },
-  '/case-study/biztoplulugu': {
-    tr: {
-      title: 'Biz Topluluğu Case Study | Mert Soylu',
-      description: 'MDX tabanlı içerik arşiviyle, build sırasında statik üretilen topluluk kurumsal sitesi.',
-    },
-    en: {
-      title: 'Biz Topluluğu Case Study | Mert Soylu',
-      description:
-        'A community organization site with an MDX-based archive, statically generated at build time.',
-    },
-    canonical: `${SITE_URL}/case-study/biztoplulugu`,
-    ogImage: DEFAULT_OG_IMAGE,
-  },
-  '/case-study/harita': {
-    tr: {
-      title: 'BİZ Şehir Haritası Case Study | Mert Soylu',
-      description:
-        '81 ilden gelen sorun bildirimlerini haritada toplayan, Supabase destekli topluluk platformu.',
-    },
-    en: {
-      title: 'BİZ Şehir Haritası Case Study | Mert Soylu',
-      description: 'A Supabase-backed community platform that maps issue reports from all 81 provinces.',
-    },
-    canonical: `${SITE_URL}/case-study/harita`,
-    ogImage: DEFAULT_OG_IMAGE,
-  },
+  ...Object.fromEntries(
+    PROJECTS.map((project) => {
+      const route = caseStudyPath(project.id);
+      return [
+        route,
+        {
+          tr: { title: `${project.title} Case Study | Mert Soylu`, description: project.summary.tr },
+          en: { title: `${project.title} Case Study | Mert Soylu`, description: project.summary.en },
+          canonical: `${SITE_URL}${route}`,
+          ogImage: DEFAULT_OG_IMAGE,
+        },
+      ];
+    }),
+  ),
   '/404': {
     tr: {
       title: 'Sayfa Bulunamadı | Mert Soylu',

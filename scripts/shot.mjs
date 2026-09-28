@@ -7,7 +7,8 @@ mkdirSync(outDir, { recursive: true });
 
 const shots = JSON.parse(process.env.SHOT_LIST || '[]');
 
-const browser = await chromium.launch();
+// SHOT_CHANNEL=chrome|msedge: Playwright tarayıcısı indirilmemişse yüklü tarayıcıyı kullan.
+const browser = await chromium.launch(process.env.SHOT_CHANNEL ? { channel: process.env.SHOT_CHANNEL } : {});
 for (const s of shots) {
   const ctx = await browser.newContext({
     viewport: { width: s.w, height: s.h },

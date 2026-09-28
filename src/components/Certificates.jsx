@@ -12,8 +12,10 @@ const Certificates = () => {
 
   return (
     <section id="certificates" className="relative px-5 py-12 sm:py-20 md:py-24">
-      <div className="container-wide">
+      {/* Geniş ekranda başlık solda, kartlar sağda: az sayıda sertifika boşlukta kaybolmasın. */}
+      <div className="container-wide grid items-end gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:gap-12">
         <SectionHeader
+          className="!mb-0"
           kicker={isTurkish ? 'Eğitim' : 'Training'}
           kickerIcon={<HiAcademicCap className="h-4 w-4" />}
           title={isTurkish ? 'Sertifikalar' : 'Certificates'}
@@ -24,7 +26,7 @@ const Certificates = () => {
           }
         />
 
-        <div className="grid gap-3 sm:gap-4 md:grid-cols-2 xl:grid-cols-3">
+        <div className={`grid gap-3 sm:gap-4 ${CERTIFICATES.length > 1 ? 'sm:grid-cols-2' : ''}`}>
           {CERTIFICATES.map((cert, index) => (
             <Reveal key={cert.id} delay={index * 0.07} className="h-full">
               <TiltedCard className="h-full" rotateAmplitude={4} scaleOnHover={1.01}>

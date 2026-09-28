@@ -3,16 +3,17 @@ import { test, expect } from '@playwright/test';
 const visibleProjectOverflow = () => {
   const viewportWidth = window.innerWidth;
   const ignoredTags = new Set(['svg', 'path']);
+  // GitHub repo şeridi (marquee) bilerek taşar; kenarları maske ile gizlenir.
+  const marquee = document.querySelector('#projects ul[aria-label*="GitHub"]');
 
   return Array.from(document.querySelectorAll('#projects *'))
     .map((element) => {
+      if (marquee && marquee.contains(element)) return null;
       const rect = element.getBoundingClientRect();
       const style = window.getComputedStyle(element);
       const isVisible =
         rect.width > 2 &&
         rect.height > 2 &&
-        rect.bottom > 0 &&
-        rect.top < window.innerHeight &&
         style.display !== 'none' &&
         style.visibility !== 'hidden' &&
         Number(style.opacity || 1) !== 0;
@@ -25,48 +26,51 @@ const visibleProjectOverflow = () => {
         className: String(element.className).slice(0, 140),
         left: Math.round(rect.left),
         right: Math.round(rect.right),
-        width: Math.round(rect.width),
       };
     })
     .filter(Boolean);
 };
 
-test.describe('Homepage responsive layout', () => {
-  test('mobile projects showcase stays inside viewport', async ({ page }) => {
+test.describe('Homepage projects', () => {
+  test('mobile project grid stays inside viewport', async ({ page }) => {
     await page.setViewportSize({ width: 390, height: 844 });
     await page.goto('/');
 
     await page.locator('#projects').scrollIntoViewIfNeeded();
-    await page.waitForTimeout(1200);
+    await page.waitForTimeout(800);
 
-    const overflowing = await page.evaluate(visibleProjectOverflow);
-
-    expect(overflowing).toEqual([]);
+    expect(await page.evaluate(visibleProjectOverflow)).toEqual([]);
   });
 
-  test('projects morph autoplay starts when visible', async ({ page }) => {
-    await page.setViewportSize({ width: 1440, height: 1000 });
+  test('featured project and all project cards are listed', async ({ page }) => {
     await page.goto('/');
-
-    await page.waitForTimeout(5200);
     await page.locator('#projects').scrollIntoViewIfNeeded();
 
-    await expect(page.locator('#projects h3').filter({ hasText: 'Mnemosyne' })).toBeVisible();
-    await page.waitForTimeout(3300);
-    await expect(page.locator('#projects h3').filter({ hasText: 'TypeSprint' })).toBeVisible();
+    for (const title of [
+      'NOBLE',
+      'Mnemosyne',
+      'TypeSprint',
+      'BİZ Şehir Haritası',
+      'Biz Topluluğu',
+      'WalkKittie',
+      'msscan',
+    ]) {
+      await expect(page.locator('#projects h3').filter({ hasText: title }).first()).toBeVisible();
+    }
   });
 
-  test('projects morph autoplay keeps running on hover', async ({ page }) => {
-    await page.setViewportSize({ width: 1440, height: 1000 });
+  test('project card opens its case study', async ({ page }) => {
     await page.goto('/');
-
     await page.locator('#projects').scrollIntoViewIfNeeded();
-    await expect(page.locator('#projects h3').filter({ hasText: 'Mnemosyne' })).toBeVisible();
+    await page.locator('#projects h3 a', { hasText: 'TypeSprint' }).click();
+    await expect(page).toHaveURL(/\/case-study\/typesprint$/);
+  });
 
-    const box = await page.locator('#projects').boundingBox();
-    await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
-
-    await page.waitForTimeout(3300);
-    await expect(page.locator('#projects h3').filter({ hasText: 'TypeSprint' })).toBeVisible();
+  test('marquee duplicates are not keyboard focusable', async ({ page }) => {
+    await page.goto('/');
+    await page.locator('#projects').scrollIntoViewIfNeeded();
+    const hiddenItems = page.locator('#projects li[aria-hidden="true"]');
+    if ((await hiddenItems.count()) === 0) return;
+    await expect(hiddenItems.first()).toHaveAttribute('inert', '');
   });
 });

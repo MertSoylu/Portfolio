@@ -13,7 +13,7 @@ test.describe('Portfolio smoke', () => {
     await expect(skip).toHaveCount(1);
   });
 
-  test('CV download link present in hero', async ({ page }) => {
+  test('CV download link present in contact section', async ({ page }) => {
     await page.goto('/');
     const cv = page.locator('a[href="/cv.pdf"]').first();
     await expect(cv).toHaveAttribute('download', '');
@@ -28,7 +28,7 @@ test.describe('Portfolio smoke', () => {
 
   test('404 page renders quick links', async ({ page }) => {
     await page.goto('/this-route-does-not-exist');
-    await expect(page.getByRole('link', { name: /web/i })).toBeVisible();
+    await expect(page.getByRole('main').getByRole('link', { name: /web/i })).toBeVisible();
   });
 
   test('honeypot blocks bot submissions', async ({ page }) => {

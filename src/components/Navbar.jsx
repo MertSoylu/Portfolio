@@ -100,13 +100,18 @@ const Navbar = () => {
           <span className="font-display text-lg font-semibold tracking-tight text-fg">Mert Soylu</span>
         </button>
 
-        <div className="hidden items-center gap-1 md:flex">
+        {/* Kapsül arka planı: sayfa tepesinde aurora parlakken linklerin okunur kalması için. */}
+        <div
+          className={`hidden items-center gap-0.5 rounded-full border px-1.5 py-1 transition-colors duration-300 md:flex ${
+            scrolled || open ? 'border-transparent' : 'border-line/10 bg-canvas/55 backdrop-blur-md'
+          }`}
+        >
           {links.map((link) => (
             <Magnet key={link.id} padding={30} magnetStrength={4}>
               <button
                 type="button"
                 onClick={() => goToSection(link.id)}
-                className="link-underline rounded-md px-3 py-2 text-sm font-medium text-muted transition-colors hover:text-fg"
+                className="rounded-full px-3.5 py-1.5 text-sm font-medium text-fg/70 transition-colors hover:bg-surface2 hover:text-fg"
               >
                 {link.label}
               </button>
@@ -117,7 +122,15 @@ const Navbar = () => {
         <div className="flex items-center gap-1.5">
           <IconToggle
             onClick={toggleDarkMode}
-            label={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
+            label={
+              isTurkish
+                ? isDark
+                  ? 'Açık temaya geç'
+                  : 'Koyu temaya geç'
+                : isDark
+                  ? 'Switch to light mode'
+                  : 'Switch to dark mode'
+            }
           >
             <AnimatePresence mode="wait" initial={false}>
               {isDark ? (

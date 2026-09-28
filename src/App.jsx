@@ -46,31 +46,18 @@ const About = lazyWithRetry(() => import('./components/About'), 'lazy-retry-abou
 const Certificates = lazyWithRetry(() => import('./components/Certificates'), 'lazy-retry-certificates');
 const Projects = lazyWithRetry(() => import('./components/Projects'), 'lazy-retry-projects');
 const Contact = lazyWithRetry(() => import('./components/Contact'), 'lazy-retry-contact');
-const MnemosyneCaseStudy = lazyWithRetry(
-  () => import('./pages/case-studies/MnemosyneCaseStudy'),
-  'lazy-retry-mnemosyne-case',
-);
-const TypeSprintCaseStudy = lazyWithRetry(
-  () => import('./pages/case-studies/TypeSprintCaseStudy'),
-  'lazy-retry-typesprint-case',
-);
-const WalkKittieCaseStudy = lazyWithRetry(
-  () => import('./pages/case-studies/WalkKittieCaseStudy'),
-  'lazy-retry-walkkittie-case',
-);
-const MsscanCaseStudy = lazyWithRetry(
-  () => import('./pages/case-studies/MsscanCaseStudy'),
-  'lazy-retry-msscan-case',
-);
-const BizTopluluguCaseStudy = lazyWithRetry(
-  () => import('./pages/case-studies/BizTopluluguCaseStudy'),
-  'lazy-retry-biztoplulugu-case',
-);
-const HaritaCaseStudy = lazyWithRetry(
-  () => import('./pages/case-studies/HaritaCaseStudy'),
-  'lazy-retry-harita-case',
-);
+const CaseStudyPage = lazyWithRetry(() => import('./pages/CaseStudyPage'), 'lazy-retry-case-study');
 const NotFoundPage = lazyWithRetry(() => import('./pages/NotFoundPage'), 'lazy-retry-404');
+
+// Ana sayfa dışındaki tüm sayfalar aynı Suspense + geçiş sarmalayıcısını kullanır.
+const LAZY_ROUTES = [
+  { path: '/web', Component: WebDevPage },
+  { path: '/android', Component: AndroidPage },
+  { path: '/cybersecurity', Component: CyberSecurityPage },
+  { path: '/data-science', Component: DataSciencePage },
+  { path: '/case-study/:id', Component: CaseStudyPage },
+  { path: '*', Component: NotFoundPage },
+];
 
 const SectionDivider = ({ className = '' }) => (
   <div className={`container-wide py-2 ${className}`}>
@@ -245,116 +232,19 @@ const AppContent = () => {
                   </PageTransition>
                 }
               />
-              <Route
-                path="/android"
-                element={
-                  <Suspense fallback={<LoadingSpinner />}>
-                    <PageTransition>
-                      <AndroidPage />
-                    </PageTransition>
-                  </Suspense>
-                }
-              />
-              <Route
-                path="/web"
-                element={
-                  <Suspense fallback={<LoadingSpinner />}>
-                    <PageTransition>
-                      <WebDevPage />
-                    </PageTransition>
-                  </Suspense>
-                }
-              />
-              <Route
-                path="/cybersecurity"
-                element={
-                  <Suspense fallback={<LoadingSpinner />}>
-                    <PageTransition>
-                      <CyberSecurityPage />
-                    </PageTransition>
-                  </Suspense>
-                }
-              />
-              <Route
-                path="/data-science"
-                element={
-                  <Suspense fallback={<LoadingSpinner />}>
-                    <PageTransition>
-                      <DataSciencePage />
-                    </PageTransition>
-                  </Suspense>
-                }
-              />
-              <Route
-                path="/case-study/mnemosyne"
-                element={
-                  <Suspense fallback={<LoadingSpinner />}>
-                    <PageTransition>
-                      <MnemosyneCaseStudy />
-                    </PageTransition>
-                  </Suspense>
-                }
-              />
-              <Route
-                path="/case-study/typesprint"
-                element={
-                  <Suspense fallback={<LoadingSpinner />}>
-                    <PageTransition>
-                      <TypeSprintCaseStudy />
-                    </PageTransition>
-                  </Suspense>
-                }
-              />
-              <Route
-                path="/case-study/walkkittie"
-                element={
-                  <Suspense fallback={<LoadingSpinner />}>
-                    <PageTransition>
-                      <WalkKittieCaseStudy />
-                    </PageTransition>
-                  </Suspense>
-                }
-              />
-              <Route
-                path="/case-study/msscan"
-                element={
-                  <Suspense fallback={<LoadingSpinner />}>
-                    <PageTransition>
-                      <MsscanCaseStudy />
-                    </PageTransition>
-                  </Suspense>
-                }
-              />
-              <Route
-                path="/case-study/biztoplulugu"
-                element={
-                  <Suspense fallback={<LoadingSpinner />}>
-                    <PageTransition>
-                      <BizTopluluguCaseStudy />
-                    </PageTransition>
-                  </Suspense>
-                }
-              />
-              <Route
-                path="/case-study/harita"
-                element={
-                  <Suspense fallback={<LoadingSpinner />}>
-                    <PageTransition>
-                      <HaritaCaseStudy />
-                    </PageTransition>
-                  </Suspense>
-                }
-              />
-              <Route
-                path="*"
-                element={
-                  <Suspense fallback={<LoadingSpinner />}>
-                    <PageTransition>
-                      <NotFoundPage />
-                    </PageTransition>
-                  </Suspense>
-                }
-              />
+              {LAZY_ROUTES.map(({ path, Component }) => (
+                <Route
+                  key={path}
+                  path={path}
+                  element={
+                    <Suspense fallback={<LoadingSpinner />}>
+                      <PageTransition>
+                        <Component />
+                      </PageTransition>
+                    </Suspense>
+                  }
+                />
+              ))}
             </Routes>
           </AnimatePresence>
         </main>
@@ -382,99 +272,50 @@ const scheduleNonCriticalTask = (callback) => {
 
 const shouldLoadVercelInsights = () => !['localhost', '127.0.0.1', '::1'].includes(window.location.hostname);
 
-const DeferredAnalytics = () => {
-  const [AnalyticsComponent, setAnalyticsComponent] = useState(null);
+// Vercel Analytics / Speed Insights'ı sayfa yüklendikten ve tarayıcı boşa çıktıktan sonra getirir.
+const DeferredVercelComponent = ({ load, label }) => {
+  const [LoadedComponent, setLoadedComponent] = useState(null);
 
   useEffect(() => {
     if (!shouldLoadVercelInsights()) return undefined;
 
     let cancelled = false;
-    let removeLoadListener = null;
     let cancelScheduledLoad = null;
 
-    const loadAnalytics = () => {
-      import('@vercel/analytics/react')
-        .then(({ Analytics }) => {
-          if (!cancelled) {
-            setAnalyticsComponent(() => Analytics);
-          }
-        })
-        .catch((error) => {
-          console.error('Failed to load Vercel Analytics:', error);
-        });
-    };
-
     const scheduleLoad = () => {
-      cancelScheduledLoad = scheduleNonCriticalTask(loadAnalytics);
+      cancelScheduledLoad = scheduleNonCriticalTask(() => {
+        load()
+          .then((Component) => {
+            if (!cancelled) setLoadedComponent(() => Component);
+          })
+          .catch((error) => {
+            console.error(`Failed to load ${label}:`, error);
+          });
+      });
     };
 
     if (document.readyState === 'complete') {
       scheduleLoad();
-    } else {
-      const handleLoad = () => {
-        scheduleLoad();
+      return () => {
+        cancelled = true;
+        if (cancelScheduledLoad) cancelScheduledLoad();
       };
-      window.addEventListener('load', handleLoad, { once: true });
-      removeLoadListener = () => window.removeEventListener('load', handleLoad);
     }
 
+    window.addEventListener('load', scheduleLoad, { once: true });
     return () => {
       cancelled = true;
-      if (removeLoadListener) removeLoadListener();
+      window.removeEventListener('load', scheduleLoad);
       if (cancelScheduledLoad) cancelScheduledLoad();
     };
-  }, []);
+  }, [load, label]);
 
-  if (!AnalyticsComponent) return null;
-  return <AnalyticsComponent />;
+  if (!LoadedComponent) return null;
+  return <LoadedComponent />;
 };
 
-const DeferredSpeedInsights = () => {
-  const [SpeedInsightsComponent, setSpeedInsightsComponent] = useState(null);
-
-  useEffect(() => {
-    if (!shouldLoadVercelInsights()) return undefined;
-
-    let cancelled = false;
-    let removeLoadListener = null;
-    let cancelScheduledLoad = null;
-
-    const loadSpeedInsights = () => {
-      import('@vercel/speed-insights/react')
-        .then(({ SpeedInsights }) => {
-          if (!cancelled) {
-            setSpeedInsightsComponent(() => SpeedInsights);
-          }
-        })
-        .catch((error) => {
-          console.error('Failed to load Vercel Speed Insights:', error);
-        });
-    };
-
-    const scheduleLoad = () => {
-      cancelScheduledLoad = scheduleNonCriticalTask(loadSpeedInsights);
-    };
-
-    if (document.readyState === 'complete') {
-      scheduleLoad();
-    } else {
-      const handleLoad = () => {
-        scheduleLoad();
-      };
-      window.addEventListener('load', handleLoad, { once: true });
-      removeLoadListener = () => window.removeEventListener('load', handleLoad);
-    }
-
-    return () => {
-      cancelled = true;
-      if (removeLoadListener) removeLoadListener();
-      if (cancelScheduledLoad) cancelScheduledLoad();
-    };
-  }, []);
-
-  if (!SpeedInsightsComponent) return null;
-  return <SpeedInsightsComponent />;
-};
+const loadAnalytics = () => import('@vercel/analytics/react').then((module) => module.Analytics);
+const loadSpeedInsights = () => import('@vercel/speed-insights/react').then((module) => module.SpeedInsights);
 
 function App() {
   return (
@@ -497,8 +338,8 @@ function App() {
                 },
               }}
             />
-            <DeferredAnalytics />
-            <DeferredSpeedInsights />
+            <DeferredVercelComponent load={loadAnalytics} label="Vercel Analytics" />
+            <DeferredVercelComponent load={loadSpeedInsights} label="Vercel Speed Insights" />
           </LanguageProvider>
         </DarkModeProvider>
       </MotionConfig>

@@ -143,7 +143,13 @@ const CardMarquee = ({
         className={`flex w-max ${gapClassName} cursor-grab select-none items-stretch [touch-action:pan-y] active:cursor-grabbing`}
       >
         {[...items, ...items].map((child, i) => (
-          <li key={i} aria-hidden={i >= items.length} className={`shrink-0 ${itemClassName}`}>
+          // Kopya set yalnızca görsel döngü için: inert, içindeki butonların Tab ile odaklanmasını engeller.
+          <li
+            key={i}
+            aria-hidden={i >= items.length}
+            {...(i >= items.length ? { inert: '' } : {})}
+            className={`shrink-0 ${itemClassName}`}
+          >
             {child}
           </li>
         ))}

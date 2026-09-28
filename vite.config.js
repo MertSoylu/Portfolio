@@ -15,6 +15,8 @@ export default defineConfig(({ mode }) => ({
       manifestFilename: 'manifest.webmanifest',
       workbox: {
         globPatterns: ['**/*.{js,css,html,svg,woff2,png,webp,jpg,jpeg}'],
+        // Yalnızca case study'de görünen galeri/video görselleri her ziyaretçiye önbelleğe alınmasın.
+        globIgnores: ['**/previews/noble/**', '**/media/**'],
         navigateFallback: '/index.html',
         navigateFallbackDenylist: [/^\/api\//, /^\/cv\.pdf$/, /^\/certificates\//, /^\/og-image\.png$/],
         runtimeCaching: [

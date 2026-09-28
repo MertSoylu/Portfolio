@@ -1,25 +1,18 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
-import {
-  HiCollection,
-  HiExternalLink,
-  HiSparkles,
-  HiStar,
-  HiX,
-  HiBookOpen,
-  HiCode,
-  HiShieldCheck,
-} from 'react-icons/hi';
-import { HiDevicePhoneMobile } from 'react-icons/hi2';
+import { HiCollection, HiExternalLink, HiSparkles, HiStar, HiX, HiBookOpen } from 'react-icons/hi';
+import { FiGithub } from 'react-icons/fi';
 import { clearRateLimitState, fetchGitHubRepos, getGitHubProfileUrl } from '../utils/githubApi';
 import { FALLBACK_PROJECTS, FOREST_SITE_URL } from '../utils/constants';
 import { useLanguage } from '../context/LanguageContext';
+import { CATEGORY_LABELS, PROJECTS, caseStudyPath, pick } from '../data/projects';
 import SectionHeader from './home/SectionHeader';
 import CardMarquee from './ui/CardMarquee';
 import Reveal from './ui/Reveal';
 import SpotlightCard from './ui/SpotlightCard';
+import { TerminalPreview } from './ui/DevicePreview';
 
 const chipClass = 'rounded-full border border-line/12 bg-surface2 px-2.5 py-1 text-xs font-medium text-muted';
 
@@ -150,92 +143,184 @@ const ProjectModal = ({ project, onClose, isTurkish }) => {
   );
 };
 
-const ProjectCard = ({ project, isTurkish, index }) => {
-  const iconMap = {
-    Web: <HiCode className="h-5 w-5" />,
-    Android: <HiDevicePhoneMobile className="h-5 w-5" />,
-    Security: <HiShieldCheck className="h-5 w-5" />,
-  };
+const CardLinks = ({ project, isTurkish }) => (
+  <div className="relative z-10 mt-auto flex items-center gap-4 pt-4 text-xs font-semibold">
+    <span className="inline-flex items-center gap-1.5 text-accent">
+      <HiBookOpen className="h-3.5 w-3.5" />
+      Case study
+    </span>
+    {(project.liveUrl || project.githubUrl) && (
+      <a
+        href={project.liveUrl || project.githubUrl}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="inline-flex items-center gap-1.5 text-muted transition-colors hover:text-fg"
+      >
+        {project.liveUrl ? <HiExternalLink className="h-3.5 w-3.5" /> : <FiGithub className="h-3.5 w-3.5" />}
+        {project.liveUrl ? pick(project.liveLabel, isTurkish) || (isTurkish ? 'Canlı' : 'Live') : 'GitHub'}
+      </a>
+    )}
+  </div>
+);
 
+const CardThumb = ({ project, isTurkish }) => {
+  const { preview } = project;
+  if (preview.kind === 'terminal') {
+    return (
+      <TerminalPreview
+        title={preview.title}
+        lines={preview.lines}
+        compact
+        className="h-full rounded-none border-0 shadow-none"
+      />
+    );
+  }
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: '-40px' }}
-      transition={{ duration: 0.5, delay: index * 0.1 }}
-      className="group relative h-full"
-    >
-      <SpotlightCard spotlightColor="rgba(194, 86, 47, 0.10)" className="h-full">
-        <div className="card card-hover flex h-full flex-col overflow-hidden rounded-2xl">
-          <div className="relative aspect-[16/10] overflow-hidden bg-surface2">
-            {project.snapshotSrc ? (
-              <img
-                src={project.snapshotSrc}
-                alt={`${project.title} ${isTurkish ? 'önizleme' : 'preview'}`}
-                loading="lazy"
-                decoding="async"
-                className="h-full w-full object-cover object-top transition-transform duration-500 group-hover:scale-[1.03]"
-              />
-            ) : (
-              <div className="flex h-full w-full items-center justify-center">
-                <span className="font-display text-2xl font-semibold text-muted/40">{project.title}</span>
-              </div>
-            )}
-            <div className="absolute inset-0 bg-gradient-to-t from-surface/80 via-transparent to-transparent" />
-            <span className="absolute bottom-3 left-3 rounded-full bg-accent/90 px-3 py-1 text-[10px] font-semibold uppercase tracking-wider text-white">
-              {project.category}
-            </span>
-          </div>
-
-          <div className="flex flex-1 flex-col p-5">
-            <div className="mb-1 flex items-center gap-2">
-              <span className="inline-flex h-7 w-7 items-center justify-center rounded-lg bg-accent/10 text-accent">
-                {iconMap[project.category] || <HiCode className="h-5 w-5" />}
-              </span>
-              <h3 className="font-display text-lg font-semibold text-fg">{project.title}</h3>
-              <span className="ml-auto text-[10px] font-semibold uppercase tracking-[0.12em] text-accent">
-                {project.status}
-              </span>
-            </div>
-            <p className="mt-2 text-sm text-muted line-clamp-2 flex-1">{project.description}</p>
-            <div className="mt-4 flex flex-wrap gap-1.5">
-              {project.tags.slice(0, 4).map((tag) => (
-                <span
-                  key={tag}
-                  className="rounded-full border border-line/12 bg-surface2 px-2 py-0.5 text-[10px] text-muted"
-                >
-                  {tag}
-                </span>
-              ))}
-            </div>
-            <div className="mt-4 flex items-center gap-3">
-              {project.caseStudyPath && (
-                <Link
-                  to={project.caseStudyPath}
-                  className="inline-flex items-center gap-1.5 text-xs font-semibold text-accent transition-colors hover:text-accent-strong"
-                >
-                  <HiBookOpen className="h-3.5 w-3.5" />
-                  Case Study
-                </Link>
-              )}
-              <a
-                href={project.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-1.5 text-xs font-semibold text-muted transition-colors hover:text-fg"
-              >
-                <HiExternalLink className="h-3.5 w-3.5" />
-                {isTurkish ? 'Aç' : 'Open'}
-              </a>
-            </div>
-          </div>
-        </div>
-      </SpotlightCard>
-    </motion.div>
+    <img
+      src={preview.src}
+      alt={`${project.title} ${isTurkish ? 'önizleme' : 'preview'}`}
+      loading="lazy"
+      decoding="async"
+      className="h-full w-full object-cover object-top transition-transform duration-500 group-hover:scale-[1.03]"
+    />
   );
 };
 
-const RepoCard = ({ repo, onOpen }) => (
+// Kartın tamamı case study'ye gider (başlıktaki linkin ::after'ı kartı kaplar);
+// harici link z-10 ile bunun üstünde kalır.
+const ProjectCard = ({ project, isTurkish, index }) => (
+  <Reveal delay={(index % 3) * 0.06} className="h-full">
+    <SpotlightCard spotlightColor="rgba(194, 86, 47, 0.10)" className="h-full">
+      <article className="card card-hover group relative flex h-full flex-col overflow-hidden">
+        <div className="relative aspect-[16/10] overflow-hidden border-b border-line/10 bg-surface2">
+          <CardThumb project={project} isTurkish={isTurkish} />
+          <span className="absolute bottom-3 left-3 rounded-full bg-canvas/85 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wider text-fg backdrop-blur-sm">
+            {pick(CATEGORY_LABELS[project.category], isTurkish)}
+          </span>
+        </div>
+
+        <div className="flex flex-1 flex-col p-5">
+          <div className="mb-2 flex items-baseline justify-between gap-3">
+            <h3 className="font-display text-lg font-semibold text-fg">
+              <Link
+                to={caseStudyPath(project.id)}
+                className="after:absolute after:inset-0 after:content-[''] focus:outline-none focus-visible:after:rounded-2xl focus-visible:after:ring-2 focus-visible:after:ring-accent"
+              >
+                {project.title}
+              </Link>
+            </h3>
+            <span className="shrink-0 text-[10px] font-semibold uppercase tracking-[0.12em] text-accent">
+              {pick(project.status, isTurkish)}
+            </span>
+          </div>
+          <p className="line-clamp-3 text-sm leading-relaxed text-muted">
+            {pick(project.summary, isTurkish)}
+          </p>
+          <div className="mt-4 flex flex-wrap gap-1.5">
+            {project.tags.slice(0, 4).map((tag) => (
+              <span
+                key={pick(tag, isTurkish)}
+                className="rounded-full border border-line/12 bg-surface2 px-2 py-0.5 text-[10px] text-muted"
+              >
+                {pick(tag, isTurkish)}
+              </span>
+            ))}
+          </div>
+          <CardLinks project={project} isTurkish={isTurkish} />
+        </div>
+      </article>
+    </SpotlightCard>
+  </Reveal>
+);
+
+const FeaturedProject = ({ project, isTurkish }) => (
+  <Reveal className="mb-5 sm:mb-6">
+    <article className="card-prominent group relative grid overflow-hidden lg:grid-cols-[minmax(0,1.35fr)_minmax(0,1fr)]">
+      <div className="relative flex items-center overflow-hidden border-b border-line/10 bg-[#0c0a07] lg:border-b-0 lg:border-r">
+        <img
+          src={project.preview.src}
+          alt={`${project.title} ${isTurkish ? 'ana ekranı' : 'home screen'}`}
+          loading="lazy"
+          decoding="async"
+          width={1200}
+          height={748}
+          className="h-auto w-full transition-transform duration-700 group-hover:scale-[1.02]"
+        />
+      </div>
+
+      <div className="flex flex-col p-6 sm:p-8">
+        <div className="mb-4 flex flex-wrap items-center gap-2">
+          <span className="inline-flex items-center gap-1.5 rounded-full border border-accent/30 bg-accent/10 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-accent">
+            <HiSparkles className="h-3 w-3" />
+            {isTurkish ? 'Öne çıkan' : 'Featured'}
+          </span>
+          <span className="text-[10px] font-semibold uppercase tracking-[0.14em] text-muted">
+            {pick(CATEGORY_LABELS[project.category], isTurkish)} · {pick(project.status, isTurkish)}
+          </span>
+        </div>
+
+        <h3 className="font-display text-3xl font-semibold tracking-tight text-fg sm:text-4xl">
+          {project.title}
+        </h3>
+        <p className="mt-3 text-body text-muted">{pick(project.summary, isTurkish)}</p>
+
+        {project.highlights && (
+          <dl className="mt-6 grid grid-cols-3 gap-3 border-y border-line/10 py-4">
+            {project.highlights.map((item) => (
+              <div key={item.value} className="flex flex-col">
+                <dt className="order-2 text-[10px] font-semibold uppercase tracking-[0.14em] text-muted">
+                  {pick(item.label, isTurkish)}
+                </dt>
+                <dd className="order-1 font-display text-xl font-semibold text-fg sm:text-2xl">
+                  {item.value}
+                </dd>
+              </div>
+            ))}
+          </dl>
+        )}
+
+        <div className="mt-5 flex flex-wrap gap-1.5">
+          {project.tags.map((tag) => (
+            <span key={tag} className={chipClass}>
+              {tag}
+            </span>
+          ))}
+        </div>
+
+        <div className="mt-auto flex flex-wrap gap-3 pt-6">
+          <Link to={caseStudyPath(project.id)} className="btn-primary px-4 py-2 text-sm">
+            <HiBookOpen className="h-4 w-4" />
+            Case study
+          </Link>
+          {project.liveUrl && (
+            <a
+              href={project.liveUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="btn-secondary px-4 py-2 text-sm"
+            >
+              <HiExternalLink className="h-4 w-4" />
+              {isTurkish ? 'Site' : 'Website'}
+            </a>
+          )}
+          {project.githubUrl && (
+            <a
+              href={project.githubUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="btn-secondary px-4 py-2 text-sm"
+            >
+              <FiGithub className="h-4 w-4" />
+              GitHub
+            </a>
+          )}
+        </div>
+      </div>
+    </article>
+  </Reveal>
+);
+
+const RepoCard = ({ repo, onOpen, isTurkish }) => (
   <SpotlightCard spotlightColor="rgba(194, 86, 47, 0.10)" className="h-full">
     <button
       type="button"
@@ -247,14 +332,16 @@ const RepoCard = ({ repo, onOpen }) => (
         {repo.language && <span className={`shrink-0 ${chipClass}`}>{repo.language}</span>}
       </div>
       <p className="mb-3 line-clamp-2 text-body-sm text-muted flex-1">
-        {repo.description || 'No description available.'}
+        {repo.description || (isTurkish ? 'Açıklama eklenmemiş.' : 'No description available.')}
       </p>
       <div className="flex items-center justify-between text-xs font-medium text-muted">
         <span className="inline-flex items-center gap-1">
           <HiStar className="text-accent" />
           {repo.stargazers_count ?? 0}
         </span>
-        <span>{repo.updated_at ? new Date(repo.updated_at).toLocaleDateString() : ''}</span>
+        <span>
+          {repo.updated_at ? new Date(repo.updated_at).toLocaleDateString(isTurkish ? 'tr-TR' : 'en-US') : ''}
+        </span>
       </div>
     </button>
   </SpotlightCard>
@@ -266,95 +353,8 @@ const Projects = () => {
   const [status, setStatus] = useState('loading');
   const [errorMessage, setErrorMessage] = useState('');
   const [activeProject, setActiveProject] = useState(null);
-
-  const featuredProjects = useMemo(
-    () => [
-      {
-        id: 'mnemosyne',
-        title: 'Mnemosyne',
-        url: 'https://m-nemosyne.live',
-        caseStudyPath: '/case-study/mnemosyne',
-        category: 'Web',
-        status: isTurkish ? 'Canlı' : 'Live',
-        snapshotSrc: '/previews/mnemosyne-live.webp',
-        description: isTurkish
-          ? 'Konum bazlı anıları harita ve zaman katmanlarıyla sunan canlı web uygulaması.'
-          : 'A live web app for location-based memories, built around maps and time layers.',
-        tags: [
-          'React',
-          'PWA',
-          isTurkish ? 'Konum' : 'Location',
-          isTurkish ? 'Zaman katmanları' : 'Time layers',
-        ],
-      },
-      {
-        id: 'typesprint',
-        title: 'TypeSprint',
-        url: 'https://typesprint.online',
-        caseStudyPath: '/case-study/typesprint',
-        category: 'Web',
-        status: isTurkish ? 'Canlı' : 'Live',
-        snapshotSrc: '/previews/typesprint-live.webp',
-        description: isTurkish
-          ? 'Yazma hızını doğrulukla ölçen, çok dilli kelime havuzlu WPM uygulaması.'
-          : 'A typing-speed app built around accuracy and multilingual word pools.',
-        tags: ['JavaScript', 'WPM', isTurkish ? 'Çok dilli' : 'Multilingual', 'Leaderboard'],
-      },
-      {
-        id: 'walkkittie',
-        title: 'WalkKittie',
-        url: 'https://play.google.com/store/apps/details?id=com.mert.paticat',
-        caseStudyPath: '/case-study/walkkittie',
-        category: 'Android',
-        status: 'Google Play',
-        snapshotSrc: '/previews/walkkittie.webp',
-        description: isTurkish
-          ? "Adım sayacı, su takibi ve piksel pet bakımını birleştiren, Google Play'de yayında bir Android uygulaması."
-          : 'A Google Play Android app combining step tracking, water tracking, and pixel-pet care.',
-        tags: ['Kotlin', 'Jetpack Compose', 'Material 3', isTurkish ? 'Pet' : 'Pet'],
-      },
-      {
-        id: 'msscan',
-        title: 'msscan',
-        url: 'https://github.com/MertSoylu/msscan',
-        caseStudyPath: '/case-study/msscan',
-        category: 'Security',
-        status: 'GitHub',
-        snapshotSrc: null,
-        description: isTurkish
-          ? 'XSS, SQLi, CSRF, header ve subdomain kontrolleri için async Python CLI güvenlik tarayıcısı.'
-          : 'An async Python CLI security scanner for XSS, SQLi, CSRF, headers, SSRF, and subdomains.',
-        tags: ['Python', 'CLI', 'Async', isTurkish ? 'Raporlama' : 'Reports'],
-      },
-      {
-        id: 'biztoplulugu',
-        title: 'Biz Topluluğu',
-        url: 'https://biztoplulugu.com.tr',
-        caseStudyPath: '/case-study/biztoplulugu',
-        category: 'Web',
-        status: isTurkish ? 'Canlı' : 'Live',
-        snapshotSrc: '/previews/biztoplulugu-live.webp',
-        description: isTurkish
-          ? 'MDX tabanlı içerik arşiviyle topluluk kurumsal sitesi; build sırasında statik üretilir.'
-          : 'Community organization site with an MDX-based content archive, statically generated at build time.',
-        tags: ['Next.js', 'MDX', 'Tailwind v4', isTurkish ? 'Statik' : 'Static'],
-      },
-      {
-        id: 'harita',
-        title: 'BİZ Şehir Haritası',
-        url: 'https://harita.biztoplulugu.com.tr',
-        caseStudyPath: '/case-study/harita',
-        category: 'Web',
-        status: isTurkish ? 'Canlı' : 'Live',
-        snapshotSrc: '/previews/harita-live.webp',
-        description: isTurkish
-          ? '81 ilden gelen sorun bildirimlerini haritada toplayan, Supabase destekli topluluk platformu.'
-          : 'A community platform backed by Supabase that maps issue reports from all 81 provinces.',
-        tags: ['Next.js', 'Supabase', 'd3-geo', 'PostgreSQL'],
-      },
-    ],
-    [isTurkish],
-  );
+  const featured = PROJECTS.find((project) => project.featured);
+  const others = PROJECTS.filter((project) => project !== featured);
 
   useEffect(() => {
     const load = async () => {
@@ -388,17 +388,14 @@ const Projects = () => {
           />
         </div>
 
-        <CardMarquee
-          ariaLabel={isTurkish ? 'Öne çıkan projeler' : 'Featured projects'}
-          direction="right"
-          speed={34}
-          gapClassName="gap-4 sm:gap-5"
-          itemClassName="w-[280px] sm:w-[340px]"
-        >
-          {featuredProjects.map((project, index) => (
-            <ProjectCard key={project.id} project={project} isTurkish={isTurkish} index={index} />
-          ))}
-        </CardMarquee>
+        <div className="mx-auto w-full max-w-6xl">
+          {featured && <FeaturedProject project={featured} isTurkish={isTurkish} />}
+          <div className="grid gap-5 sm:gap-6 md:grid-cols-2 lg:grid-cols-3">
+            {others.map((project, index) => (
+              <ProjectCard key={project.id} project={project} isTurkish={isTurkish} index={index} />
+            ))}
+          </div>
+        </div>
 
         <div className="mt-16">
           <div className="mx-auto w-full max-w-6xl border-t border-line/10 pt-10">
@@ -487,7 +484,12 @@ const Projects = () => {
               itemClassName="w-[260px] sm:w-[300px]"
             >
               {repos.slice(0, 8).map((repo) => (
-                <RepoCard key={repo.id || repo.name} repo={repo} onOpen={setActiveProject} />
+                <RepoCard
+                  key={repo.id || repo.name}
+                  repo={repo}
+                  onOpen={setActiveProject}
+                  isTurkish={isTurkish}
+                />
               ))}
             </CardMarquee>
           )}

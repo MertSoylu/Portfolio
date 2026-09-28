@@ -1,4 +1,5 @@
 import { HiMail } from 'react-icons/hi';
+import { Link } from 'react-router-dom';
 import { FiGithub, FiLinkedin } from 'react-icons/fi';
 import { useLanguage } from '../context/LanguageContext';
 import { PERSONAL_INFO } from '../utils/constants';
@@ -20,7 +21,7 @@ const Footer = () => {
   return (
     <footer className="mt-12 border-t border-line/10 px-5 py-14">
       <div className="container-wide">
-        <div className="grid gap-10 md:grid-cols-[1.5fr_1fr_1fr]">
+        <div className="grid gap-10 sm:grid-cols-2 md:grid-cols-[1.5fr_1fr_1fr_1fr]">
           <div>
             <h3 className="mb-3 font-display text-2xl font-semibold text-fg">Mert Soylu</h3>
             <p className="max-w-sm text-sm leading-relaxed text-muted">
@@ -41,12 +42,35 @@ const Footer = () => {
                 { name: isTurkish ? 'İletişim' : 'Contact', href: '/#contact' },
               ].map((link) => (
                 <li key={link.name}>
-                  <a
-                    href={link.href}
+                  <Link
+                    to={link.href}
                     className="text-sm font-medium text-muted transition-colors hover:text-fg"
                   >
                     {link.name}
-                  </a>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          <div>
+            <h4 className="mb-4 text-xs font-semibold uppercase tracking-[0.18em] text-muted">
+              {isTurkish ? 'Alanlar' : 'Areas'}
+            </h4>
+            <ul className="space-y-2.5">
+              {[
+                { name: 'Web', to: '/web' },
+                { name: 'Android', to: '/android' },
+                { name: isTurkish ? 'Siber güvenlik' : 'Cybersecurity', to: '/cybersecurity' },
+                { name: isTurkish ? 'Veri bilimi' : 'Data science', to: '/data-science' },
+              ].map((link) => (
+                <li key={link.to}>
+                  <Link
+                    to={link.to}
+                    className="text-sm font-medium text-muted transition-colors hover:text-fg"
+                  >
+                    {link.name}
+                  </Link>
                 </li>
               ))}
             </ul>
@@ -61,8 +85,7 @@ const Footer = () => {
                 <a
                   key={link.name}
                   href={link.href}
-                  target="_blank"
-                  rel="noopener noreferrer"
+                  {...(link.href.startsWith('http') ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
                   className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-line/12 bg-surface text-fg transition-colors hover:border-line/25 hover:bg-surface2"
                   title={link.name}
                   aria-label={link.name}

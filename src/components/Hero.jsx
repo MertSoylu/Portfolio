@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
+import { Link } from 'react-router-dom';
 import { HiArrowRight, HiMail } from 'react-icons/hi';
 import { useLanguage } from '../context/LanguageContext';
 import { fetchGitHubRepos } from '../utils/githubApi';
@@ -68,6 +69,19 @@ const Hero = () => {
           animate="visible"
           className="mx-auto max-w-3xl text-center"
         >
+          <motion.div variants={item} className="mb-6 flex justify-center sm:mb-8">
+            <Link
+              to="/case-study/noble"
+              className="group inline-flex items-center gap-2 rounded-full border border-line/15 bg-surface/70 py-1 pl-1 pr-3 text-xs font-medium text-muted backdrop-blur-sm transition-colors hover:border-accent/40 hover:text-fg"
+            >
+              <span className="rounded-full bg-accent px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-white">
+                {isTurkish ? 'Yeni' : 'New'}
+              </span>
+              {isTurkish ? 'NOBLE: Rust ile terminal çalışma alanı' : 'NOBLE: a terminal workspace in Rust'}
+              <HiArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
+            </Link>
+          </motion.div>
+
           <motion.p variants={item} className="eyebrow mb-4 text-accent sm:mb-6">
             {isTurkish ? 'Merhaba, ben' : "Hi, I'm"}
           </motion.p>
@@ -93,7 +107,8 @@ const Hero = () => {
               <RotatingText
                 texts={roles}
                 rotationInterval={3000}
-                mainClassName="text-accent"
+                mainClassName="justify-center text-accent"
+                splitLevelClassName="overflow-hidden pb-1"
                 splitBy="characters"
                 staggerDuration={0.02}
                 staggerFrom="last"
