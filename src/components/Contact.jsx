@@ -293,7 +293,7 @@ const Contact = () => {
       icon: <FiLinkedin className="h-5 w-5" />,
       label: 'LinkedIn',
       value: 'mert-soylu',
-      href: 'https://www.linkedin.com/in/mert-soylu-b8b6a1341/',
+      href: 'https://www.linkedin.com/in/mertsoylu/',
     },
     {
       icon: <FiGithub className="h-5 w-5" />,

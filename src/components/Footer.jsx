@@ -13,7 +13,7 @@ const Footer = () => {
     {
       name: 'LinkedIn',
       icon: <FiLinkedin className="h-5 w-5" />,
-      href: 'https://www.linkedin.com/in/mert-soylu-b8b6a1341/',
+      href: 'https://www.linkedin.com/in/mertsoylu/',
     },
     { name: 'Email', icon: <HiMail className="h-5 w-5" />, href: `mailto:${PERSONAL_INFO.email}` },
   ];
