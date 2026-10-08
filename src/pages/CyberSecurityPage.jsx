@@ -1,109 +1,110 @@
-import {
-  HiBookOpen,
-  HiExternalLink,
-  HiFingerPrint,
-  HiShieldCheck,
-  HiShieldExclamation,
-  HiTerminal,
-} from 'react-icons/hi';
-import { Link } from 'react-router-dom';
+import { HiFingerPrint, HiShieldCheck, HiShieldExclamation, HiTerminal } from 'react-icons/hi';
 import { useLanguage } from '../context/LanguageContext';
 import SpecialtyPageLayout from '../components/SpecialtyPageLayout';
+import ProjectShowcase from '../components/project/ProjectShowcase';
 import Reveal from '../components/ui/Reveal';
+import { pick, projectsByCategory } from '../data/projects';
 
-const THREAT_ICONS = [HiShieldExclamation, HiTerminal, HiFingerPrint];
+// msscan'in mevcut kontrol listesi. Kısa teknik adlar iki dilde aynı; diğerleri doğal çevirilidir.
+const SCAN_CHECKS = [
+  { tr: 'XSS', en: 'XSS' },
+  { tr: 'SQLi', en: 'SQLi' },
+  { tr: 'CSRF', en: 'CSRF' },
+  { tr: 'SSRF', en: 'SSRF' },
+  { tr: 'Açık yönlendirme', en: 'Open redirect' },
+  { tr: 'Güvenlik başlıkları', en: 'Security headers' },
+  { tr: 'Alt alan adları', en: 'Subdomains' },
+];
+
+const FOCUS_AREAS = [
+  {
+    icon: HiShieldExclamation,
+    title: { tr: 'Web açıklıkları', en: 'Web vulnerabilities' },
+    desc: {
+      tr: 'XSS, SQLi, CSRF, SSRF ve açık yönlendirme gibi sık görülen açıklıkları tanımak ve tespit etmek.',
+      en: 'Recognizing and detecting common flaws such as XSS, SQLi, CSRF, SSRF and open redirects.',
+    },
+  },
+  {
+    icon: HiTerminal,
+    title: { tr: 'CLI otomasyonu', en: 'CLI automation' },
+    desc: {
+      tr: 'Güvenlik kontrollerini terminalden, her seferinde aynı adımlarla çalıştırmak.',
+      en: 'Running security checks from the terminal, the same way every time.',
+    },
+  },
+  {
+    icon: HiFingerPrint,
+    title: { tr: 'Güvenli kodlama', en: 'Secure coding' },
+    desc: {
+      tr: 'Saldırgan bakış açısını günlük ürün ve tasarım kararlarının içine taşımak.',
+      en: "Bringing an attacker's perspective into everyday product and design decisions.",
+    },
+  },
+];
 
 const CyberSecurityPage = () => {
   const { isTurkish } = useLanguage();
-
-  const scanTargets = ['XSS', 'SQLi', 'CSRF', 'SSRF', 'Open redirect', 'Security headers', 'Subdomains'];
-
-  const focusAreas = isTurkish
-    ? [
-        { title: 'Web açıklıkları', desc: 'XSS, SQLi, CSRF, SSRF, open redirect ve header kontrolleri.' },
-        { title: 'CLI otomasyon', desc: 'Terminal tabanlı araçlarla tekrarlanabilir güvenlik kontrolleri.' },
-        {
-          title: 'Güvenli kodlama',
-          desc: 'Uygulama geliştirirken saldırgan bakışını tasarım kararlarına katmak.',
-        },
-      ]
-    : [
-        { title: 'Web vulnerabilities', desc: 'XSS, SQLi, CSRF, SSRF, open redirect, and header checks.' },
-        { title: 'CLI automation', desc: 'Repeatable security checks through terminal-based tooling.' },
-        { title: 'Secure coding', desc: 'Bringing an attacker mindset into everyday product decisions.' },
-      ];
+  const t = (value) => pick(value, isTurkish);
+  const projects = projectsByCategory('Security');
 
   return (
     <SpecialtyPageLayout
       routePath="/cybersecurity"
-      eyebrow={isTurkish ? 'Siber güvenlik' : 'Cybersecurity'}
-      eyebrowIcon={<HiShieldCheck className="h-4 w-4" />}
-      title={isTurkish ? 'Siber Güvenlik' : 'Cyber Security'}
-      subtitle={
-        isTurkish
-          ? 'Güvenlik tarafında odağım, öğrenilen kavramları küçük ama çalışır araçlara dönüştürmek.'
-          : 'My security focus is turning learned concepts into small but working tools.'
-      }
+      eyebrow={t({ tr: 'Siber güvenlik', en: 'Cybersecurity' })}
+      eyebrowIcon={<HiShieldCheck className="h-4 w-4" aria-hidden="true" />}
+      title={t({ tr: 'Siber Güvenlik', en: 'Cyber Security' })}
+      subtitle={t({
+        tr: 'Öğrendiğim güvenlik kavramlarını küçük, çalışan ve tekrarlanabilir araçlara dönüştürüyorum.',
+        en: 'I turn the security concepts I learn into small, working and repeatable tools.',
+      })}
     >
-      <Reveal className="card-prominent p-6 sm:p-8">
-        <p className="eyebrow mb-2 text-accent">msscan</p>
-        <h2 className="mb-4 text-h2 text-fg">
-          {isTurkish ? 'Async Python web güvenlik tarayıcısı.' : 'Async Python web security scanner.'}
-        </h2>
-        <p className="mb-6 max-w-3xl text-body text-muted">
-          {isTurkish
-            ? 'msscan; XSS, SQL injection, CSRF, SSRF, open redirect, HTTP security headers ve subdomain enumeration kontrolleri için geliştirdiğim terminal aracıdır. Odak: async çalışma, rate limiting, bağlam farkında tespit ve HTML rapor üretimi.'
-            : 'msscan is my terminal tool for XSS, SQL injection, CSRF, SSRF, open redirect, HTTP security headers, and subdomain enumeration checks. Focus: async execution, rate limiting, context-aware detection, and HTML reporting.'}
-        </p>
-
-        <div className="mb-6">
-          <p className="mb-3 text-xs font-semibold uppercase tracking-[0.18em] text-muted">
-            {isTurkish ? 'Kontrol ettiği alanlar' : 'What it checks'}
-          </p>
-          <div className="flex flex-wrap gap-2">
-            {scanTargets.map((target) => (
-              <span
-                key={target}
-                className="rounded-full border border-line/12 bg-surface2 px-3 py-1 text-xs font-medium text-fg"
-              >
-                {target}
-              </span>
+      {projects.length > 0 && (
+        <section aria-labelledby="cyber-projects-heading">
+          <Reveal as="h2" id="cyber-projects-heading" className="mb-8 text-h2 text-fg sm:mb-10">
+            {t({ tr: 'Projeler', en: 'Projects' })}
+          </Reveal>
+          <div className="space-y-16 sm:space-y-20">
+            {projects.map((project, index) => (
+              <ProjectShowcase key={project.id} project={project} index={index} headingLevel="h3" />
             ))}
           </div>
-        </div>
+        </section>
+      )}
 
-        <div className="flex flex-wrap gap-3">
-          <a
-            href="https://github.com/MertSoylu/msscan"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="btn-primary"
-          >
-            <HiExternalLink className="h-4 w-4" />
-            GitHub
-          </a>
-          <Link to="/case-study/msscan" className="btn-secondary">
-            <HiBookOpen className="h-4 w-4" />
-            Case Study
-          </Link>
-        </div>
-      </Reveal>
+      <section aria-labelledby="scan-checks-heading" className="mt-16 sm:mt-24">
+        <Reveal as="h2" id="scan-checks-heading" className="mb-6 text-h2 text-fg">
+          {t({ tr: 'Kontrol ettiği alanlar', en: 'What it checks' })}
+        </Reveal>
+        <Reveal delay={0.05}>
+          <ul className="flex flex-wrap gap-2">
+            {SCAN_CHECKS.map((check) => (
+              <li
+                key={check.en}
+                className="rounded-full border border-line/12 bg-surface2 px-3.5 py-1.5 text-sm font-medium text-fg"
+              >
+                {t(check)}
+              </li>
+            ))}
+          </ul>
+        </Reveal>
+      </section>
 
-      <section className="mt-16" aria-labelledby="focus-areas-heading">
-        <h2 id="focus-areas-heading" className="mb-8 text-h2 text-fg">
-          {isTurkish ? 'Odak alanları' : 'Focus areas'}
-        </h2>
-        <div className="grid gap-4 lg:grid-cols-3">
-          {focusAreas.map((area, index) => {
-            const Icon = THREAT_ICONS[index] ?? HiShieldExclamation;
+      <section aria-labelledby="focus-areas-heading" className="mt-16 sm:mt-24">
+        <Reveal as="h2" id="focus-areas-heading" className="mb-8 text-h2 text-fg">
+          {t({ tr: 'Odak alanları', en: 'Focus areas' })}
+        </Reveal>
+        <div className="grid gap-4 md:grid-cols-3">
+          {FOCUS_AREAS.map((area, index) => {
+            const Icon = area.icon;
             return (
-              <Reveal key={area.title} delay={index * 0.08} className="h-full">
+              <Reveal key={area.title.en} delay={index * 0.08} className="h-full">
                 <div className="card card-hover h-full p-6">
-                  <div className="mb-3 inline-flex h-10 w-10 items-center justify-center rounded-xl bg-surface2 text-accent">
-                    <Icon className="h-5 w-5" />
+                  <div className="mb-4 inline-flex h-10 w-10 items-center justify-center rounded-xl bg-surface2 text-accent">
+                    <Icon className="h-5 w-5" aria-hidden="true" />
                   </div>
-                  <h3 className="mb-2 text-h4 text-fg">{area.title}</h3>
-                  <p className="text-body-sm text-muted">{area.desc}</p>
+                  <h3 className="mb-2 text-h4 text-fg">{t(area.title)}</h3>
+                  <p className="text-body-sm text-muted">{t(area.desc)}</p>
                 </div>
               </Reveal>
             );

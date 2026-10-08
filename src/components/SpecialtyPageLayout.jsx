@@ -3,9 +3,10 @@ import PageBackButton from './ui/PageBackButton';
 import Reveal from './ui/Reveal';
 
 /**
- * Shared layout for specialty pages (Web, Android, Cyber, Data). Owns the back
- * link, the editorial header (eyebrow + serif title + subtitle + optional side
- * slot), and the content slot. A `centered` variant backs the 404 page.
+ * Uzmanlık sayfalarının (Web, Android, Cyber, Data) ortak düzeni. Geri bağlantısını,
+ * editoryal başlığı (eyebrow + serif h1 + alt metin + isteğe bağlı yan alan) ve içerik
+ * alanını yönetir. `centered` varyantı 404 sayfası içindir ve davranışı değişmez.
+ * `backTo` / `backLabel` geri bağlantısının hedefini ve metnini değiştirir.
  */
 const SpecialtyPageLayout = ({
   routePath,
@@ -16,6 +17,8 @@ const SpecialtyPageLayout = ({
   sideNode,
   centered = false,
   hideBackButton = false,
+  backTo = '/',
+  backLabel,
   children,
 }) => {
   if (centered) {
@@ -28,10 +31,10 @@ const SpecialtyPageLayout = ({
   }
 
   return (
-    <div className="relative min-h-screen px-5 pb-16 pt-24 sm:pt-32">
+    <div className="relative min-h-screen px-5 pb-20 pt-28 sm:pt-32">
       {routePath && <PageMeta route={routePath} />}
       <div className="container-wide">
-        {!hideBackButton && <PageBackButton className="mb-8" />}
+        {!hideBackButton && <PageBackButton to={backTo} label={backLabel} className="mb-8" />}
 
         {(eyebrow || title || subtitle || sideNode) && (
           <header

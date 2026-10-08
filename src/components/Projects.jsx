@@ -7,7 +7,7 @@ import { FiGithub } from 'react-icons/fi';
 import { clearRateLimitState, fetchGitHubRepos, getGitHubProfileUrl } from '../utils/githubApi';
 import { FALLBACK_PROJECTS, FOREST_SITE_URL } from '../utils/constants';
 import { useLanguage } from '../context/LanguageContext';
-import { CATEGORY_LABELS, PROJECTS, caseStudyPath, pick } from '../data/projects';
+import { CATEGORY_LABELS, PROJECTS, UI_COPY, caseStudyPath, pick } from '../data/projects';
 import SectionHeader from './home/SectionHeader';
 import CardMarquee from './ui/CardMarquee';
 import Reveal from './ui/Reveal';
@@ -147,7 +147,7 @@ const CardLinks = ({ project, isTurkish }) => (
   <div className="relative z-10 mt-auto flex items-center gap-4 pt-4 text-xs font-semibold">
     <span className="inline-flex items-center gap-1.5 text-accent">
       <HiBookOpen className="h-3.5 w-3.5" />
-      Case study
+      {pick(UI_COPY.caseStudy, isTurkish)}
     </span>
     {(project.liveUrl || project.githubUrl) && (
       <a
@@ -290,7 +290,7 @@ const FeaturedProject = ({ project, isTurkish }) => (
         <div className="mt-auto flex flex-wrap gap-3 pt-6">
           <Link to={caseStudyPath(project.id)} className="btn-primary px-4 py-2 text-sm">
             <HiBookOpen className="h-4 w-4" />
-            Case study
+            {pick(UI_COPY.caseStudy, isTurkish)}
           </Link>
           {project.liveUrl && (
             <a

@@ -2,7 +2,6 @@ import { test, expect } from '@playwright/test';
 
 const screenshotCases = [
   { route: '/case-study/noble', image: '/previews/noble-live.webp' },
-  { route: '/case-study/mnemosyne', image: '/previews/mnemosyne-live.webp' },
   { route: '/case-study/typesprint', image: '/previews/typesprint-live.webp' },
   { route: '/case-study/walkkittie', image: '/previews/walkkittie.webp' },
 ];
@@ -38,12 +37,29 @@ test.describe('Case study pages', () => {
 
   test('prev/next navigation moves between case studies', async ({ page }) => {
     await page.goto('/case-study/noble');
+    // Listede noble'dan sonra gelen proje typesprint (PROJECTS dizisindeki sıradaki öğe).
     await page
       .getByRole('navigation', { name: /Proje gezinme|Project navigation/ })
       .getByRole('link')
       .last()
       .click();
-    await expect(page).toHaveURL(/\/case-study\/mnemosyne$/);
+    await expect(page).toHaveURL(/\/case-study\/typesprint$/);
+  });
+
+  test('case study has no horizontal scroll at 360px', async ({ page }) => {
+    await page.setViewportSize({ width: 360, height: 800 });
+    await page.goto('/case-study/noble');
+    await expect(page.locator('h1')).toBeVisible();
+    const overflows = await page.evaluate(
+      () => document.documentElement.scrollWidth > document.documentElement.clientWidth,
+    );
+    expect(overflows).toBe(false);
+  });
+
+  test('other projects nav is visible on mobile', async ({ page }) => {
+    await page.setViewportSize({ width: 360, height: 800 });
+    await page.goto('/case-study/noble');
+    await expect(page.getByRole('navigation', { name: /Diğer projeler|Other projects/ })).toBeVisible();
   });
 
   test('unknown case study renders 404', async ({ page }) => {

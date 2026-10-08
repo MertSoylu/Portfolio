@@ -1,8 +1,9 @@
 import { motion, useReducedMotion } from 'framer-motion';
-import { HiAcademicCap, HiChartBar, HiChip, HiClock, HiSparkles } from 'react-icons/hi';
+import { HiAcademicCap, HiChartBar, HiChip, HiSparkles } from 'react-icons/hi';
 import { useLanguage } from '../context/LanguageContext';
 import SpecialtyPageLayout from '../components/SpecialtyPageLayout';
 import Reveal from '../components/ui/Reveal';
+import { pick } from '../data/projects';
 
 const EASE = [0.22, 1, 0.36, 1];
 
@@ -18,6 +19,60 @@ const DATA_POINTS = [
   [310, 40],
 ];
 
+// Öğrenme alanları; yüzdeler mevcut sayfadaki kendi değerlendirmemi temsil eder.
+const LEARNING_AREAS = [
+  {
+    icon: HiChartBar,
+    title: { tr: 'Veri analizi', en: 'Data analysis' },
+    desc: {
+      tr: 'Pandas ve NumPy ile veri temizleme, keşifsel analiz ve görselleştirme.',
+      en: 'Cleaning, exploratory analysis and visualization with Pandas and NumPy.',
+    },
+    pct: 55,
+    level: { tr: 'Gelişiyor', en: 'Developing' },
+  },
+  {
+    icon: HiSparkles,
+    title: { tr: 'Makine öğrenmesi', en: 'Machine learning' },
+    desc: {
+      tr: 'Baseline model kurma, özellik mühendisliği ve değerlendirme metrikleri.',
+      en: 'Baseline models, feature engineering and evaluation metrics.',
+    },
+    pct: 40,
+    level: { tr: 'Temel', en: 'Foundations' },
+  },
+  {
+    icon: HiChip,
+    title: { tr: 'Derin öğrenme', en: 'Deep learning' },
+    desc: {
+      tr: 'Sinir ağı temelleri, eğitim akışı ve küçük ölçekli deneyler.',
+      en: 'Neural network basics, the training loop and small-scale experiments.',
+    },
+    pct: 25,
+    level: { tr: 'Başlangıç', en: 'Early' },
+  },
+];
+
+const NEXT_OUTPUTS = [
+  {
+    tr: 'Açık bir veri seti üzerinde EDA notu',
+    en: 'An EDA note on an open dataset',
+  },
+  {
+    tr: 'Scikit-learn ile baseline sınıflandırma modeli',
+    en: 'A baseline classification model with Scikit-learn',
+  },
+  {
+    tr: 'Küçük bir CNN ile görüntü sınıflandırma denemesi',
+    en: 'A small CNN image-classification experiment',
+  },
+  {
+    tr: 'Model sonuçlarını okunabilir bir rapora dönüştürmek',
+    en: 'Turning model results into a readable report',
+  },
+];
+
+// Öğrenme eğrisi şeklinin SVG çizimi; yalnızca dekoratif değil, ekran okuyucuya da açıklanır.
 const LearningCurveChart = ({ reduce, isTurkish }) => (
   <svg
     viewBox="0 0 320 200"
@@ -91,7 +146,8 @@ const LearningCurveChart = ({ reduce, isTurkish }) => (
   </svg>
 );
 
-const SkillMeter = ({ pct, levelLabel, reduce, delay = 0 }) => (
+// `label` ekran okuyucuya alanın adını ve seviyeyi birlikte okutur; `levelLabel` görünen metindir.
+const SkillMeter = ({ pct, levelLabel, label, reduce, delay = 0 }) => (
   <div>
     <div className="mb-1.5">
       <span className="text-[11px] font-semibold uppercase tracking-wide text-muted">{levelLabel}</span>
@@ -102,7 +158,7 @@ const SkillMeter = ({ pct, levelLabel, reduce, delay = 0 }) => (
       aria-valuenow={pct}
       aria-valuemin={0}
       aria-valuemax={100}
-      aria-label={levelLabel}
+      aria-label={label}
     >
       <motion.div
         className="h-full origin-left rounded-full bg-accent"
@@ -119,140 +175,102 @@ const SkillMeter = ({ pct, levelLabel, reduce, delay = 0 }) => (
 const DataSciencePage = () => {
   const { isTurkish } = useLanguage();
   const reduce = useReducedMotion();
-
-  const learningFocus = isTurkish
-    ? [
-        {
-          icon: <HiChartBar className="h-5 w-5" />,
-          title: 'Veri analizi',
-          desc: 'Pandas, NumPy, temizleme, keşifsel analiz ve görselleştirme temelleri.',
-          pct: 55,
-          level: 'Gelişiyor',
-        },
-        {
-          icon: <HiSparkles className="h-5 w-5" />,
-          title: 'Makine öğrenmesi',
-          desc: 'Baseline model kurma, özellik mühendisliği ve değerlendirme metrikleri.',
-          pct: 40,
-          level: 'Temel',
-        },
-        {
-          icon: <HiChip className="h-5 w-5" />,
-          title: 'Derin öğrenme',
-          desc: 'Sinir ağı temelleri, eğitim akışı ve küçük ölçekli deneyler.',
-          pct: 25,
-          level: 'Başlangıç',
-        },
-      ]
-    : [
-        {
-          icon: <HiChartBar className="h-5 w-5" />,
-          title: 'Data analysis',
-          desc: 'Pandas, NumPy, cleaning, exploratory analysis, and visualization basics.',
-          pct: 55,
-          level: 'Developing',
-        },
-        {
-          icon: <HiSparkles className="h-5 w-5" />,
-          title: 'Machine learning',
-          desc: 'Baseline models, feature engineering, and evaluation metrics.',
-          pct: 40,
-          level: 'Foundations',
-        },
-        {
-          icon: <HiChip className="h-5 w-5" />,
-          title: 'Deep learning',
-          desc: 'Neural network basics, training flow, and small-scale experiments.',
-          pct: 25,
-          level: 'Early',
-        },
-      ];
-
-  const nextSteps = isTurkish
-    ? [
-        'Açık veri setiyle EDA notu',
-        'Scikit-learn baseline sınıflandırma',
-        'Küçük CNN görüntü sınıflandırma deneyi',
-        'Model sonuçlarını okunur rapora çevirme',
-      ]
-    : [
-        'EDA note on an open dataset',
-        'Scikit-learn baseline classification',
-        'Small CNN image-classification experiment',
-        'Turn model results into readable reports',
-      ];
+  const t = (value) => pick(value, isTurkish);
 
   return (
     <SpecialtyPageLayout
       routePath="/data-science"
-      eyebrow={isTurkish ? 'AI ve veri bilimi' : 'AI & Data Science'}
-      eyebrowIcon={<HiAcademicCap className="h-4 w-4" />}
-      title={isTurkish ? 'Temeli güçlendirdiğim alan' : 'A field where I am building fundamentals'}
-      subtitle={
-        isTurkish
-          ? 'Bu alanda henüz yayınladığım büyük bir ürün yok. Şu anda öğrenme notları, küçük deneyler ve temel projelerle ilerliyorum.'
-          : 'I do not have a major published product in this area yet. I am currently progressing through notes, small experiments, and fundamentals-first projects.'
-      }
+      eyebrow={t({ tr: 'Yapay zeka ve veri bilimi', en: 'AI & Data Science' })}
+      eyebrowIcon={<HiAcademicCap className="h-4 w-4" aria-hidden="true" />}
+      title={t({ tr: 'Temelini attığım alan', en: 'A field where I am building fundamentals' })}
+      subtitle={t({
+        tr: 'Bu alanda henüz yayınladığım büyük bir ürün yok. Şu an öğrenme notları, küçük deneyler ve temel projelerle ilerliyorum.',
+        en: 'I do not have a major published product in this area yet. For now I am progressing through study notes, small experiments and fundamentals-first projects.',
+      })}
       sideNode={
         <figure className="card w-full p-5">
           <LearningCurveChart reduce={reduce} isTurkish={isTurkish} />
           <figcaption className="mt-2 text-center text-[11px] text-muted">
-            {isTurkish ? 'şekil 1 — öğrenme eğrisi' : 'fig. 1 — the learning curve'}
+            {t({ tr: 'şekil 1 — öğrenme eğrisi', en: 'fig. 1 — the learning curve' })}
           </figcaption>
         </figure>
       }
     >
-      <Reveal className="card mb-6 p-6 sm:p-8">
-        <div className="mb-5 flex flex-col justify-between gap-3 sm:flex-row sm:items-start">
-          <div>
-            <p className="eyebrow mb-2 text-accent">{isTurkish ? 'Durum' : 'Status'}</p>
-            <h2 className="text-h2 text-fg">
-              {isTurkish ? 'Aktif öğrenme, abartısız vitrin.' : 'Active learning, honest presentation.'}
-            </h2>
-          </div>
-          <span className="self-start rounded-full border border-accent/30 bg-accent/10 px-3 py-1 text-xs font-semibold text-accent">
-            {isTurkish ? 'Yolculuk aşaması' : 'Learning stage'}
-          </span>
-        </div>
-        <p className="text-body text-muted">
-          {isTurkish
-            ? 'Buradaki amaç, hazır olmadığım bir alanı olduğundan büyük göstermek değil. Temel kavramları sistemli çalışıp, sonuçları okunabilir küçük projelerle paylaşmak.'
-            : 'The goal here is not to overstate a field I am still building. I am studying core concepts systematically and will share results through small, readable projects.'}
-        </p>
-      </Reveal>
-
-      <div className="mb-6 grid gap-4 md:grid-cols-3">
-        {learningFocus.map((item, index) => (
-          <Reveal key={item.title} delay={index * 0.08} className="h-full">
-            <div className="card card-hover h-full p-5">
-              <div className="mb-3 inline-flex h-10 w-10 items-center justify-center rounded-xl bg-surface2 text-accent">
-                {item.icon}
-              </div>
-              <h3 className="mb-2 text-h4 text-fg">{item.title}</h3>
-              <p className="mb-4 text-body-sm text-muted">{item.desc}</p>
-              <SkillMeter pct={item.pct} levelLabel={item.level} reduce={reduce} delay={0.2 + index * 0.12} />
+      <section aria-labelledby="status-heading">
+        <Reveal className="card-prominent p-6 sm:p-8">
+          <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+            <div>
+              <p className="eyebrow mb-2 text-accent">{t({ tr: 'Durum', en: 'Status' })}</p>
+              <h2 id="status-heading" className="text-h2 text-fg">
+                {t({ tr: 'Aktif öğrenme, abartısız vitrin.', en: 'Active learning, honest presentation.' })}
+              </h2>
             </div>
-          </Reveal>
-        ))}
-      </div>
+            <span className="self-start rounded-full border border-accent/30 bg-accent/10 px-3 py-1 text-xs font-semibold text-accent">
+              {t({ tr: 'Yolculuk aşaması', en: 'Learning stage' })}
+            </span>
+          </div>
+          <p className="max-w-3xl text-body-lg text-muted">
+            {t({
+              tr: 'Amacım bu alanı olduğundan büyük göstermek değil. Temel kavramları düzenli biçimde çalışıyor ve öğrendiklerimi okunabilir, küçük projelerle paylaşıyorum.',
+              en: 'The goal is not to make this field look bigger than it is. I study the core concepts consistently and share what I learn through small, readable projects.',
+            })}
+          </p>
+        </Reveal>
+      </section>
 
-      <Reveal className="card p-6 sm:p-8">
-        <div className="mb-4 flex items-center gap-2">
-          <HiClock className="h-5 w-5 text-accent" />
-          <h2 className="text-h3 text-fg">{isTurkish ? 'Sıradaki küçük çıktılar' : 'Next small outputs'}</h2>
+      <section aria-labelledby="learning-areas-heading" className="mt-16 sm:mt-24">
+        <Reveal as="h2" id="learning-areas-heading" className="mb-8 text-h2 text-fg">
+          {t({ tr: 'Öğrenme alanları', en: 'Learning areas' })}
+        </Reveal>
+        <div className="grid gap-4 md:grid-cols-3">
+          {LEARNING_AREAS.map((area, index) => {
+            const Icon = area.icon;
+            const title = t(area.title);
+            const level = t(area.level);
+            return (
+              <Reveal key={area.title.en} delay={index * 0.08} className="h-full">
+                <div className="card card-hover flex h-full flex-col p-6">
+                  <div className="mb-4 inline-flex h-10 w-10 items-center justify-center rounded-xl bg-surface2 text-accent">
+                    <Icon className="h-5 w-5" aria-hidden="true" />
+                  </div>
+                  <h3 className="mb-2 text-h4 text-fg">{title}</h3>
+                  <p className="mb-6 text-body-sm text-muted">{t(area.desc)}</p>
+                  <div className="mt-auto">
+                    <SkillMeter
+                      pct={area.pct}
+                      levelLabel={level}
+                      label={`${title}: ${level}`}
+                      reduce={reduce}
+                      delay={0.2 + index * 0.12}
+                    />
+                  </div>
+                </div>
+              </Reveal>
+            );
+          })}
         </div>
-        <ul className="grid gap-2">
-          {nextSteps.map((item) => (
-            <li
-              key={item}
-              className="flex items-center gap-3 rounded-xl border border-line/10 bg-surface2 px-4 py-3"
-            >
-              <span aria-hidden="true" className="h-2 w-2 shrink-0 rounded-full bg-accent" />
-              <span className="text-sm font-medium text-fg">{item}</span>
-            </li>
-          ))}
-        </ul>
-      </Reveal>
+      </section>
+
+      <section aria-labelledby="next-outputs-heading" className="mt-16 sm:mt-24">
+        <Reveal as="h2" id="next-outputs-heading" className="mb-8 text-h2 text-fg">
+          {t({ tr: 'Sıradaki küçük çıktılar', en: 'Next small outputs' })}
+        </Reveal>
+        <Reveal delay={0.05}>
+          <ol className="grid gap-2 md:grid-cols-2">
+            {NEXT_OUTPUTS.map((item, index) => (
+              <li
+                key={item.en}
+                className="flex items-center gap-4 rounded-xl border border-line/10 bg-surface2 px-4 py-3.5"
+              >
+                <span className="font-display text-sm font-semibold text-accent" aria-hidden="true">
+                  {String(index + 1).padStart(2, '0')}
+                </span>
+                <span className="text-sm font-medium text-fg">{t(item)}</span>
+              </li>
+            ))}
+          </ol>
+        </Reveal>
+      </section>
     </SpecialtyPageLayout>
   );
 };

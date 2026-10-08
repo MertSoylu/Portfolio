@@ -1,19 +1,21 @@
 import { useEffect, useRef, useState } from 'react';
 import { animate, useInView, useReducedMotion } from 'framer-motion';
-import { HiBookOpen, HiDeviceMobile, HiExternalLink, HiHeart, HiTrendingUp } from 'react-icons/hi';
-import { Link } from 'react-router-dom';
+import { HiBeaker, HiDeviceMobile, HiHeart, HiTrendingUp } from 'react-icons/hi';
 import { useLanguage } from '../context/LanguageContext';
 import SpecialtyPageLayout from '../components/SpecialtyPageLayout';
 import Reveal from '../components/ui/Reveal';
-import { PhoneFrame } from '../components/ui/DevicePreview';
+import ProjectShowcase from '../components/project/ProjectShowcase';
+import { pick, projectsByCategory } from '../data/projects';
 
-const PLAY_URL = 'https://play.google.com/store/apps/details?id=com.mert.paticat';
-
+// Sayı, görünür olunca 0'dan hedef değere sayar. Azaltılmış hareket tercihinde animasyon yok.
+// Sayı olmayan değerler (ör. "Kotlin") olduğu gibi gösterilir.
 const StatNumber = ({ value, suffix = '', inView }) => {
   const reduce = useReducedMotion();
-  const [display, setDisplay] = useState(reduce ? value : 0);
+  const isNumber = typeof value === 'number';
+  const [display, setDisplay] = useState(reduce || !isNumber ? value : 0);
 
   useEffect(() => {
+    if (!isNumber) return undefined;
     if (!inView || reduce) {
       if (reduce) setDisplay(value);
       return undefined;
@@ -24,7 +26,7 @@ const StatNumber = ({ value, suffix = '', inView }) => {
       onUpdate: (latest) => setDisplay(Math.round(latest)),
     });
     return () => controls.stop();
-  }, [inView, value, reduce]);
+  }, [inView, value, reduce, isNumber]);
 
   return (
     <span className="font-display text-3xl font-semibold text-fg sm:text-4xl">
@@ -40,15 +42,15 @@ const StatsStrip = ({ isTurkish }) => {
 
   const stats = isTurkish
     ? [
-        { value: 1, label: 'piksel pet', sub: 'adımlarınla gelişen evcil pet' },
+        { value: 1, label: 'piksel pet', sub: 'adımlarınla beslenen animasyonlu pet' },
         { value: 3, label: 'bakım döngüsü', sub: 'adım, su tüketimi, pet bakımı' },
-        { value: 100, suffix: '%', label: 'native Kotlin', sub: 'Jetpack Compose + Material 3' },
+        { value: 'Kotlin', label: 'native Android', sub: 'Jetpack Compose + Material 3' },
         { value: 1, label: 'mağaza yayını', sub: 'Google Play’de canlı' },
       ]
     : [
-        { value: 1, label: 'pixel pet', sub: 'a pet loop fed by your steps' },
+        { value: 1, label: 'pixel pet', sub: 'an animated pet fed by your steps' },
         { value: 3, label: 'care loops', sub: 'steps, water intake, pet care' },
-        { value: 100, suffix: '%', label: 'native Kotlin', sub: 'Jetpack Compose + Material 3' },
+        { value: 'Kotlin', label: 'native Android', sub: 'Jetpack Compose + Material 3' },
         { value: 1, label: 'store release', sub: 'live on Google Play' },
       ];
 
@@ -69,107 +71,95 @@ const StatsStrip = ({ isTurkish }) => {
 
 const AndroidPage = () => {
   const { isTurkish } = useLanguage();
+  const t = (value) => pick(value, isTurkish);
 
-  const features = isTurkish
-    ? [
-        {
-          icon: <HiTrendingUp className="h-5 w-5" />,
-          title: 'Adım takibi',
-          desc: 'Günlük hareketi uygulama içinde takip edilebilir hale getirir.',
-        },
-        {
-          icon: <HiHeart className="h-5 w-5" />,
-          title: 'Piksel pet',
-          desc: 'Verilen sprite’dan türetilen animasyonlu evcil pet.',
-        },
-        {
-          icon: <HiDeviceMobile className="h-5 w-5" />,
-          title: 'Native Android',
-          desc: 'Kotlin, Jetpack Compose ve Material 3 ile yayınlandı.',
-        },
-      ]
-    : [
-        {
-          icon: <HiTrendingUp className="h-5 w-5" />,
-          title: 'Step tracking',
-          desc: 'Turns daily movement into visible in-app progress.',
-        },
-        {
-          icon: <HiHeart className="h-5 w-5" />,
-          title: 'Pixel pet',
-          desc: 'An animated pet adapted from the supplied sprite.',
-        },
-        {
-          icon: <HiDeviceMobile className="h-5 w-5" />,
-          title: 'Native Android',
-          desc: 'Published with Kotlin, Jetpack Compose, and Material 3.',
-        },
-      ];
+  const projects = projectsByCategory('Android');
+
+  const features = [
+    {
+      icon: <HiTrendingUp className="h-5 w-5" aria-hidden="true" />,
+      title: { tr: 'Adım takibi', en: 'Step tracking' },
+      desc: {
+        tr: 'Günlük yürüyüşünü uygulama içinde görünür bir ilerlemeye çevirir.',
+        en: 'Turns your daily walking into visible progress inside the app.',
+      },
+    },
+    {
+      icon: <HiBeaker className="h-5 w-5" aria-hidden="true" />,
+      title: { tr: 'Su takibi', en: 'Water tracking' },
+      desc: {
+        tr: 'Su tüketimi, pet bakım döngüsünün bir parçası olarak günlük rutine girer.',
+        en: 'Water intake becomes part of the pet care loop, inside the same daily routine.',
+      },
+    },
+    {
+      icon: <HiHeart className="h-5 w-5" aria-hidden="true" />,
+      title: { tr: 'Piksel pet', en: 'Pixel pet' },
+      desc: {
+        tr: 'Verilen sprite’tan türetilen animasyonlu pet; hareket ettikçe oyun döngüsü ilerler.',
+        en: 'An animated pet built from the supplied sprite; the game loop moves forward as you move.',
+      },
+    },
+  ];
 
   return (
     <SpecialtyPageLayout
       routePath="/android"
       eyebrow={isTurkish ? 'Android geliştirme' : 'Android development'}
       eyebrowIcon={<HiDeviceMobile className="h-4 w-4" />}
-      title={isTurkish ? 'Google Play’de yayınlanan mobil iş' : 'Published mobile work on Google Play'}
+      title={
+        isTurkish
+          ? 'Google Play’de yayında bir Android ürünü'
+          : 'A native Android product live on Google Play'
+      }
       subtitle={
         isTurkish
-          ? 'WalkKittie, sağlık takibini oyunlaştıran native Android ürünüm. Odak; sade akış, motivasyon ve günlük kullanım.'
-          : 'WalkKittie is my native Android product that gamifies health tracking. Focus: simple flow, motivation, and daily use.'
+          ? 'Kotlin ve Jetpack Compose ile native olarak geliştirdiğim WalkKittie, adım ve su takibini piksel pet bakımıyla birleştiriyor.'
+          : 'WalkKittie, built natively with Kotlin and Jetpack Compose, pairs step and water tracking with pixel-pet care.'
       }
     >
-      <Reveal className="mb-16 grid items-center gap-10 lg:grid-cols-[minmax(0,1fr)_320px]">
-        <div className="grid gap-4 sm:grid-cols-3 lg:order-2 lg:grid-cols-1">
-          {features.map((feature) => (
-            <div key={feature.title} className="card p-5">
-              <div className="mb-3 inline-flex h-10 w-10 items-center justify-center rounded-xl bg-surface2 text-accent">
-                {feature.icon}
-              </div>
-              <h3 className="mb-2 text-h4 text-fg">{feature.title}</h3>
-              <p className="text-body-sm text-muted">{feature.desc}</p>
-            </div>
-          ))}
-        </div>
-        <div className="lg:order-1">
-          <PhoneFrame src="/previews/walkkittie.webp" alt="WalkKittie" title="WalkKittie" />
-        </div>
-      </Reveal>
-
-      <div className="mb-16">
-        <StatsStrip isTurkish={isTurkish} />
+      <div className="space-y-20 sm:space-y-24">
+        {projects.map((project, index) => (
+          <ProjectShowcase key={project.id} project={project} index={index} />
+        ))}
       </div>
 
-      <Reveal className="card-prominent p-6 sm:p-8">
-        <p className="eyebrow mb-2 text-accent">WalkKittie</p>
-        <h2 className="mb-4 text-h2 text-fg">
-          {isTurkish ? 'Yürü, puan kazan, pet’ine bak.' : 'Walk, earn points, care for your pet.'}
-        </h2>
-        <p className="mb-5 max-w-3xl text-body text-muted">
-          {isTurkish
-            ? 'Uygulama adım takibi, su tüketimi, animasyonlu piksel pet bakımı ve küçük oyun akışlarını tek bir günlük rutin içinde birleştiriyor. Amacı sağlık uygulamasını soğuk bir sayaç olmaktan çıkarıp daha sıcak bir motivasyon sistemine çevirmek.'
-            : 'The app combines step tracking, water intake, animated pixel-pet care, and small game flows into one daily routine. Its goal is to make health tracking feel less mechanical and more motivating.'}
-        </p>
-        <div className="mb-6 flex flex-wrap gap-2">
-          {['Kotlin', 'Jetpack Compose', 'Material 3', 'Google Play'].map((tag) => (
-            <span
-              key={tag}
-              className="rounded-full border border-line/12 bg-surface2 px-2.5 py-1 text-xs font-medium text-muted"
-            >
-              {tag}
-            </span>
+      <section aria-labelledby="android-features-heading" className="mt-20 sm:mt-24">
+        <Reveal className="mb-8 max-w-2xl sm:mb-10">
+          <p className="eyebrow mb-3 text-accent">{isTurkish ? 'Ürün' : 'Product'}</p>
+          <h2 id="android-features-heading" className="text-h2 text-fg">
+            {isTurkish ? 'Üç temel akış' : 'Three core loops'}
+          </h2>
+          <p className="mt-3 text-body text-muted">
+            {isTurkish
+              ? 'Uygulama adım takibi, su tüketimi ve piksel pet bakımını tek bir günlük rutinde birleştiriyor. Amaç, sağlık takibini soğuk bir sayaç olmaktan çıkarıp motive edici bir alışkanlığa dönüştürmek.'
+              : 'The app joins step tracking, water intake and pixel-pet care in one daily routine. The goal is to turn health tracking from a cold counter into a habit that feels motivating.'}
+          </p>
+        </Reveal>
+
+        <div className="grid gap-4 sm:grid-cols-3">
+          {features.map((feature, index) => (
+            <Reveal key={feature.title.en} delay={index * 0.06} className="h-full">
+              <div className="card h-full p-6">
+                <span className="mb-4 inline-flex h-10 w-10 items-center justify-center rounded-xl bg-surface2 text-accent">
+                  {feature.icon}
+                </span>
+                <h3 className="mb-2 text-h4 text-fg">{t(feature.title)}</h3>
+                <p className="text-body-sm text-muted">{t(feature.desc)}</p>
+              </div>
+            </Reveal>
           ))}
         </div>
-        <div className="flex flex-wrap gap-3">
-          <a href={PLAY_URL} target="_blank" rel="noopener noreferrer" className="btn-primary">
-            <HiExternalLink className="h-4 w-4" />
-            Google Play
-          </a>
-          <Link to="/case-study/walkkittie" className="btn-secondary">
-            <HiBookOpen className="h-4 w-4" />
-            Case Study
-          </Link>
-        </div>
-      </Reveal>
+      </section>
+
+      <section aria-labelledby="android-stats-heading" className="mt-20 sm:mt-24">
+        <Reveal className="mb-8 sm:mb-10">
+          <h2 id="android-stats-heading" className="text-h2 text-fg">
+            {isTurkish ? 'Bir bakışta' : 'At a glance'}
+          </h2>
+        </Reveal>
+        <StatsStrip isTurkish={isTurkish} />
+      </section>
     </SpecialtyPageLayout>
   );
 };

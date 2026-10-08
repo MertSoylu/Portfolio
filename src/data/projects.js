@@ -32,8 +32,12 @@ export const PROJECTS = [
     // Görsel pencere çerçevesini zaten içeriyor; tarayıcı çerçevesine sarılmaz.
     preview: { kind: 'window', src: '/previews/noble-live.webp' },
     summary: {
-      tr: 'Gerçek kabuklar, git projeleri, sistem sensörleri ve AI kotalarını tek bir kokpitte toplayan, Rust ile yazılmış terminal çalışma alanı.',
-      en: 'A Rust terminal workspace that puts real shells, git projects, system sensors and AI quotas into one cockpit.',
+      tr: 'Rust ile yazılmış terminal çalışma alanı: gerçek kabuklar, git projeleri, sistem sensörleri ve AI kotaları tek ekranda.',
+      en: 'A Rust terminal workspace where real shells, git projects, system sensors and AI quotas share one screen.',
+    },
+    focus: {
+      tr: 'Odak: AI ajanlarıyla çalışırken araçlar arasında bağlam değiştirmeyi bitirmek.',
+      en: 'Focus: end the context switching of AI agent work by keeping project state, quotas and shells together.',
     },
     highlights: [
       { value: '~22 MB', label: { tr: 'RAM kullanımı', en: 'RAM usage' } },
@@ -50,12 +54,12 @@ export const PROJECTS = [
     liveUrl: 'https://typesprint.online',
     preview: { kind: 'browser', src: '/previews/typesprint-live.webp' },
     summary: {
-      tr: 'Yazma hızını doğrulukla ölçen, çok dilli kelime havuzlu WPM uygulaması.',
-      en: 'A typing-speed app built around accuracy and multilingual word pools.',
+      tr: 'Yazma hızını doğrulukla birlikte ölçen, çok dilli kelime havuzlu bir WPM uygulaması.',
+      en: 'A WPM typing test that measures speed together with accuracy, using multilingual word pools.',
     },
     focus: {
-      tr: 'Odak: yanlış girişte akışı durdurarak ölçümü daha dürüst hâle getirmek.',
-      en: 'Focus: make measurement more honest by stopping progress on wrong input.',
+      tr: 'Odak: yanlış girişte akışı durdurarak skoru daha dürüst hâle getirmek.',
+      en: 'Focus: stop progress on wrong input so the score reflects real typing.',
     },
     tags: ['JavaScript', 'WPM', { tr: 'Çok dilli', en: 'Multilingual' }, 'Leaderboard'],
   },
@@ -67,12 +71,12 @@ export const PROJECTS = [
     liveUrl: 'https://harita.biztoplulugu.com.tr',
     preview: { kind: 'browser', src: '/previews/harita-live.webp' },
     summary: {
-      tr: '81 ilden gelen sorun bildirimlerini haritada toplayan, Supabase destekli topluluk platformu.',
-      en: 'A community platform backed by Supabase that maps issue reports from all 81 provinces.',
+      tr: 'Supabase destekli bir topluluk platformu: 81 ilden gelen sorun bildirimlerini haritada toplar.',
+      en: 'A Supabase-backed community platform that maps issue reports from all 81 provinces.',
     },
     focus: {
-      tr: 'Odak: haritayı kütüphanesiz SVG ile üreterek hafif ve hızlı bir veri yüzeyi kurmak.',
-      en: 'Focus: render the map as library-free SVG for a lightweight, fast data surface.',
+      tr: 'Odak: haritayı kütüphanesiz SVG ile çizerek hafif ve hızlı bir veri yüzeyi kurmak.',
+      en: 'Focus: draw the map as library-free SVG for a light, fast data surface.',
     },
     tags: ['Next.js 16', 'Supabase', 'd3-geo', 'PostgreSQL'],
   },
@@ -84,8 +88,8 @@ export const PROJECTS = [
     liveUrl: 'https://biztoplulugu.com.tr',
     preview: { kind: 'browser', src: '/previews/biztoplulugu-live.webp' },
     summary: {
-      tr: 'MDX tabanlı içerik arşiviyle, build sırasında statik üretilen topluluk kurumsal sitesi.',
-      en: 'A community organization site with an MDX-based archive, statically generated at build time.',
+      tr: 'Etkinlik, rapor ve duyuru arşivini MDX ile taşıyan, build sırasında statik üretilen topluluk sitesi.',
+      en: 'A community site that carries its event, report and announcement archive in MDX, statically generated at build time.',
     },
     focus: {
       tr: 'Odak: veritabanısız mimariyle içerik ağırlıklı arşivi hızlı ve düşük maliyetli tutmak.',
@@ -103,8 +107,12 @@ export const PROJECTS = [
     githubUrl: 'https://github.com/MertSoylu/WalkKittie_App',
     preview: { kind: 'phone', src: '/previews/walkkittie.webp' },
     summary: {
-      tr: "Adım sayacı, su takibi ve piksel pet bakımını birleştiren, Google Play'de yayında bir Android uygulaması.",
-      en: 'A Google Play Android app combining step tracking, water tracking, and pixel-pet care.',
+      tr: "Adım ve su takibini piksel pet bakımıyla birleştiren, Google Play'de yayında bir Android uygulaması.",
+      en: 'A Google Play Android app that pairs step and water tracking with pixel-pet care.',
+    },
+    focus: {
+      tr: 'Odak: sağlık takibini sayaç ve grafiklerin ötesine taşıyıp günlük alışkanlığa bağlamak.',
+      en: 'Focus: move health tracking beyond counters and charts, tying it to a daily habit.',
     },
     tags: ['Kotlin', 'Jetpack Compose', 'Material 3', 'Google Play'],
   },
@@ -129,12 +137,32 @@ export const PROJECTS = [
       ],
     },
     summary: {
-      tr: 'XSS, SQLi, CSRF, SSRF, header ve subdomain kontrolleri için async Python CLI güvenlik tarayıcısı.',
-      en: 'An async Python CLI security scanner for XSS, SQLi, CSRF, SSRF, headers, and subdomains.',
+      tr: 'XSS, SQLi, CSRF, SSRF, header ve subdomain kontrollerini async modüllerle çalıştıran Python CLI tarayıcısı.',
+      en: 'A Python CLI scanner that runs XSS, SQLi, CSRF, SSRF, header and subdomain checks as async modules.',
+    },
+    focus: {
+      tr: 'Odak: tarama modüllerini ayrı tutarak yeni kontrol eklemeyi kolaylaştırmak ve bulguları HTML raporla okunur kılmak.',
+      en: 'Focus: keep scan modules separate so new checks are easy to add, and turn findings into a readable HTML report.',
     },
     tags: ['Python', 'CLI', 'Async', { tr: 'HTML rapor', en: 'HTML reports' }],
   },
 ];
+
+// Kategori → uzmanlık sayfası yolu. Terminal (Tool) kategorisinin ayrı bir sayfası yok;
+// proje kartı ana sayfadaki proje bölümüne döner.
+export const CATEGORY_ROUTES = { Web: '/web', Android: '/android', Security: '/cybersecurity' };
+
+export const categoryPath = (category) => CATEGORY_ROUTES[category] ?? '/#projects';
+
+// Proje sayfalarında ve bileşenlerde kullanılan ortak arayüz metinleri.
+export const UI_COPY = {
+  caseStudy: { tr: 'Vaka incelemesi', en: 'Case study' },
+  liveSite: { tr: 'Canlı site', en: 'Live site' },
+  sourceCode: { tr: 'Kaynak kodu', en: 'Source code' },
+  preview: { tr: 'önizleme', en: 'preview' },
+  backHome: { tr: 'Ana sayfaya dön', en: 'Back to home' },
+  backToProjects: { tr: 'Projelere dön', en: 'Back to projects' },
+};
 
 export const caseStudyPath = (id) => `/case-study/${id}`;
 
