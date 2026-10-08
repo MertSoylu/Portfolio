@@ -48,7 +48,6 @@ test.describe('Homepage projects', () => {
 
     for (const title of [
       'NOBLE',
-      'Mnemosyne',
       'TypeSprint',
       'BİZ Şehir Haritası',
       'Biz Topluluğu',
