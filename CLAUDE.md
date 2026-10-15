@@ -2,7 +2,7 @@
 
 React 18 SPA portfolio. React Router v6, Tailwind CSS v3, Framer Motion v10. `@` → `src/`.
 
-Visual identity is **Signal** (`docs/superpowers/specs/2026-10-15-signal-identity.md` is the contract): near-black canvas, hairline grid, one acid-lime accent, Geist + Geist Mono. No WebGL/canvas/continuous JS animation.
+Visual identity is **Signal** (`docs/superpowers/specs/2026-10-15-signal-identity.md` is the contract): near-black canvas, hairline grid, one Claude-orange (#D97757) accent, Geist + Geist Mono. No WebGL/canvas/continuous JS animation.
 
 ## Commands
 

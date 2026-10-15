@@ -19,7 +19,7 @@ if (typeof window !== 'undefined' && import.meta.env.PROD) {
   // eslint-disable-next-line no-console
   console.log(
     '%cMert Soylu %cgithub.com/MertSoylu',
-    'font-size: 18px; font-weight: 700; color: #c8f542;',
+    'font-size: 18px; font-weight: 700; color: #d97757;',
     'font-size: 13px; color: #888;',
   );
 }

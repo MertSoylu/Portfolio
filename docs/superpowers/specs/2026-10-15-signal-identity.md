@@ -4,7 +4,7 @@
 
 ## Idea
 
-A precise, technical, dark-first identity: near-black canvas, hairline grid, one acid-lime **signal** colour, Geist + Geist Mono. It reads like a well-made engineering tool, not a code toy: no ASCII art, no glitch, no WebGL, no canvas effects. Personality comes from typography, a measured grid, mono metadata and one loud accent used sparingly.
+A precise, technical, dark-first identity: near-black canvas, hairline grid, one Claude-orange **signal** colour, Geist + Geist Mono. It reads like a well-made engineering tool, not a code toy: no ASCII art, no glitch, no WebGL, no canvas effects. Personality comes from typography, a measured grid, mono metadata and one loud accent used sparingly.
 
 Non-negotiables: TR/EN parity for every visible string, WCAG AA contrast, `prefers-reduced-motion` respected, mobile-first (360px no horizontal scroll), zero continuous JS animation loops.
 
@@ -24,8 +24,8 @@ Non-negotiables: TR/EN parity for every visible string, WCAG AA contrast, `prefe
 | `--fg`        | `236 237 239` #ECEDEF | `12 13 15` #0C0D0F    | text                                                       |
 | `--muted`     | `143 148 156` #8F949C | `88 92 99` #585C63    | secondary text (≥5.5:1)                                    |
 | `--line`      | `236 237 239`         | `12 13 15`            | borders, always with alpha                                 |
-| `--accent`    | `200 245 66` #C8F542  | `63 98 18` #3F6212    | **text-safe** accent: text, icons, small marks, focus ring |
-| `--signal`    | `200 245 66`          | `200 245 66`          | accent **fill** (buttons, highlight, monogram)             |
+| `--accent`    | `217 119 87` #D97757  | `168 69 42` #A8452A   | **text-safe** accent: text, icons, small marks, focus ring |
+| `--signal`    | `217 119 87`          | `217 119 87`          | accent **fill** (buttons, highlight, monogram)             |
 | `--signal-fg` | `10 11 13`            | `10 11 13`            | text on signal fill                                        |
 | `--ok`        | `74 222 128`          | `21 128 61`           | success / available                                        |
 | `--danger`    | `248 113 113`         | `185 28 28`           | errors                                                     |
@@ -58,7 +58,7 @@ Rules: never `text-signal` on light backgrounds (use `text-accent`). Line alphas
 
 ## Components (`src/index.css @layer components` + `src/components/ui/`)
 
-- Buttons: `.btn` base (h-11, px-5, text-sm, font-medium, rounded-md, inline-flex gap-2, focus ring) + `.btn-primary` (signal fill, signal-fg text; light mode 1px fg border), `.btn-secondary` (border line/20, hover line/40 + surface2), `.btn-ghost`, `.btn-lg` (h-12 px-6).
+- Buttons: `.btn` base (h-11, px-5, text-sm, font-medium, rounded-md, inline-flex gap-2, focus ring) + `.btn-primary` (signal fill, signal-fg text), `.btn-secondary` (border line/20, hover line/40 + surface2), `.btn-ghost`, `.btn-lg` (h-12 px-6).
 - `.card`, `.card-interactive`, `.tag` (mono 0.75rem, border line/15, px-2 py-0.5), `.label`, `.link` (accent underline that grows on hover), `.container-site` (max-w-6xl, **single** gutter px-4 sm:px-6 lg:px-8).
 - `SectionHeader({ id, index, label, title, lead, aside })` — the only section header pattern; renders the hairline rule + mono index, h2, lead.
 - `Reveal` stays: opacity + 12px rise, 0.5s, once; reduced motion → opacity only.

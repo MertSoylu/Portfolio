@@ -96,10 +96,10 @@ const hex = (h) => [
   255,
 ];
 
-const BG = hex('#faf8f4');
-const FG = hex('#13110f');
-const ACCENT = hex('#c2562f');
-const MUTED = hex('#7a6a5c');
+const BG = hex('#0a0b0d');
+const FG = hex('#ecedef');
+const ACCENT = hex('#d97757');
+const MUTED = hex('#8f949c');
 
 const buf = Buffer.alloc(W * H * 4, 0);
 for (let y = 0; y < H; y += 1) {

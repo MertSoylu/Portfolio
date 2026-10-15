@@ -16,9 +16,9 @@
   --muted: 88 92 99;
   --line: 12 13 15;
   /* text-safe accent (text, icons, small marks, focus ring) */
-  --accent: 63 98 18;
+  --accent: 168 69 42;
   /* accent fill (buttons, highlight, monogram) */
-  --signal: 200 245 66;
+  --signal: 217 119 87;
   --signal-fg: 10 11 13;
   --ok: 21 128 61;
   --danger: 185 28 28;
@@ -32,8 +32,8 @@ html.dark {
   --fg: 236 237 239;
   --muted: 143 148 156;
   --line: 236 237 239;
-  --accent: 200 245 66;
-  --signal: 200 245 66;
+  --accent: 217 119 87;
+  --signal: 217 119 87;
   --signal-fg: 10 11 13;
   --ok: 74 222 128;
   --danger: 248 113 113;
@@ -201,11 +201,6 @@ html.dark {
     background-color: rgb(var(--signal) / 0.88);
   }
 
-  /* Lime on a light canvas has little edge contrast: give the fill a 1px fg border in light mode. */
-  html:not(.dark) .btn-primary {
-    border-color: rgb(var(--fg));
-  }
-
   .btn-secondary {
     @apply text-fg;
     border-color: rgb(var(--line) / 0.2);
@@ -317,7 +312,7 @@ html.dark {
       100% 100%;
   }
 
-  /* Signal highlight: lime fill behind a word (hero role line). */
+  /* Signal highlight: orange fill behind a word (hero role line). */
   .mark {
     @apply rounded-sm bg-signal px-[0.25em] text-signal-fg;
     -webkit-box-decoration-break: clone;

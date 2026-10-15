@@ -61,7 +61,7 @@ const TONES = {
   danger: 'text-[#F87171]',
   warn: 'text-[#FBBF24]',
   ok: 'text-[#4ADE80]',
-  accent: 'text-[#C8F542]',
+  accent: 'text-[#D97757]',
 };
 
 /**
@@ -90,7 +90,7 @@ export const TerminalPreview = ({ title = '', lines = [], className = '', compac
     >
       {lines.map((line, index) => (
         <span key={index} className="block">
-          {line.prompt && <span className="text-[#C8F542]">{line.prompt} </span>}
+          {line.prompt && <span className="text-[#D97757]">{line.prompt} </span>}
           <span className={TONES[line.tone] || ''}>{line.text}</span>
         </span>
       ))}
