@@ -1,3 +1,5 @@
+import { readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { SEO_META } from '../../src/utils/constants';
 import { PROJECTS, caseStudyPath } from '../../src/data/projects';
@@ -51,6 +53,24 @@ describe('SEO_META', () => {
     CASE_STUDY_ROUTES.forEach((route) => {
       expect(SEO_META[route].canonical).toBe(`https://mertsoylu.dev${route}`);
     });
+  });
+});
+
+describe('sitemap.xml', () => {
+  const sitemap = readFileSync(resolve(process.cwd(), 'public/sitemap.xml'), 'utf8');
+  const locs = [...sitemap.matchAll(/<loc>([^<]+)<\/loc>/g)].map((match) => match[1]);
+
+  it('lists every case study route', () => {
+    CASE_STUDY_ROUTES.forEach((route) => {
+      expect(locs, route).toContain(SEO_META[route].canonical);
+    });
+  });
+
+  it('lists every indexable route (everything but /404) and nothing else', () => {
+    const indexable = REQUIRED_ROUTES.filter((route) => route !== '/404').map(
+      (route) => SEO_META[route].canonical,
+    );
+    expect([...locs].sort()).toEqual([...indexable].sort());
   });
 });
 

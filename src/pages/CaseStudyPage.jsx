@@ -1,5 +1,6 @@
+import { lazy, Suspense, useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import { HiArrowLeft, HiArrowRight, HiExternalLink } from 'react-icons/hi';
+import { HiArrowLeft, HiArrowRight, HiChevronDown } from 'react-icons/hi';
 import { useLanguage } from '../context/LanguageContext';
 import {
   CATEGORY_LABELS,
@@ -13,11 +14,14 @@ import {
 } from '../data/projects';
 import { CASE_STUDIES } from '../data/caseStudies';
 import PageMeta from '../components/PageMeta';
+import LoadingSpinner from '../components/LoadingSpinner';
 import PageBackButton from '../components/ui/PageBackButton';
 import Reveal from '../components/ui/Reveal';
 import { ProjectPreview } from '../components/ui/DevicePreview';
 import { ProjectActions } from '../components/project/ProjectShowcase';
-import NotFoundPage from './NotFoundPage';
+
+// Bilinmeyen id nadir bir durum: 404 sayfası vaka chunk'ına girmesin, gerektiğinde yüklensin.
+const NotFoundPage = lazy(() => import('./NotFoundPage'));
 
 // Sayfadaki sabit arayüz metinleri. İçerik metinleri (sorun, çözüm, özellikler...) caseStudies.js'ten gelir.
 const COPY = {
@@ -25,54 +29,85 @@ const COPY = {
   solution: { tr: 'Çözüm', en: 'Solution' },
   video: { tr: 'Tanıtım videosu', en: 'Promo video' },
   features: { tr: 'Öne çıkan özellikler', en: 'Key features' },
+  decisions: { tr: 'Kararlar', en: 'Decisions' },
   gallery: { tr: 'Ekranlar', en: 'Screens' },
   result: { tr: 'Sonuç', en: 'Result' },
-  onThisPage: { tr: 'Bu sayfada', en: 'On this page' },
+  contents: { tr: 'İçindekiler', en: 'Contents' },
   otherProjects: { tr: 'Diğer projeler', en: 'Other projects' },
   projectNav: { tr: 'Proje gezinme', en: 'Project navigation' },
   previous: { tr: 'Önceki', en: 'Previous' },
   next: { tr: 'Sonraki', en: 'Next' },
-  newTab: { tr: '(yeni sekmede açılır)', en: '(opens in a new tab)' },
 };
 
-const STATUS_CHIP =
-  'rounded-full border border-accent/30 bg-accent/10 px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-[0.14em] text-accent';
-const TAG_CHIP = 'rounded-full border border-line/12 bg-surface2 px-2.5 py-1 text-xs font-medium text-muted';
-const HERO_BUTTON = 'btn-secondary px-6 py-3 text-base';
-const SIDE_HEADING = 'mb-4 font-sans text-xs font-semibold uppercase tracking-[0.16em] text-muted';
+const toArray = (value) => (Array.isArray(value) ? value : []);
 
 // Metindeki `ters tırnaklı` parçaları satır içi kod olarak gösterir.
 const withInlineCode = (text) =>
-  text.split(/`([^`]+)`/).map((part, index) =>
-    index % 2 === 1 ? (
-      <code key={index} className="rounded bg-canvas px-1.5 py-0.5 font-mono text-[0.85em] text-fg">
-        {part}
-      </code>
-    ) : (
-      part
-    ),
-  );
+  String(text ?? '')
+    .split(/`([^`]+)`/)
+    .map((part, index) =>
+      index % 2 === 1 ? (
+        <code
+          key={index}
+          className="rounded border border-line/10 bg-canvas px-1 py-0.5 font-mono text-[0.85em] text-fg"
+        >
+          {part}
+        </code>
+      ) : (
+        part
+      ),
+    );
 
-// Bölüm kartı: numaralı eyebrow + h2 başlık. `id` hem sayfa içi bağlantının hedefi hem de
-// aria-labelledby için kullanılır. `variant` kart stilini seçer; video bölümü kendi gövdesini
-// (bodyClassName) kenardan kenara çizer.
-const Section = ({
-  id,
-  number,
-  title,
-  variant = 'card',
-  bodyClassName = 'px-6 pb-6 sm:px-8 sm:pb-8',
-  children,
-}) => (
-  <Reveal
-    as="section"
-    id={id}
-    aria-labelledby={`${id}-title`}
-    className={`${variant} scroll-mt-28 overflow-hidden`}
-  >
-    <div className="px-6 pt-6 sm:px-8 sm:pt-8">
-      <span className="eyebrow mb-3 block text-accent">{number}</span>
-      <h2 id={`${id}-title`} className="mb-5 text-h3 text-fg">
+// Hangi bölümün okunduğunu izler: üst çubuğun hemen altındaki bantta kesişen ilk bölüm "aktif" sayılır.
+// Bölümlerden hiçbiri bantta değilse son aktif bölüm korunur. IntersectionObserver yoksa (eski
+// tarayıcı, jsdom) aktif bölüm hiç işaretlenmez; bağlantılar yine çalışır.
+const useActiveSection = (ids) => {
+  const [active, setActive] = useState(null);
+  const key = ids.join('|');
+
+  useEffect(() => {
+    if (typeof IntersectionObserver === 'undefined') return undefined;
+
+    const elements = key
+      .split('|')
+      .map((id) => document.getElementById(id))
+      .filter(Boolean);
+    if (!elements.length) return undefined;
+
+    const visible = new Set();
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) visible.add(entry.target.id);
+          else visible.delete(entry.target.id);
+        });
+        const current = elements.find((element) => visible.has(element.id));
+        if (current) {
+          setActive(current.id);
+        } else if (elements[0].getBoundingClientRect().top > window.innerHeight * 0.45) {
+          // Sayfanın başına dönüldü: ilk bölüm bandın altında kaldı, hiçbir bölüm "okunmuyor".
+          setActive(null);
+        }
+      },
+      { rootMargin: '-96px 0px -55% 0px' },
+    );
+
+    elements.forEach((element) => observer.observe(element));
+    return () => observer.disconnect();
+  }, [key]);
+
+  return active;
+};
+
+// Bölüm kartı: numaralı mono indeks + h2 başlık. `id` hem sayfa içi bağlantının hedefi hem de
+// aria-labelledby için kullanılır; video bölümü kendi gövdesini (bodyClassName) kenardan kenara çizer.
+const Section = ({ id, number, title, bodyClassName = 'px-5 pb-5 sm:px-8 sm:pb-8', children }) => (
+  <Reveal as="section" id={id} aria-labelledby={`${id}-title`} className="card scroll-mt-24 overflow-hidden">
+    <div className="px-5 pt-5 sm:px-8 sm:pt-8">
+      <p aria-hidden="true" className="label mb-3 text-accent">
+        {number}
+      </p>
+      <h2 id={`${id}-title`} className="mb-5 break-words text-h3">
         {title}
       </h2>
     </div>
@@ -80,41 +115,77 @@ const Section = ({
   </Reveal>
 );
 
-// Sayfa içi bölüm bağlantıları. Yalnızca lg'de görünür; mobilde sayfa zaten kısa bir akıştır.
-const PageToc = ({ sections, t }) => (
-  <nav className="card hidden p-5 lg:block" aria-label={t(COPY.onThisPage)}>
-    <h2 className={SIDE_HEADING}>{t(COPY.onThisPage)}</h2>
-    <ul className="space-y-1">
-      {sections.map((section) => (
+// Sayfa içi bölüm bağlantıları. 44px hedefler; aktif bölüm `aria-current="location"` taşır.
+const TocLinks = ({ sections, active, onNavigate }) => (
+  <ul className="space-y-0.5">
+    {sections.map((section) => {
+      const isActive = active === section.id;
+      return (
         <li key={section.id}>
           <a
             href={`#${section.id}`}
-            className="flex items-baseline gap-3 rounded-xl px-3 py-2 text-sm font-medium text-muted transition-colors hover:bg-surface2 hover:text-fg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+            aria-current={isActive ? 'location' : undefined}
+            onClick={onNavigate}
+            className={`flex min-h-11 items-center gap-3 rounded-r-md border-l-2 px-3 text-sm transition-colors hover:bg-surface2 hover:text-fg ${
+              isActive ? 'border-accent bg-surface2/60 font-medium text-fg' : 'border-transparent text-muted'
+            }`}
           >
-            <span className="font-display text-xs font-semibold text-accent">{section.number}</span>
-            <span>{section.title}</span>
+            <span aria-hidden="true" className="micro text-accent">
+              {section.number}
+            </span>
+            <span className="min-w-0 break-words">{section.title}</span>
           </a>
         </li>
-      ))}
-    </ul>
+      );
+    })}
+  </ul>
+);
+
+// lg altında: başlığın altında açılır atlama listesi. Bir bağlantıya basınca kapanır.
+const MobileContents = ({ sections, active, t }) => {
+  const [open, setOpen] = useState(false);
+
+  return (
+    <details
+      open={open}
+      onToggle={(event) => setOpen(event.currentTarget.open)}
+      className="card group mb-10 lg:hidden"
+    >
+      <summary className="flex min-h-11 cursor-pointer list-none items-center justify-between gap-3 rounded-lg px-4 py-2 marker:hidden [&::-webkit-details-marker]:hidden">
+        <span className="label text-fg">{t(COPY.contents)}</span>
+        <HiChevronDown
+          className="h-4 w-4 shrink-0 text-muted transition-transform group-open:rotate-180"
+          aria-hidden="true"
+        />
+      </summary>
+      <nav aria-label={t(COPY.contents)} className="border-t border-line/10 p-2">
+        <TocLinks sections={sections} active={active} onNavigate={() => setOpen(false)} />
+      </nav>
+    </details>
+  );
+};
+
+// lg ve üstünde: sağ rayda yapışkan içindekiler listesi.
+const RailContents = ({ sections, active, t }) => (
+  <nav aria-label={t(COPY.contents)} className="card hidden p-2 lg:block">
+    <p className="label px-3 pb-1 pt-3">{t(COPY.contents)}</p>
+    <TocLinks sections={sections} active={active} />
   </nav>
 );
 
-// Diğer projelerin listesi. Mobilde sayfa sonunda, lg'de yan alanda görünür.
+// Diğer projelerin listesi. Mobilde sayfa sonunda, lg'de sağ rayda görünür.
 const OtherProjectsNav = ({ currentId, t }) => (
-  <nav className="card p-5" aria-label={t(COPY.otherProjects)}>
-    <h2 className={SIDE_HEADING}>{t(COPY.otherProjects)}</h2>
-    <ul className="space-y-1">
+  <nav aria-label={t(COPY.otherProjects)} className="card p-2">
+    <p className="label px-3 pb-1 pt-3">{t(COPY.otherProjects)}</p>
+    <ul className="space-y-0.5">
       {PROJECTS.filter((project) => project.id !== currentId).map((project) => (
         <li key={project.id}>
           <Link
             to={caseStudyPath(project.id)}
-            className="group flex items-center justify-between gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-muted transition-colors hover:bg-surface2 hover:text-fg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+            className="flex min-h-11 items-center justify-between gap-3 rounded-md px-3 text-sm text-muted transition-colors hover:bg-surface2 hover:text-fg"
           >
-            <span className="truncate">{project.title}</span>
-            <span className="shrink-0 text-[10px] font-semibold uppercase tracking-[0.14em] text-accent/80">
-              {t(CATEGORY_LABELS[project.category])}
-            </span>
+            <span className="min-w-0 truncate">{project.title}</span>
+            <span className="micro shrink-0 uppercase">{t(CATEGORY_LABELS[project.category])}</span>
           </Link>
         </li>
       ))}
@@ -128,149 +199,138 @@ const PrevNext = ({ currentId, t }) => {
   const prev = PROJECTS[(index - 1 + PROJECTS.length) % PROJECTS.length];
   const next = PROJECTS[(index + 1) % PROJECTS.length];
 
-  const item = (project, direction) => {
-    const isNext = direction === 'next';
-    return (
-      <Link
-        to={caseStudyPath(project.id)}
-        className={`card card-hover group flex flex-col gap-1 p-5 ${isNext ? 'text-right' : ''}`}
-      >
-        <span
-          className={`inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-[0.16em] text-muted ${
-            isNext ? 'justify-end' : ''
-          }`}
-        >
-          {!isNext && <HiArrowLeft className="h-3.5 w-3.5 transition-transform group-hover:-translate-x-1" />}
-          {t(isNext ? COPY.next : COPY.previous)}
-          {isNext && <HiArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-1" />}
-        </span>
-        <span className="font-display text-xl font-semibold text-fg">{project.title}</span>
-      </Link>
-    );
-  };
+  const item = (project, isNext) => (
+    <Link
+      to={caseStudyPath(project.id)}
+      className={`card-interactive group flex flex-col gap-1.5 p-5 ${isNext ? 'items-end text-right' : ''}`}
+    >
+      <span className="label inline-flex items-center gap-2">
+        {!isNext && (
+          <HiArrowLeft
+            className="h-3.5 w-3.5 transition-transform group-hover:-translate-x-0.5"
+            aria-hidden="true"
+          />
+        )}
+        {t(isNext ? COPY.next : COPY.previous)}
+        {isNext && (
+          <HiArrowRight
+            className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5"
+            aria-hidden="true"
+          />
+        )}
+      </span>
+      <span className="text-h4 break-words text-fg">{project.title}</span>
+    </Link>
+  );
 
   return (
     <nav className="grid gap-3 sm:grid-cols-2" aria-label={t(COPY.projectNav)}>
-      {item(prev, 'prev')}
-      {item(next, 'next')}
+      {item(prev, false)}
+      {item(next, true)}
     </nav>
   );
 };
 
-const CaseStudyPage = () => {
-  const { id } = useParams();
+const CaseStudy = ({ project, study }) => {
   const { isTurkish } = useLanguage();
-  const project = getProject(id);
-  const study = CASE_STUDIES[id];
-
-  if (!project || !study) return <NotFoundPage />;
-
   const t = (value) => pick(value, isTurkish);
+
   const category = t(CATEGORY_LABELS[project.category]);
   const isPhone = project.preview?.kind === 'phone';
-  const decisions = t(study.decisions) || [];
+  const facts = toArray(study.facts);
+  const features = toArray(study.features);
+  const decisions = toArray(t(study.decisions));
+  const gallery = toArray(study.gallery);
+  const resultTags = toArray(study.resultTags);
+  const extraLinks = toArray(study.extraLinks);
 
   // Kategorinin uzmanlık sayfası varsa oraya dön; yoksa (ör. Terminal) proje bölümüne.
   const hasCategoryPage = Boolean(CATEGORY_ROUTES[project.category]);
-  const backTo = categoryPath(project.category);
   const backLabel = hasCategoryPage
     ? t({ tr: `${category} projelerine dön`, en: `Back to ${category} projects` })
     : t(UI_COPY.backToProjects);
 
-  // Görünen bölümler sırayla numaralanır; eksik bölümler (video, özellik, galeri) listeye girmez.
-  const sectionList = [
+  // Görünen bölümler sırayla numaralanır; eksik bölümler (video, özellik, karar, galeri) listeye girmez.
+  const sections = [
     { id: 'problem', title: t(COPY.problem) },
     { id: 'solution', title: t(COPY.solution) },
     study.video && { id: 'video', title: t(COPY.video) },
-    study.features && { id: 'features', title: t(COPY.features) },
-    { id: 'decisions', title: t(study.decisionsTitle) },
-    study.gallery && { id: 'gallery', title: t(COPY.gallery) },
+    features.length > 0 && { id: 'features', title: t(COPY.features) },
+    decisions.length > 0 && { id: 'decisions', title: t(study.decisionsTitle) || t(COPY.decisions) },
+    gallery.length > 0 && { id: 'gallery', title: t(COPY.gallery) },
     { id: 'result', title: t(COPY.result) },
   ]
     .filter(Boolean)
     .map((section, index) => ({ ...section, number: String(index + 1).padStart(2, '0') }));
-  const sectionMeta = Object.fromEntries(sectionList.map((section) => [section.id, section]));
+  const meta = Object.fromEntries(sections.map((section) => [section.id, section]));
+  const active = useActiveSection(sections.map((section) => section.id));
 
   return (
-    <div className="relative min-h-screen px-5 pb-20 pt-28 sm:pt-32">
+    <div className="relative pb-20 pt-28 sm:pt-32">
       <PageMeta route={caseStudyPath(project.id)} />
-      <div className="container-wide">
-        <PageBackButton to={backTo} label={backLabel} className="mb-8" />
+      <div className="container-site">
+        <PageBackButton to={categoryPath(project.category)} label={backLabel} className="mb-8" />
 
         <header
-          className={`mb-12 grid items-center gap-8 sm:mb-14 lg:gap-12 ${
-            isPhone ? 'lg:grid-cols-[minmax(0,1fr)_280px]' : 'lg:grid-cols-[minmax(0,1fr)_minmax(0,520px)]'
+          className={`mb-10 grid items-center gap-10 lg:gap-12 ${
+            isPhone ? 'lg:grid-cols-[minmax(0,1fr)_17rem]' : 'lg:grid-cols-[minmax(0,1fr)_minmax(0,32rem)]'
           }`}
         >
-          <div className="min-w-0">
-            <Reveal as="div" className="mb-4 flex flex-wrap items-center gap-x-3 gap-y-2">
-              <span className="eyebrow text-accent">{`${category} · ${t(UI_COPY.caseStudy)}`}</span>
-              <span className={STATUS_CHIP}>{t(project.status)}</span>
-            </Reveal>
-            <Reveal as="h1" delay={0.05} className="text-h1 text-fg">
-              {project.title}
-            </Reveal>
-            <Reveal as="p" delay={0.1} className="mt-5 max-w-2xl text-body-lg text-fg/80">
-              {t(study.subtitle)}
-            </Reveal>
-            <Reveal delay={0.15} className="mt-7 flex flex-wrap items-center gap-2.5">
-              <ProjectActions project={project} showCaseStudy={false} size="lg" />
-              {(study.extraLinks || []).map((link) => (
-                <a
-                  key={link.href}
-                  href={link.href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className={HERO_BUTTON}
-                >
-                  {t(link.label)}
-                  <HiExternalLink className="h-4 w-4" aria-hidden="true" />
-                  <span className="sr-only">{t(COPY.newTab)}</span>
-                </a>
-              ))}
-            </Reveal>
-          </div>
+          <Reveal className="min-w-0">
+            <div className="mb-5 flex flex-wrap items-center gap-x-3 gap-y-2">
+              <p className="label">{`${category} · ${t(UI_COPY.caseStudy)}`}</p>
+              <span className="tag">{t(project.status)}</span>
+            </div>
+            <h1 className="break-words text-h1">{project.title}</h1>
+            <p className="text-lead mt-5 max-w-2xl break-words">{t(study.subtitle)}</p>
+            <div className="mt-7">
+              <ProjectActions project={project} showCaseStudy={false} size="lg" extraLinks={extraLinks} />
+            </div>
+          </Reveal>
 
-          <Reveal delay={0.1} className="min-w-0 w-full">
-            <ProjectPreview project={project} alt={`${project.title} ${t(UI_COPY.preview)}`} eager />
+          {/* Köşe işaretleri (.ticks) sayfadaki tek vurgu paneli: önizlemeyi vizör gibi çerçeveler. */}
+          <Reveal
+            delay={0.1}
+            className={`ticks min-w-0 p-3 sm:p-4 ${isPhone ? 'mx-auto w-fit max-w-full lg:justify-self-end' : ''}`}
+          >
+            <ProjectPreview project={project} eager />
           </Reveal>
         </header>
 
-        <dl className="card mb-12 grid divide-y divide-line/10 sm:grid-cols-3 sm:divide-x sm:divide-y-0">
-          {study.facts.map((fact) => (
-            <div key={t(fact.label)} className="p-5">
-              <dt className="text-xs font-semibold uppercase tracking-[0.16em] text-muted">
-                {t(fact.label)}
-              </dt>
-              <dd className="mt-2 text-sm font-semibold text-fg">{t(fact.value)}</dd>
-            </div>
-          ))}
-        </dl>
+        {facts.length > 0 && (
+          <dl className="mb-10 grid divide-y divide-line/10 border-y border-line/10 sm:grid-cols-3 sm:divide-x sm:divide-y-0">
+            {facts.map((fact, index) => (
+              <div key={index} className="min-w-0 py-4 sm:px-6 sm:first:pl-0 sm:last:pr-0">
+                <dt className="label">{t(fact.label)}</dt>
+                <dd className="mt-1.5 break-words text-sm font-medium text-fg">{t(fact.value)}</dd>
+              </div>
+            ))}
+          </dl>
+        )}
 
-        <div className="grid items-start gap-8 lg:grid-cols-[minmax(0,1fr)_260px] lg:gap-12">
+        <MobileContents sections={sections} active={active} t={t} />
+
+        <div className="grid items-start gap-8 lg:grid-cols-[minmax(0,1fr)_16rem] lg:gap-12">
           <div className="min-w-0 space-y-6">
-            <Section {...sectionMeta.problem}>
-              <p className="text-body text-muted">{t(study.problem)}</p>
+            <Section {...meta.problem}>
+              <p className="max-w-prose break-words text-muted">{t(study.problem)}</p>
             </Section>
 
-            <Section {...sectionMeta.solution}>
-              <p className="text-body text-muted">{t(study.solution)}</p>
+            <Section {...meta.solution}>
+              <p className="max-w-prose break-words text-muted">{t(study.solution)}</p>
             </Section>
 
             {study.video && (
-              <Section {...sectionMeta.video} bodyClassName="">
+              <Section {...meta.video} bodyClassName="">
                 {/* preload="none": video yalnızca oynatılınca indirilir. Videoda konuşma yok
-                    (müzik + ekrandaki yazılar), bu yüzden altyazı izi eklenmedi.
-                    relative + z-[9999]: sayfanın üstündeki sabit Noise katmanı (z-[9998]) grenini
-                    videonun üstüne bindirmesin ve kontroller tıklanabilir kalsın. Bu değer
-                    kaldırılırsa video grenin altında kalır. */}
+                    (müzik + ekrandaki yazılar), bu yüzden altyazı izi eklenmedi. */}
                 {/* eslint-disable-next-line jsx-a11y/media-has-caption */}
                 <video
                   aria-label={t({
                     tr: `${project.title} tanıtım videosu`,
                     en: `${project.title} promo video`,
                   })}
-                  className="relative z-[9999] block aspect-video w-full bg-black"
+                  className="block aspect-video w-full bg-black"
                   src={study.video.src}
                   poster={study.video.poster}
                   controls
@@ -280,84 +340,109 @@ const CaseStudyPage = () => {
               </Section>
             )}
 
-            {study.features && (
-              <Section {...sectionMeta.features}>
+            {features.length > 0 && (
+              <Section {...meta.features}>
                 <ul className="grid gap-3 sm:grid-cols-2">
-                  {study.features.map((feature) => (
-                    <li key={t(feature.title)} className="rounded-xl border border-line/10 bg-surface2 p-4">
-                      <h3 className="mb-1.5 font-sans text-sm font-semibold text-fg">{t(feature.title)}</h3>
-                      <p className="text-body-sm text-muted">{t(feature.desc)}</p>
+                  {features.map((feature, index) => (
+                    <li key={index} className="min-w-0 rounded-md border border-line/10 bg-surface2 p-4">
+                      <h3 className="text-h4 break-words">{t(feature.title)}</h3>
+                      <p className="mt-1.5 break-words text-sm text-muted">
+                        {withInlineCode(t(feature.desc))}
+                      </p>
                     </li>
                   ))}
                 </ul>
               </Section>
             )}
 
-            <Section {...sectionMeta.decisions} variant="card-prominent">
-              <ol className="grid gap-3">
-                {decisions.map((item, index) => (
-                  <li
-                    key={item}
-                    className="flex gap-4 rounded-xl border border-line/10 bg-surface2 p-4 text-body-sm text-muted"
-                  >
-                    <span className="font-display text-base font-semibold leading-snug text-accent">
-                      {String(index + 1).padStart(2, '0')}
-                    </span>
-                    <span>{withInlineCode(item)}</span>
-                  </li>
-                ))}
-              </ol>
-            </Section>
+            {decisions.length > 0 && (
+              <Section {...meta.decisions}>
+                <ol className="divide-y divide-line/10 border-y border-line/10">
+                  {decisions.map((item, index) => (
+                    <li key={index} className="flex items-baseline gap-4 py-4">
+                      <span aria-hidden="true" className="shrink-0 font-mono text-sm font-medium text-accent">
+                        {String(index + 1).padStart(2, '0')}
+                      </span>
+                      <span className="min-w-0 break-words text-muted">{withInlineCode(item)}</span>
+                    </li>
+                  ))}
+                </ol>
+              </Section>
+            )}
 
-            {study.gallery && (
-              <Section {...sectionMeta.gallery}>
+            {gallery.length > 0 && (
+              <Section {...meta.gallery}>
                 <div className="grid gap-4 sm:grid-cols-2">
-                  {study.gallery.map((shot) => (
-                    <figure key={shot.src} className={shot.wide ? 'sm:col-span-2' : ''}>
+                  {gallery.map((shot) => (
+                    <figure key={shot.src} className={shot.wide ? 'min-w-0 sm:col-span-2' : 'min-w-0'}>
+                      {/* Bağlantının adı görselin alt metninden gelir (görselde ne olduğu); görünen
+                          altyazı figcaption'da ayrıca durur, böylece aynı cümle iki kez okunmaz. */}
                       <a
                         href={shot.src}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="block overflow-hidden rounded-2xl border border-line/12 bg-[#0c0a07] transition-transform duration-300 hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+                        className="block overflow-hidden rounded-lg border border-line/10 bg-surface2 transition-colors hover:border-line/25"
                       >
                         <img
                           src={shot.src}
-                          alt={t(shot.caption)}
+                          alt={t(shot.alt) || t(shot.caption)}
+                          width={shot.width}
+                          height={shot.height}
                           loading="lazy"
                           decoding="async"
-                          className="w-full"
+                          className="h-auto w-full"
                         />
-                        <span className="sr-only">{t(COPY.newTab)}</span>
+                        <span className="sr-only"> {t(UI_COPY.newTab)}</span>
                       </a>
-                      <figcaption className="mt-2 text-xs text-muted">{t(shot.caption)}</figcaption>
+                      <figcaption className="mt-2 break-words text-sm text-muted">
+                        {t(shot.caption)}
+                      </figcaption>
                     </figure>
                   ))}
                 </div>
               </Section>
             )}
 
-            <Section {...sectionMeta.result}>
-              <p className="text-body text-muted">{t(study.result)}</p>
-              <div className="mt-4 flex flex-wrap gap-2">
-                {study.resultTags.map((tag) => (
-                  <span key={t(tag)} className={TAG_CHIP}>
-                    {t(tag)}
-                  </span>
-                ))}
-              </div>
+            <Section {...meta.result}>
+              <p className="max-w-prose break-words text-muted">{t(study.result)}</p>
+              {resultTags.length > 0 && (
+                <ul className="mt-5 flex flex-wrap gap-1.5">
+                  {resultTags.map((tag, index) => (
+                    <li key={index} className="tag">
+                      {t(tag)}
+                    </li>
+                  ))}
+                </ul>
+              )}
             </Section>
 
             <PrevNext currentId={project.id} t={t} />
           </div>
 
-          <aside className="min-w-0 space-y-5 lg:sticky lg:top-28">
-            <PageToc sections={sectionList} t={t} />
+          <div className="min-w-0 space-y-5 lg:sticky lg:top-24 lg:max-h-[calc(100vh-8rem)] lg:overflow-y-auto">
+            <RailContents sections={sections} active={active} t={t} />
             <OtherProjectsNav currentId={project.id} t={t} />
-          </aside>
+          </div>
         </div>
       </div>
     </div>
   );
+};
+
+const CaseStudyPage = () => {
+  const { id } = useParams();
+  const project = getProject(id);
+  const study = project ? CASE_STUDIES[project.id] : undefined;
+
+  if (!project || !study) {
+    return (
+      <Suspense fallback={<LoadingSpinner />}>
+        <NotFoundPage />
+      </Suspense>
+    );
+  }
+
+  return <CaseStudy key={project.id} project={project} study={study} />;
 };
 
 export default CaseStudyPage;

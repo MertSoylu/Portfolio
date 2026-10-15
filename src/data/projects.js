@@ -4,11 +4,14 @@
 //
 // Çift dilli alanlar { tr, en } nesnesidir; `pick(value, isTurkish)` ile okunur.
 
+// Okuma sırası: istenen dil, yoksa diğer dil, o da yoksa boş metin. Çevirisi eksik bir alan
+// arayüzde `undefined` olarak değil, en azından diğer dilde görünür. Düz metin ve diziler olduğu gibi döner.
 export const pick = (value, isTurkish) => {
-  if (value && typeof value === 'object' && !Array.isArray(value) && 'tr' in value) {
-    return isTurkish ? value.tr : value.en;
+  if (value && typeof value === 'object' && !Array.isArray(value) && ('tr' in value || 'en' in value)) {
+    const [preferred, other] = isTurkish ? [value.tr, value.en] : [value.en, value.tr];
+    return preferred || other || '';
   }
-  return value;
+  return value ?? '';
 };
 
 export const CATEGORY_LABELS = {
@@ -61,7 +64,12 @@ export const PROJECTS = [
       tr: 'Odak: yanlış girişte akışı durdurarak skoru daha dürüst hâle getirmek.',
       en: 'Focus: stop progress on wrong input so the score reflects real typing.',
     },
-    tags: ['JavaScript', 'WPM', { tr: 'Çok dilli', en: 'Multilingual' }, 'Leaderboard'],
+    tags: [
+      'JavaScript',
+      'WPM',
+      { tr: 'Çok dilli', en: 'Multilingual' },
+      { tr: 'Liderlik tablosu', en: 'Leaderboard' },
+    ],
   },
   {
     id: 'harita',
@@ -130,7 +138,7 @@ export const PROJECTS = [
         { prompt: 'msscan>', text: 'set url https://example.com' },
         { prompt: 'msscan>', text: 'set modules xss,sqli,headers' },
         { prompt: 'msscan>', text: 'scan' },
-        { tone: 'warn', text: '[HIGH]  XSS · reflected in html body' },
+        { tone: 'danger', text: '[HIGH]  XSS · reflected in html body' },
         { tone: 'warn', text: '[MED]   Headers · CSP missing' },
         { tone: 'ok', text: '[OK]    SQLi · no injection found' },
         { tone: 'accent', text: 'HTML report ready → report.html' },
@@ -160,6 +168,9 @@ export const UI_COPY = {
   liveSite: { tr: 'Canlı site', en: 'Live site' },
   sourceCode: { tr: 'Kaynak kodu', en: 'Source code' },
   preview: { tr: 'önizleme', en: 'preview' },
+  screenshot: { tr: 'ekran görüntüsü', en: 'screenshot' },
+  // Harici bağlantıların ekran okuyucu notu (görünmez, `sr-only`).
+  newTab: { tr: '(yeni sekmede açılır)', en: '(opens in a new tab)' },
   backHome: { tr: 'Ana sayfaya dön', en: 'Back to home' },
   backToProjects: { tr: 'Projelere dön', en: 'Back to projects' },
 };
@@ -167,5 +178,10 @@ export const UI_COPY = {
 export const caseStudyPath = (id) => `/case-study/${id}`;
 
 export const getProject = (id) => PROJECTS.find((project) => project.id === id);
+
+// Önizleme görselinin alt metni: proje adı + özet. Böylece ekran okuyucu kullanıcısı
+// görselin ne gösterdiğini "<ad> önizleme" gibi boş bir etiketten daha iyi anlar.
+export const previewAlt = (project, isTurkish) =>
+  `${project.title} ${pick(UI_COPY.screenshot, isTurkish)}: ${pick(project.summary, isTurkish)}`;
 
 export const projectsByCategory = (category) => PROJECTS.filter((project) => project.category === category);

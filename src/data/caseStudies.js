@@ -1,6 +1,11 @@
 // Case study içerikleri. Kart düzeyindeki bilgiler (başlık, linkler, önizleme)
 // projects.js'te; burada yalnızca detay sayfasının metinleri durur.
 
+// Düz değerler her iki dilde aynıdır (teknoloji adları); `same` onları yine de { tr, en } biçiminde tutar.
+const same = (value) => ({ tr: value, en: value });
+const PLATFORM = { tr: 'Platform', en: 'Platform' };
+const STACK = { tr: 'Yığın', en: 'Stack' };
+
 const DECISIONS = {
   design: { tr: 'Tasarım kararları', en: 'Design decisions' },
   product: { tr: 'Ürün kararları', en: 'Product decisions' },
@@ -14,8 +19,8 @@ export const CASE_STUDIES = {
       en: 'A single native binary that turns your terminal into a workspace: git projects, real shells, AI agent quotas and a system monitor on one screen.',
     },
     facts: [
-      { label: { tr: 'Dil', en: 'Language' }, value: 'Rust 2024 · ratatui' },
-      { label: { tr: 'Platformlar', en: 'Platforms' }, value: 'Windows · Linux · macOS' },
+      { label: PLATFORM, value: same('Windows · Linux · macOS') },
+      { label: { tr: 'Dil', en: 'Language' }, value: same('Rust 2024 · ratatui') },
       {
         label: { tr: 'Dağıtım', en: 'Distribution' },
         value: { tr: 'crates.io + hazır binary', en: 'crates.io + prebuilt binaries' },
@@ -92,38 +97,70 @@ export const CASE_STUDIES = {
         'CI runs the full test suite, including real-terminal and end-to-end tests, on all three platforms.',
       ],
     },
+    // width/height: gerçek piksel boyutları; <img> bunlarla yer ayırır, görsel yüklenirken sayfa kaymaz.
+    // alt: görselde ne olduğunu anlatır; görünen altyazı (caption) ayrıca figcaption'da durur.
     gallery: [
       {
         src: '/previews/noble/home.webp',
+        width: 1600,
+        height: 999,
         caption: {
           tr: 'Home: projeler, son commit’ler, AI kullanımı ve sistem sensörleri',
           en: 'Home: projects, recent commits, AI usage and system sensors',
         },
+        alt: {
+          tr: 'Koyu amber temalı NOBLE Home ekranı: dal ve git durumuyla proje tablosu, son commit’ler, değişen dosyalar, Claude Code ile Codex için AI kullanım çubukları, CPU, RAM, disk ve batarya göstergeleri.',
+          en: 'NOBLE Home screen in a dark amber theme: a project table with branch and git status, recent commits, changed files, AI usage bars for Claude Code and Codex, and CPU, RAM, disk and battery gauges.',
+        },
       },
       {
         src: '/previews/noble/terminals.webp',
+        width: 1600,
+        height: 999,
         caption: {
           tr: 'Claude Code ve Codex, yan yana bölmelerde',
           en: 'Claude Code and Codex side by side in splits',
         },
+        alt: {
+          tr: 'İki gerçek terminal bölmesi: solda bir yapılandırma dosyasını düzenleyip testleri çalıştıran Claude Code, sağda pil tahminindeki sınır durumlarını inceleyen OpenAI Codex.',
+          en: 'Two real terminal panes: Claude Code on the left editing a config file and running tests, OpenAI Codex on the right reviewing edge cases in a battery estimate.',
+        },
       },
       {
         src: '/previews/noble/system.webp',
+        width: 1600,
+        height: 999,
         caption: {
           tr: 'Sistem: CPU, çekirdekler, bellek, ağ, disk ve süreçler',
           en: 'System: CPU, cores, memory, network, disks and processes',
         },
+        alt: {
+          tr: 'NOBLE Sistem ekranı: CPU geçmiş grafiği ve çekirdek bazlı yük, bellek ile swap çubukları, ağ hızı, disk kullanımı, batarya ve sıralanabilir süreç tablosu.',
+          en: 'NOBLE System screen: a CPU history graph with per-core load, memory and swap bars, network throughput, disk usage, battery level and a sortable process table.',
+        },
       },
       {
         src: '/previews/noble/palette.webp',
+        width: 1600,
+        height: 1019,
         caption: {
           tr: 'Komut paleti: her eylem, proje, sekme ve tema tek yerde',
           en: 'Command palette: every action, project, tab and theme in one place',
         },
+        alt: {
+          tr: 'Home ekranının üstünde açılmış komut paleti: gezinme, sekme, sistem ve başlatma komutları klavye kısayollarıyla listeleniyor.',
+          en: 'The command palette open over the Home screen, listing navigation, tab, system and launch commands with their keyboard shortcuts.',
+        },
       },
       {
         src: '/previews/noble/themes.webp',
+        width: 1600,
+        height: 717,
         caption: { tr: '22 temadan altısı', en: 'Six of the 22 themes' },
+        alt: {
+          tr: 'Yan yana altı NOBLE teması (Ice, Synthwave, Catppuccin, Gruvbox, Nord ve Catppuccin Latte); hepsinde aynı Home ekranı görünüyor.',
+          en: 'Six NOBLE themes side by side (Ice, Synthwave, Catppuccin, Gruvbox, Nord and Catppuccin Latte), each showing the same Home screen.',
+        },
         wide: true,
       },
     ],
@@ -140,13 +177,10 @@ export const CASE_STUDIES = {
       en: 'A live web app that measures typing speed through accuracy and flow control, not raw speed alone.',
     },
     facts: [
-      {
-        label: { tr: 'Yüzey', en: 'Surface' },
-        value: { tr: 'Canlı WPM uygulaması', en: 'Live WPM application' },
-      },
+      { label: PLATFORM, value: { tr: 'Canlı web uygulaması', en: 'Live web app' } },
       { label: { tr: 'Odak', en: 'Focus' }, value: { tr: 'Doğruluk + ritim', en: 'Accuracy + rhythm' } },
       {
-        label: { tr: 'Dil', en: 'Language' },
+        label: { tr: 'Kelimeler', en: 'Words' },
         value: { tr: 'Çok dilli kelime havuzu', en: 'Multilingual word pools' },
       },
     ],
@@ -175,7 +209,12 @@ export const CASE_STUDIES = {
       tr: 'TypeSprint, küçük bir web aracında bile ölçüm mantığı, kullanıcı psikolojisi ve arayüz ritminin birlikte tasarlanması gerektiğini gösteriyor.',
       en: 'TypeSprint shows that even a small web tool needs measurement logic, user psychology and interface rhythm designed together.',
     },
-    resultTags: ['JavaScript', 'WPM', 'Multilingual', 'Leaderboard'],
+    resultTags: [
+      'JavaScript',
+      'WPM',
+      { tr: 'Çok dilli', en: 'Multilingual' },
+      { tr: 'Liderlik tablosu', en: 'Leaderboard' },
+    ],
   },
 
   harita: {
@@ -184,12 +223,9 @@ export const CASE_STUDIES = {
       en: 'A Supabase-backed community platform that collects issue reports from all 81 provinces of Turkey and maps them.',
     },
     facts: [
-      {
-        label: { tr: 'Yüzey', en: 'Surface' },
-        value: { tr: 'Etkileşimli harita platformu', en: 'Interactive map platform' },
-      },
-      { label: { tr: 'Yığın', en: 'Stack' }, value: 'Next.js 16, Supabase, d3-geo' },
-      { label: { tr: 'Doğrulama', en: 'Validation' }, value: 'zod + Cloudflare Turnstile' },
+      { label: PLATFORM, value: { tr: 'Etkileşimli harita platformu', en: 'Interactive map platform' } },
+      { label: STACK, value: same('Next.js 16, Supabase, d3-geo') },
+      { label: { tr: 'Doğrulama', en: 'Validation' }, value: same('zod + Cloudflare Turnstile') },
     ],
     problem: {
       tr: 'Topluluğun 81 ile yayılan sorun bildirimleri dağınık kanallarda kayboluyordu. Sorunların hangi bölgelerde yoğunlaştığını görmek zordu; tek bir harita yüzeyine ihtiyaç vardı.',
@@ -227,11 +263,8 @@ export const CASE_STUDIES = {
       en: 'A community organization site that carries its event, report and announcement archive in MDX, statically generated at build time.',
     },
     facts: [
-      {
-        label: { tr: 'Yüzey', en: 'Surface' },
-        value: { tr: 'Kurumsal topluluk sitesi', en: 'Community organization site' },
-      },
-      { label: { tr: 'Yığın', en: 'Stack' }, value: 'Next.js + MDX, Tailwind v4' },
+      { label: PLATFORM, value: { tr: 'Kurumsal topluluk sitesi', en: 'Community organization site' } },
+      { label: STACK, value: same('Next.js + MDX, Tailwind v4') },
       {
         label: { tr: 'İçerik', en: 'Content' },
         value: { tr: 'Build sırasında statik üretim', en: 'Statically generated at build' },
@@ -271,8 +304,8 @@ export const CASE_STUDIES = {
       en: 'An Android app on Google Play that connects daily walking with pixel-pet care.',
     },
     facts: [
-      { label: { tr: 'Platform', en: 'Platform' }, value: 'Google Play' },
-      { label: { tr: 'Yığın', en: 'Stack' }, value: 'Kotlin + Jetpack Compose' },
+      { label: PLATFORM, value: same('Android · Google Play') },
+      { label: STACK, value: same('Kotlin + Jetpack Compose') },
       {
         label: { tr: 'Odak', en: 'Focus' },
         value: { tr: 'Sağlık takibini oyunlaştırma', en: 'Gamified health tracking' },
@@ -312,11 +345,8 @@ export const CASE_STUDIES = {
       en: 'An async Python CLI tool for XSS, SQLi, CSRF, SSRF, open redirect, header and subdomain checks.',
     },
     facts: [
-      { label: { tr: 'Dil', en: 'Language' }, value: 'Python 3.10+' },
-      {
-        label: { tr: 'Yüzey', en: 'Surface' },
-        value: { tr: 'Etkileşimli terminal', en: 'Interactive terminal' },
-      },
+      { label: PLATFORM, value: { tr: 'Etkileşimli terminal', en: 'Interactive terminal' } },
+      { label: { tr: 'Dil', en: 'Language' }, value: same('Python 3.10+') },
       {
         label: { tr: 'Çıktı', en: 'Output' },
         value: { tr: 'Konsol + HTML rapor', en: 'Console + HTML report' },
@@ -349,6 +379,11 @@ export const CASE_STUDIES = {
       tr: 'msscan, güvenlik öğrenimini bir ürüne dönüştürüyor: yalnızca teorik bir açık listesi değil, terminalden çalıştırılabilen ve rapor üreten bir pratik alanı.',
       en: 'msscan turns security learning into a product: not just a theoretical list of vulnerabilities, but a practice space you run from the terminal and that produces a report.',
     },
-    resultTags: ['Python', 'Async', 'Rate limiting', { tr: 'HTML rapor', en: 'HTML reports' }],
+    resultTags: [
+      'Python',
+      'Async',
+      { tr: 'Hız sınırlama', en: 'Rate limiting' },
+      { tr: 'HTML rapor', en: 'HTML reports' },
+    ],
   },
 };
