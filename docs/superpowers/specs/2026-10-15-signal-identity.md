@@ -4,9 +4,15 @@
 
 ## Idea
 
-A precise, technical, dark-first identity: near-black canvas, hairline grid, one Claude-orange **signal** colour, Geist + Geist Mono. It reads like a well-made engineering tool, not a code toy: no ASCII art, no glitch, no WebGL, no canvas effects. Personality comes from typography, a measured grid, mono metadata and one loud accent used sparingly.
+A precise, technical, dark-first identity: near-black canvas, hairline grid, one Claude-orange **signal** colour, Geist + Geist Mono. Personality comes from typography, a measured grid, mono metadata, one loud accent used sparingly — and the **Signal Field** (see below): a living, GPU-rendered ASCII field behind the whole site that the hero name emerges from.
 
-Non-negotiables: TR/EN parity for every visible string, WCAG AA contrast, `prefers-reduced-motion` respected, mobile-first (360px no horizontal scroll), zero continuous JS animation loops.
+Non-negotiables: TR/EN parity for every visible string, WCAG AA contrast, `prefers-reduced-motion` respected, mobile-first (360px no horizontal scroll). Continuous animation only on the GPU (WebGL shaders), never per-pixel CPU work; every loop pauses when hidden/off-screen and stops under reduced motion.
+
+## Signal Field (signature, v2.1 — 2026-10-15)
+
+- **Background (`AsciiField`)**: one fixed full-viewport WebGL canvas (raw WebGL, no deps) behind all content. A glyph atlas (ramp ` .·:-=+*%#@` drawn once in Geist Mono) is sampled per cell in the fragment shader. Value field = slow domain-warped noise + a periodic diagonal **signal sweep** (radar-like band that lights glyphs orange) + cursor **lens** (denser, orange glyphs around the pointer) + click **ripples** (expanding rings; replaces ClickSpark) + scroll parallax. Base glyphs are faint (`fg` ≤ ~12% alpha) so text stays AA-readable; orange only at hot spots. Per-route **mood** uniform: home = flowing, area = steadier grid drift, case study = calm, 404 = static/noisy.
+- **Hero name (`AsciiName`)**: "Mert Soylu" rendered as ASCII by a shader that samples a text-mask texture (Geist bold drawn once); glyphs shimmer, an orange sweep crosses the letters, the cursor scatters nearby glyphs and they settle back. A real `<h1>` stays in the DOM (visually hidden while the canvas is active); plain `.text-display` text is shown until WebGL is ready and as the fallback.
+- **Budget**: DPR ≤ 1.5 (1 on mobile), mobile capped at 30 fps, no per-frame allocations, pause on `document.hidden` and when off-screen, reduced motion → single static frame, no WebGL → CSS grid background + text h1. Loaded lazily after first paint.
 
 ## Fonts (self-hosted, no Google Fonts)
 
@@ -50,7 +56,7 @@ Rules: never `text-signal` on light backgrounds (use `text-accent`). Line alphas
 
 - Radius: cards `rounded-lg` (8px), buttons/inputs `rounded-md` (6px), tags `rounded` (4px). No pills except the status chip.
 - Depth by border + surface, not shadow. Cards: `bg-surface border border-line/10`. Interactive hover: `border-line/25 bg-surface2/60`, 150ms colour transition. No lift, tilt, magnet or spotlight.
-- **Background:** fixed, pure CSS: 64px hairline grid (`line/5`), radial mask fading to canvas, plus a very faint signal glow at the top (≤6% alpha). No JS.
+- **Background:** the Signal Field (above); the pure-CSS hairline grid `.site-bg` remains as the no-WebGL / pre-load fallback.
 - **Section index:** every home section has a mono index + label (`01 / Projeler`) on a full-width hairline rule above the title.
 - **Corner ticks** (`.ticks`): L-shaped accent marks on the four corners of hero/featured panels (background gradients, no extra DOM). Use on ≤2 elements per page.
 - **Signal highlight** (`.mark`): signal fill behind a word in the hero role line.
@@ -68,11 +74,11 @@ Rules: never `text-signal` on light backgrounds (use `text-accent`). Line alphas
 
 - Page transition: opacity + 8px, 0.3s in / 0.15s out (`mode="wait"` kept). Reduced motion: 0.15s fade.
 - Hero roles: `RotatingText` kept, mono, inside `.mark`; reduced motion → static first role + full list for screen readers.
-- Only CSS transitions on hover/focus. No RAF loops, no canvas, no WebGL anywhere.
+- UI chrome uses only CSS transitions on hover/focus. The only animation loops are the two Signal Field shaders.
 
 ## Removed (delete files + deps)
 
-Aurora (and `ogl`), Noise, ClickSpark, ASCIIText, GradientText, ShinyText, Magnet, MagicBento, TiltedCard, SpotlightCard, LogoLoop, CardMarquee, ProjectModal, `src/lib/utils.ts` (+ `clsx`, `tailwind-merge`), legacy Tailwind palettes/shadows/keyframes, legacy CSS classes, Google Fonts.
+Aurora (and `ogl`), Noise, ClickSpark, the old CPU ASCIIText (replaced by the shader-based AsciiName), GradientText, ShinyText, Magnet, MagicBento, TiltedCard, SpotlightCard, LogoLoop, CardMarquee, ProjectModal, `src/lib/utils.ts` (+ `clsx`, `tailwind-merge`), legacy Tailwind palettes/shadows/keyframes, legacy CSS classes, Google Fonts.
 
 ## Information architecture
 
