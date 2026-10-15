@@ -1,15 +1,16 @@
 import { PROJECTS, caseStudyPath } from '../data/projects';
 import { areaByPath } from '../data/areas';
 
-// Personal information
+// Personal information. Bilingual fields are { tr, en } (read with `pick` from src/data/projects.js).
 export const PERSONAL_INFO = {
   name: 'Mert Soylu',
   title: 'Junior Full-Stack Developer',
-  university: 'Kütahya Dumlupınar University',
+  university: { tr: 'Kütahya Dumlupınar Üniversitesi', en: 'Kütahya Dumlupınar University' },
   email: 's6ylumert@gmail.com',
   github: 'https://github.com/MertSoylu',
   linkedin: 'https://www.linkedin.com/in/mertsoylu/',
-  location: 'İzmir, Turkey',
+  location: { tr: 'İzmir, Türkiye', en: 'İzmir, Turkey' },
+  locationShort: 'İzmir, TR',
 };
 
 export const HERO_ROLES = {
@@ -23,58 +24,11 @@ export const HERO_ROLES = {
 };
 
 export const CV_LABEL = {
-  tr: 'CV İndir',
+  tr: 'CV indir',
   en: 'Download CV',
 };
 
 export const CV_PATH = '/cv.pdf';
-
-export const SKILLS_DESCRIPTIONS = {
-  web: {
-    icon: 'HiCode',
-    title: { tr: 'Web Geliştirme', en: 'Web Development' },
-    description: {
-      tr: 'React ve Tailwind ile ürün hissi olan, hızlı ve okunur web arayüzleri geliştiriyorum.',
-      en: 'Building fast, readable web interfaces with a product feel using React and Tailwind.',
-    },
-    technologies: ['React', 'JavaScript', 'Tailwind CSS', 'HTML/CSS'],
-    proficiency: 80,
-    link: '/web',
-  },
-  android: {
-    icon: 'HiAcademicCap',
-    title: { tr: 'Android Geliştirme', en: 'Android Development' },
-    description: {
-      tr: 'Native Android, Compose ve günlük kullanım akışlarına odaklanan mobil işler geliştiriyorum.',
-      en: 'Building mobile work around native Android, Compose, and daily-use flows.',
-    },
-    technologies: ['Kotlin', 'Jetpack Compose', 'Android Studio', 'Material 3'],
-    proficiency: 65,
-    link: '/android',
-  },
-  security: {
-    icon: 'HiShieldCheck',
-    title: { tr: 'Siber Güvenlik', en: 'Cybersecurity' },
-    description: {
-      tr: 'Web güvenliği, güvenli kodlama ve otomasyon araçlarını pratik projelerle çalışıyorum.',
-      en: 'Practicing web security, secure coding, and automation tools through practical projects.',
-    },
-    technologies: ['Python', 'Network Security', 'Encryption', 'Secure Coding'],
-    proficiency: 60,
-    link: '/cybersecurity',
-  },
-  datascience: {
-    icon: 'HiChip',
-    title: { tr: 'Veri Bilimi ve Derin Öğrenme', en: 'Data Science & Deep Learning' },
-    description: {
-      tr: 'Veri bilimi ve derin öğrenme temellerini küçük deneylerle güçlendiriyorum.',
-      en: 'Building data science and deep learning fundamentals through small experiments.',
-    },
-    technologies: ['Python', 'NumPy', 'Pandas', 'Deep Learning'],
-    proficiency: 40,
-    link: '/data-science',
-  },
-};
 
 export const CERTIFICATES = [
   {
@@ -185,29 +139,37 @@ export const SEO_META = {
   },
 };
 
+// Shown when the GitHub API is unreachable or returns nothing. Descriptions are bilingual; there is no
+// star count or update date because these are placeholders that point at the profile, not real repos.
 export const FALLBACK_PROJECTS = [
   {
     id: 'fallback-1',
     name: 'Portfolio Website',
-    description: 'Personal portfolio built with React, Vite, Tailwind CSS, and Framer Motion.',
-    html_url: 'https://github.com/MertSoylu',
+    description: {
+      tr: 'React, Vite, Tailwind CSS ve Framer Motion ile yapılmış kişisel portfolyo sitesi.',
+      en: 'Personal portfolio built with React, Vite, Tailwind CSS, and Framer Motion.',
+    },
+    html_url: PERSONAL_INFO.github,
     language: 'JavaScript',
-    stargazers_count: 0,
   },
   {
     id: 'fallback-2',
     name: 'Android App Projects',
-    description: 'Mobile projects built with Kotlin and Jetpack Compose on Android Studio.',
-    html_url: 'https://github.com/MertSoylu',
+    description: {
+      tr: "Android Studio'da Kotlin ve Jetpack Compose ile geliştirdiğim mobil projeler.",
+      en: 'Mobile projects built with Kotlin and Jetpack Compose on Android Studio.',
+    },
+    html_url: PERSONAL_INFO.github,
     language: 'Kotlin',
-    stargazers_count: 0,
   },
   {
     id: 'fallback-3',
     name: 'Cybersecurity Labs',
-    description: 'Hands-on security labs and learning projects on Linux and web security basics.',
-    html_url: 'https://github.com/MertSoylu',
+    description: {
+      tr: 'Linux ve web güvenliği temellerini çalıştığım uygulamalı güvenlik laboratuvarları.',
+      en: 'Hands-on security labs and learning projects on Linux and web security basics.',
+    },
+    html_url: PERSONAL_INFO.github,
     language: 'Python',
-    stargazers_count: 0,
   },
 ];

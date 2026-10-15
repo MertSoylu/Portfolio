@@ -1,79 +1,85 @@
-import { HiAcademicCap, HiExternalLink } from 'react-icons/hi';
+import { HiExternalLink } from 'react-icons/hi';
 import { useLanguage } from '../context/LanguageContext';
+import { pick } from '../data/projects';
 import { CERTIFICATES } from '../utils/constants';
 import SectionHeader from './home/SectionHeader';
+import NewTabNote from './ui/NewTabNote';
 import Reveal from './ui/Reveal';
-import TiltedCard from './ui/TiltedCard';
+
+// Dates are stored as 'YYYY' or 'YYYY-MM' and formatted per language (UTC so the day never shifts).
+const formatCertDate = (value, locale) => {
+  const [year, month] = String(value).split('-').map(Number);
+  if (!year) return String(value);
+  const date = new Date(Date.UTC(year, (month || 1) - 1, 1));
+  return new Intl.DateTimeFormat(locale, {
+    year: 'numeric',
+    ...(month ? { month: 'long' } : {}),
+    timeZone: 'UTC',
+  }).format(date);
+};
 
 const Certificates = () => {
   const { isTurkish } = useLanguage();
+  const t = (tr, en) => (isTurkish ? tr : en);
+  const locale = isTurkish ? 'tr-TR' : 'en-US';
 
   if (!CERTIFICATES.length) return null;
 
   return (
-    <section id="certificates" className="relative px-5 py-12 sm:py-20 md:py-24">
-      {/* Geniş ekranda başlık solda, kartlar sağda: az sayıda sertifika boşlukta kaybolmasın. */}
-      <div className="container-wide grid items-end gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:gap-12">
+    <section id="certificates" aria-labelledby="certificates-title" className="relative py-20 md:py-28">
+      <div className="container-site">
         <SectionHeader
-          className="!mb-0"
-          kicker={isTurkish ? 'Eğitim' : 'Training'}
-          kickerIcon={<HiAcademicCap className="h-4 w-4" />}
-          title={isTurkish ? 'Sertifikalar' : 'Certificates'}
-          lead={
-            isTurkish
-              ? 'Güvenlik ve yazılım temelimi güçlendiren eğitimler.'
-              : 'Training that strengthens my security and software fundamentals.'
-          }
+          id="certificates-title"
+          index="04"
+          label={t('Sertifikalar', 'Certificates')}
+          title={t('Eğitim ve sertifikalar.', 'Training and certificates.')}
+          lead={t(
+            'Güvenlik ve yazılım temelimi güçlendiren eğitimler.',
+            'Training that strengthens my security and software fundamentals.',
+          )}
         />
 
-        <div className={`grid gap-3 sm:gap-4 ${CERTIFICATES.length > 1 ? 'sm:grid-cols-2' : ''}`}>
+        <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {CERTIFICATES.map((cert, index) => (
-            <Reveal key={cert.id} delay={index * 0.07} className="h-full">
-              <TiltedCard className="h-full" rotateAmplitude={4} scaleOnHover={1.01}>
-                <div className="card card-hover group flex h-full flex-col p-4 sm:p-5">
-                  <div className="mb-3 flex items-start justify-between gap-3">
-                    <div className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-surface2 text-accent">
-                      <HiAcademicCap className="h-5 w-5" />
-                    </div>
-                    <span className="rounded-full border border-line/12 bg-surface2 px-2.5 py-0.5 text-[11px] font-semibold text-muted">
-                      {cert.date}
-                    </span>
-                  </div>
+            <Reveal as="li" key={cert.id} delay={index * 0.06} className="min-w-0">
+              <article className="card flex h-full flex-col p-5 sm:p-6">
+                <div className="flex items-baseline justify-between gap-4">
+                  <p className="label min-w-0">{cert.issuer}</p>
+                  <time dateTime={cert.date} className="micro shrink-0 text-muted">
+                    {formatCertDate(cert.date, locale)}
+                  </time>
+                </div>
 
-                  <h4 className="mb-1.5 font-display text-base font-semibold leading-snug text-fg sm:text-lg">
-                    {isTurkish ? cert.title.tr : cert.title.en}
-                  </h4>
-                  <p className="mb-3 text-xs font-medium text-muted sm:text-sm">{cert.issuer}</p>
+                <h3 className="text-h3 mt-5">{pick(cert.title, isTurkish)}</h3>
 
-                  {cert.skills?.length > 0 && (
-                    <div className="mb-4 flex flex-wrap gap-1.5">
-                      {cert.skills.map((skill) => (
-                        <span
-                          key={skill}
-                          className="rounded-full border border-line/12 bg-surface2 px-2 py-0.5 text-[10px] font-medium text-muted"
-                        >
-                          {skill}
-                        </span>
-                      ))}
-                    </div>
-                  )}
+                {cert.skills?.length > 0 && (
+                  <ul className="mt-5 flex flex-wrap gap-1.5">
+                    {cert.skills.map((skill) => (
+                      <li key={skill} className="tag">
+                        {skill}
+                      </li>
+                    ))}
+                  </ul>
+                )}
 
-                  {cert.fileUrl && (
+                {cert.fileUrl && (
+                  <p className="mt-auto pt-6">
                     <a
                       href={cert.fileUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="mt-auto inline-flex items-center gap-1.5 text-sm font-semibold text-accent hover:text-accent-strong"
+                      className="link relative inline-flex items-center gap-1.5 text-sm font-medium after:absolute after:inset-x-0 after:-inset-y-3 after:content-['']"
                     >
-                      {isTurkish ? 'Sertifikayı gör' : 'View certificate'}
-                      <HiExternalLink className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+                      {t("PDF'i aç", 'Open PDF')}
+                      <HiExternalLink aria-hidden="true" className="h-4 w-4" />
+                      <NewTabNote />
                     </a>
-                  )}
-                </div>
-              </TiltedCard>
+                  </p>
+                )}
+              </article>
             </Reveal>
           ))}
-        </div>
+        </ul>
       </div>
     </section>
   );

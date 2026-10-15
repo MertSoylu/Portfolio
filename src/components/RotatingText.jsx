@@ -1,9 +1,7 @@
 import { forwardRef, useCallback, useEffect, useImperativeHandle, useMemo, useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 
-function cn(...classes) {
-  return classes.filter(Boolean).join(' ');
-}
+const cx = (...classes) => classes.filter(Boolean).join(' ');
 
 const RotatingText = forwardRef(function RotatingText(
   {
@@ -29,6 +27,7 @@ const RotatingText = forwardRef(function RotatingText(
   ref,
 ) {
   const [currentTextIndex, setCurrentTextIndex] = useState(0);
+  const reduceMotion = useReducedMotion();
 
   const splitIntoCharacters = (text) => {
     if (typeof Intl !== 'undefined' && Intl.Segmenter) {
@@ -117,55 +116,63 @@ const RotatingText = forwardRef(function RotatingText(
 
   useImperativeHandle(ref, () => ({ next, previous, jumpTo, reset }), [next, previous, jumpTo, reset]);
 
+  // Reduced motion: no timer at all. The first text stays on screen (the imperative handle still works).
+  const rotates = auto && !reduceMotion && texts.length > 1;
+
   useEffect(() => {
-    if (!auto) return;
+    if (!rotates) return;
     const intervalId = setInterval(next, rotationInterval);
     return () => clearInterval(intervalId);
-  }, [next, rotationInterval, auto]);
+  }, [next, rotationInterval, rotates]);
 
   return (
     // Not: `layout` animasyonu bilerek yok. Hero'da y animasyonu yapan bir üst öğe içinde
     // framer-motion projeksiyonu metni eğip kaydırıyordu; genişlik değişimi artık anında olur.
-    <span className={cn('inline-flex flex-wrap whitespace-pre-wrap relative', mainClassName)} {...rest}>
-      <span className="sr-only">{texts[currentTextIndex]}</span>
-      <AnimatePresence mode={animatePresenceMode} initial={animatePresenceInitial}>
-        <motion.span
-          key={currentTextIndex}
-          className={cn(
-            splitBy === 'lines' ? 'flex flex-col w-full' : 'flex flex-wrap whitespace-pre-wrap relative',
-          )}
-          aria-hidden="true"
-        >
-          {elements.map((wordObj, wordIndex, array) => {
-            const previousCharsCount = array
-              .slice(0, wordIndex)
-              .reduce((sum, word) => sum + word.characters.length, 0);
-            return (
-              <span key={wordIndex} className={cn('inline-flex', splitLevelClassName)}>
-                {wordObj.characters.map((char, charIndex) => (
-                  <motion.span
-                    key={charIndex}
-                    initial={initial}
-                    animate={animate}
-                    exit={exit}
-                    transition={{
-                      ...transition,
-                      delay: getStaggerDelay(
-                        previousCharsCount + charIndex,
-                        array.reduce((sum, word) => sum + word.characters.length, 0),
-                      ),
-                    }}
-                    className={cn('inline-block', elementLevelClassName)}
-                  >
-                    {char}
-                  </motion.span>
-                ))}
-                {wordObj.needsSpace && <span className="whitespace-pre"> </span>}
-              </span>
-            );
-          })}
-        </motion.span>
-      </AnimatePresence>
+    <span className={cx('inline-flex flex-wrap whitespace-pre-wrap relative', mainClassName)} {...rest}>
+      {/* Screen readers get every text once, whatever the animation is showing. */}
+      <span className="sr-only">{texts.join(', ')}</span>
+      {reduceMotion ? (
+        <span aria-hidden="true">{texts[currentTextIndex]}</span>
+      ) : (
+        <AnimatePresence mode={animatePresenceMode} initial={animatePresenceInitial}>
+          <motion.span
+            key={currentTextIndex}
+            className={cx(
+              splitBy === 'lines' ? 'flex flex-col w-full' : 'flex flex-wrap whitespace-pre-wrap relative',
+            )}
+            aria-hidden="true"
+          >
+            {elements.map((wordObj, wordIndex, array) => {
+              const previousCharsCount = array
+                .slice(0, wordIndex)
+                .reduce((sum, word) => sum + word.characters.length, 0);
+              return (
+                <span key={wordIndex} className={cx('inline-flex', splitLevelClassName)}>
+                  {wordObj.characters.map((char, charIndex) => (
+                    <motion.span
+                      key={charIndex}
+                      initial={initial}
+                      animate={animate}
+                      exit={exit}
+                      transition={{
+                        ...transition,
+                        delay: getStaggerDelay(
+                          previousCharsCount + charIndex,
+                          array.reduce((sum, word) => sum + word.characters.length, 0),
+                        ),
+                      }}
+                      className={cx('inline-block', elementLevelClassName)}
+                    >
+                      {char}
+                    </motion.span>
+                  ))}
+                  {wordObj.needsSpace && <span className="whitespace-pre"> </span>}
+                </span>
+              );
+            })}
+          </motion.span>
+        </AnimatePresence>
+      )}
     </span>
   );
 });

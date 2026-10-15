@@ -1,75 +1,94 @@
 import { useRef, useState } from 'react';
 import emailjs from '@emailjs/browser';
-import { useReducedMotion } from 'framer-motion';
 import toast from 'react-hot-toast';
-import { HiArrowRight, HiCheckCircle, HiDownload, HiMail, HiXCircle } from 'react-icons/hi';
+import {
+  HiArrowRight,
+  HiCheckCircle,
+  HiDocumentText,
+  HiDownload,
+  HiExternalLink,
+  HiMail,
+  HiXCircle,
+} from 'react-icons/hi';
 import { FiGithub, FiLinkedin, FiMapPin } from 'react-icons/fi';
 import { useLanguage } from '../context/LanguageContext';
+import { pick } from '../data/projects';
 import { CV_LABEL, CV_PATH, PERSONAL_INFO } from '../utils/constants';
 import SectionHeader from './home/SectionHeader';
+import NewTabNote from './ui/NewTabNote';
 import Reveal from './ui/Reveal';
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-const MIN_NAME_LENGTH = 2;
-const MIN_SUBJECT_LENGTH = 3;
-const MIN_MESSAGE_LENGTH = 10;
 
-const validateField = (name, value, isTurkish) => {
-  const trimmed = (value ?? '').trim();
-  switch (name) {
-    case 'from_name':
-      if (!trimmed) return isTurkish ? 'İsim zorunlu.' : 'Name is required.';
-      if (trimmed.length < MIN_NAME_LENGTH)
-        return isTurkish ? 'En az 2 karakter olmalı.' : 'Must be at least 2 characters.';
-      return '';
-    case 'from_email':
-      if (!trimmed) return isTurkish ? 'E-posta zorunlu.' : 'Email is required.';
-      if (!EMAIL_REGEX.test(trimmed)) return isTurkish ? 'Geçerli e-posta gir.' : 'Enter a valid email.';
-      return '';
-    case 'subject':
-      if (!trimmed) return isTurkish ? 'Konu zorunlu.' : 'Subject is required.';
-      if (trimmed.length < MIN_SUBJECT_LENGTH)
-        return isTurkish ? 'En az 3 karakter olmalı.' : 'Must be at least 3 characters.';
-      return '';
-    case 'message':
-      if (!trimmed) return isTurkish ? 'Mesaj zorunlu.' : 'Message is required.';
-      if (trimmed.length < MIN_MESSAGE_LENGTH)
-        return isTurkish ? 'En az 10 karakter olmalı.' : 'Must be at least 10 characters.';
-      return '';
-    default:
-      return '';
-  }
+// Per-field rules. Errors are stored as codes ('required' | 'min' | 'email') and turned into text at
+// render time, so a language switch re-words messages that are already on screen.
+const FIELDS = {
+  from_name: { min: 2, required: { tr: 'İsim zorunlu.', en: 'Name is required.' } },
+  from_email: { email: true, required: { tr: 'E-posta zorunlu.', en: 'Email is required.' } },
+  subject: { min: 3, required: { tr: 'Konu zorunlu.', en: 'Subject is required.' } },
+  message: { min: 10, required: { tr: 'Mesaj zorunlu.', en: 'Message is required.' } },
 };
+const FIELD_NAMES = Object.keys(FIELDS);
+
+const validateField = (name, value) => {
+  const rule = FIELDS[name];
+  const trimmed = (value ?? '').trim();
+  if (!rule) return '';
+  if (!trimmed) return 'required';
+  if (rule.email && !EMAIL_REGEX.test(trimmed)) return 'email';
+  if (rule.min && trimmed.length < rule.min) return 'min';
+  return '';
+};
+
+const errorText = (name, code, isTurkish) => {
+  if (code === 'required') return pick(FIELDS[name].required, isTurkish);
+  if (code === 'email') return isTurkish ? 'Geçerli e-posta gir.' : 'Enter a valid email.';
+  if (code === 'min') {
+    const { min } = FIELDS[name];
+    return isTurkish ? `En az ${min} karakter olmalı.` : `Must be at least ${min} characters.`;
+  }
+  return '';
+};
+
+const inputBase =
+  'block w-full min-h-11 rounded-md border bg-surface2 px-3.5 py-2.5 text-base text-fg placeholder:text-muted transition-colors sm:text-sm';
 
 const ContactForm = ({ isTurkish }) => {
   const formRef = useRef(null);
   const [status, setStatus] = useState('idle');
   const [errors, setErrors] = useState({});
   const [touched, setTouched] = useState({});
+  const t = (tr, en) => (isTurkish ? tr : en);
 
   const handleBlur = (event) => {
     const { name, value } = event.target;
     setTouched((prev) => ({ ...prev, [name]: true }));
-    setErrors((prev) => ({ ...prev, [name]: validateField(name, value, isTurkish) }));
+    setErrors((prev) => ({ ...prev, [name]: validateField(name, value) }));
   };
 
   const handleChange = (event) => {
     const { name, value } = event.target;
+    // Editing after a send attempt dismisses the result banner.
+    if (status === 'success' || status === 'error') setStatus('idle');
     if (!touched[name]) return;
-    setErrors((prev) => ({ ...prev, [name]: validateField(name, value, isTurkish) }));
+    setErrors((prev) => ({ ...prev, [name]: validateField(name, value) }));
   };
 
   const validateAll = () => {
     if (!formRef.current) return false;
     const data = new FormData(formRef.current);
     const nextErrors = {};
-    ['from_name', 'from_email', 'subject', 'message'].forEach((field) => {
-      const error = validateField(field, data.get(field), isTurkish);
-      if (error) nextErrors[field] = error;
+    FIELD_NAMES.forEach((field) => {
+      const code = validateField(field, data.get(field));
+      if (code) nextErrors[field] = code;
     });
     setErrors(nextErrors);
-    setTouched({ from_name: true, from_email: true, subject: true, message: true });
-    return Object.keys(nextErrors).length === 0;
+    setTouched(Object.fromEntries(FIELD_NAMES.map((field) => [field, true])));
+    if (Object.keys(nextErrors).length > 0) {
+      formRef.current.elements.namedItem(FIELD_NAMES.find((field) => nextErrors[field]))?.focus();
+      return false;
+    }
+    return true;
   };
 
   const handleSubmit = async (event) => {
@@ -92,33 +111,51 @@ const ContactForm = ({ isTurkish }) => {
         { publicKey: import.meta.env.VITE_EMAILJS_PUBLIC_KEY },
       );
       setStatus('success');
-      toast.success(isTurkish ? 'Mesaj iletildi.' : 'Message sent.');
+      toast.success(t('Mesaj iletildi.', 'Message sent.'));
       formRef.current?.reset();
       setErrors({});
       setTouched({});
     } catch {
       setStatus('error');
-      toast.error(isTurkish ? 'Mesaj gönderilemedi.' : 'Could not send message.');
+      toast.error(t('Mesaj gönderilemedi.', 'Could not send message.'));
     }
   };
 
-  const baseInput =
-    'w-full rounded-xl border bg-surface2 px-4 py-3 text-sm text-fg placeholder-muted outline-none transition-colors';
-  const inputClass = (field) => {
-    const showError = touched[field] && errors[field];
-    return `${baseInput} ${showError ? 'border-red-400 focus:border-red-500' : 'border-line/12 focus:border-accent'}`;
+  const shown = (field) => (touched[field] && errors[field] ? errors[field] : '');
+  const inputProps = (field) => {
+    const code = shown(field);
+    return {
+      id: field,
+      name: field,
+      required: true,
+      'aria-required': true,
+      'aria-invalid': Boolean(code),
+      'aria-describedby': code ? `${field}-error` : undefined,
+      onBlur: handleBlur,
+      onChange: handleChange,
+      className: `${inputBase} ${code ? 'border-danger' : 'border-line/15 focus:border-accent'}`,
+    };
   };
-  const labelClass = 'mb-2 block text-xs font-semibold uppercase tracking-[0.16em] text-muted';
-  const renderError = (field) =>
-    touched[field] && errors[field] ? (
-      <p className="mt-1 text-xs font-medium text-red-500" role="alert">
-        {errors[field]}
+  const messageProps = inputProps('message');
+  const labelClass = 'label mb-2 block';
+  const renderError = (field) => {
+    const code = shown(field);
+    return code ? (
+      <p id={`${field}-error`} className="mt-1.5 text-sm text-danger">
+        {errorText(field, code, isTurkish)}
       </p>
     ) : null;
+  };
 
   return (
-    <Reveal delay={0.05}>
-      <form ref={formRef} onSubmit={handleSubmit} className="card space-y-3 sm:space-y-4 p-5 sm:p-6 lg:p-8">
+    <Reveal delay={0.06} className="min-w-0 lg:col-span-7">
+      <form
+        ref={formRef}
+        onSubmit={handleSubmit}
+        noValidate
+        aria-labelledby="contact-form-title"
+        className="card relative space-y-4 p-5 sm:p-6 lg:p-8"
+      >
         <input
           type="text"
           name="website"
@@ -127,42 +164,36 @@ const ContactForm = ({ isTurkish }) => {
           aria-hidden="true"
           className="absolute -left-[9999px] top-auto h-0 w-0 overflow-hidden border-0 p-0 opacity-0"
         />
+
         <div>
-          <h3 className="text-h3 text-fg">{isTurkish ? 'Birlikte konuşalım' : 'Let’s talk'}</h3>
+          <h3 id="contact-form-title" className="text-h3">
+            {t('Mesaj gönder', 'Send a message')}
+          </h3>
+          <p className="mt-2 text-sm text-muted">{t('Tüm alanlar zorunlu.', 'All fields are required.')}</p>
         </div>
 
-        <div className="grid gap-3 sm:grid-cols-2">
+        <div className="grid gap-4 sm:grid-cols-2">
           <div>
             <label htmlFor="from_name" className={labelClass}>
-              {isTurkish ? 'Ad' : 'Name'}
+              {t('Ad', 'Name')}
             </label>
             <input
-              id="from_name"
               type="text"
-              name="from_name"
-              required
-              placeholder={isTurkish ? 'Adın Soyadın' : 'Your name'}
-              className={inputClass('from_name')}
-              onBlur={handleBlur}
-              onChange={handleChange}
-              aria-invalid={Boolean(touched.from_name && errors.from_name)}
+              autoComplete="name"
+              placeholder={t('Adın Soyadın', 'Your name')}
+              {...inputProps('from_name')}
             />
             {renderError('from_name')}
           </div>
           <div>
             <label htmlFor="from_email" className={labelClass}>
-              {isTurkish ? 'E-posta' : 'Email'}
+              {t('E-posta', 'Email')}
             </label>
             <input
-              id="from_email"
               type="email"
-              name="from_email"
-              required
+              autoComplete="email"
               placeholder="email@example.com"
-              className={inputClass('from_email')}
-              onBlur={handleBlur}
-              onChange={handleChange}
-              aria-invalid={Boolean(touched.from_email && errors.from_email)}
+              {...inputProps('from_email')}
             />
             {renderError('from_email')}
           </div>
@@ -170,72 +201,65 @@ const ContactForm = ({ isTurkish }) => {
 
         <div>
           <label htmlFor="subject" className={labelClass}>
-            {isTurkish ? 'Konu' : 'Subject'}
+            {t('Konu', 'Subject')}
           </label>
           <input
-            id="subject"
             type="text"
-            name="subject"
-            required
-            placeholder={isTurkish ? 'Ne hakkında?' : 'What is this about?'}
-            className={inputClass('subject')}
-            onBlur={handleBlur}
-            onChange={handleChange}
-            aria-invalid={Boolean(touched.subject && errors.subject)}
+            placeholder={t('Ne hakkında?', 'What is this about?')}
+            {...inputProps('subject')}
           />
           {renderError('subject')}
         </div>
 
         <div>
           <label htmlFor="message" className={labelClass}>
-            {isTurkish ? 'Mesaj' : 'Message'}
+            {t('Mesaj', 'Message')}
           </label>
           <textarea
-            id="message"
-            name="message"
-            required
             rows={5}
-            placeholder={isTurkish ? 'Mesajını yaz...' : 'Write your message...'}
-            className={`${inputClass('message')} resize-none`}
-            onBlur={handleBlur}
-            onChange={handleChange}
-            aria-invalid={Boolean(touched.message && errors.message)}
+            placeholder={t('Mesajını yaz...', 'Write your message...')}
+            {...messageProps}
+            className={`${messageProps.className} resize-y`}
           />
           {renderError('message')}
         </div>
 
-        {status === 'success' && (
-          <div className="flex items-center gap-2 rounded-xl border border-emerald-400/40 bg-emerald-500/10 px-4 py-3 text-sm font-medium text-emerald-700 dark:text-emerald-300">
-            <HiCheckCircle className="h-5 w-5" />
-            {isTurkish
-              ? 'Mesajın iletildi. En kısa sürede döneceğim.'
-              : 'Message sent. I will get back to you soon.'}
-          </div>
-        )}
-        {status === 'error' && (
-          <div className="flex items-center gap-2 rounded-xl border border-red-400/40 bg-red-500/10 px-4 py-3 text-sm font-medium text-red-600 dark:text-red-300">
-            <HiXCircle className="h-5 w-5" />
-            {isTurkish
-              ? 'Bir hata oluştu. E-posta ile ulaşabilirsin.'
-              : 'Something went wrong. You can email me directly.'}
-          </div>
-        )}
+        <div aria-live="polite">
+          {status === 'success' && (
+            <p className="flex items-start gap-2.5 rounded-md border border-ok/30 bg-ok/10 px-4 py-3 text-sm">
+              <HiCheckCircle aria-hidden="true" className="mt-0.5 h-5 w-5 shrink-0 text-ok" />
+              {t('Mesajın iletildi. En kısa sürede döneceğim.', 'Message sent. I will get back to you soon.')}
+            </p>
+          )}
+          {status === 'error' && (
+            <p className="flex items-start gap-2.5 rounded-md border border-danger/30 bg-danger/10 px-4 py-3 text-sm">
+              <HiXCircle aria-hidden="true" className="mt-0.5 h-5 w-5 shrink-0 text-danger" />
+              {t(
+                'Bir hata oluştu. E-posta ile ulaşabilirsin.',
+                'Something went wrong. You can email me directly.',
+              )}
+            </p>
+          )}
+        </div>
 
         <button
           type="submit"
           disabled={status === 'sending'}
-          className="btn-primary w-full disabled:cursor-not-allowed disabled:opacity-60"
+          aria-busy={status === 'sending'}
+          className="btn-primary btn-lg w-full"
         >
           {status === 'sending' ? (
             <>
-              <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/40 border-t-white" />
-              {isTurkish ? 'Gönderiliyor...' : 'Sending...'}
+              <span
+                aria-hidden="true"
+                className="h-4 w-4 rounded-full border-2 border-signal-fg/30 border-t-signal-fg motion-safe:animate-spin"
+              />
+              {t('Gönderiliyor...', 'Sending...')}
             </>
           ) : (
             <>
-              <HiMail className="h-5 w-5" />
-              {isTurkish ? 'Gönder' : 'Send message'}
-              <HiArrowRight className="h-4 w-4" />
+              {t('Mesajı gönder', 'Send message')}
+              <HiArrowRight aria-hidden="true" className="h-4 w-4" />
             </>
           )}
         </button>
@@ -244,115 +268,120 @@ const ContactForm = ({ isTurkish }) => {
   );
 };
 
+const displayUrl = (url) => url.replace(/^https?:\/\/(www\.)?/, '').replace(/\/$/, '');
+
 const ChannelRow = ({ item }) => {
   const body = (
-    <div className="flex items-center gap-4 py-4">
-      <span className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-surface2 text-accent">
-        {item.icon}
+    <>
+      <item.Icon aria-hidden="true" className="h-5 w-5 shrink-0 text-muted" />
+      <span className="min-w-0 flex-1">
+        <span className="label block">{item.label}</span>
+        <span className="mt-0.5 block break-all text-sm font-medium">{item.value}</span>
       </span>
-      <div className="min-w-0 flex-1">
-        <p className="text-xs font-semibold uppercase tracking-[0.16em] text-muted">{item.label}</p>
-        <p className="break-all text-sm font-semibold text-fg">{item.value}</p>
-      </div>
-      {item.href && (
-        <HiArrowRight className="h-4 w-4 shrink-0 -translate-x-1 text-muted opacity-0 transition-all duration-300 group-hover:translate-x-0 group-hover:text-accent group-hover:opacity-100" />
+      {item.EndIcon && (
+        <item.EndIcon
+          aria-hidden="true"
+          className="h-4 w-4 shrink-0 text-muted transition-[transform,color] duration-150 group-hover:translate-x-0.5 group-hover:text-accent"
+        />
       )}
-    </div>
+    </>
   );
 
-  const wrapperClass =
-    'group block border-b border-line/10 transition-colors last:border-0 hover:bg-surface2';
+  const rowClass = 'flex min-h-16 items-center gap-4 border-b border-line/10 py-3.5';
+  if (!item.href) return <div className={rowClass}>{body}</div>;
 
-  if (!item.href) return <div className={wrapperClass}>{body}</div>;
-
+  const external = item.href.startsWith('http');
   return (
     <a
       href={item.href}
-      target={item.href.startsWith('http') ? '_blank' : undefined}
-      rel={item.href.startsWith('http') ? 'noopener noreferrer' : undefined}
+      target={external ? '_blank' : undefined}
+      rel={external ? 'noopener noreferrer' : undefined}
       download={item.download}
-      className={wrapperClass}
+      className={`group ${rowClass} transition-colors hover:text-accent`}
     >
       {body}
+      {external && <NewTabNote />}
     </a>
   );
 };
 
 const Contact = () => {
   const { isTurkish } = useLanguage();
-  const reduce = useReducedMotion();
+  const t = (tr, en) => (isTurkish ? tr : en);
 
-  const contactInfo = [
+  const channels = [
     {
-      icon: <HiMail className="h-5 w-5" />,
-      label: isTurkish ? 'E-posta' : 'Email',
+      Icon: HiMail,
+      EndIcon: HiArrowRight,
+      label: t('E-posta', 'Email'),
       value: PERSONAL_INFO.email,
       href: `mailto:${PERSONAL_INFO.email}`,
     },
     {
-      icon: <FiLinkedin className="h-5 w-5" />,
+      Icon: FiLinkedin,
+      EndIcon: HiExternalLink,
       label: 'LinkedIn',
-      value: 'mert-soylu',
-      href: 'https://www.linkedin.com/in/mertsoylu/',
+      value: displayUrl(PERSONAL_INFO.linkedin),
+      href: PERSONAL_INFO.linkedin,
     },
     {
-      icon: <FiGithub className="h-5 w-5" />,
+      Icon: FiGithub,
+      EndIcon: HiExternalLink,
       label: 'GitHub',
-      value: 'MertSoylu',
-      href: 'https://github.com/MertSoylu',
+      value: displayUrl(PERSONAL_INFO.github),
+      href: PERSONAL_INFO.github,
     },
     {
-      icon: <FiMapPin className="h-5 w-5" />,
-      label: isTurkish ? 'Konum' : 'Location',
-      value: 'İzmir, Turkey',
-      href: null,
-    },
-    {
-      icon: <HiDownload className="h-5 w-5" />,
+      Icon: HiDocumentText,
+      EndIcon: HiDownload,
       label: 'CV',
       value: isTurkish ? CV_LABEL.tr : CV_LABEL.en,
       href: CV_PATH,
       download: true,
     },
+    {
+      Icon: FiMapPin,
+      label: t('Konum', 'Location'),
+      value: pick(PERSONAL_INFO.location, isTurkish),
+    },
   ];
 
   return (
-    <section id="contact" className="relative px-5 py-12 sm:py-20 md:py-24">
-      <div className="container-wide">
+    <section id="contact" aria-labelledby="contact-title" className="relative py-20 md:py-28">
+      <div className="container-site">
         <SectionHeader
-          kicker={isTurkish ? 'İletişim' : 'Contact'}
-          kickerIcon={<HiMail className="h-4 w-4" />}
-          title={isTurkish ? 'İletişim' : 'Get in touch'}
-          lead={
-            isTurkish
-              ? 'Full-stack, Android veya AI odaklı işler için kısa bir mesaj yeterli.'
-              : 'A short message is enough for full-stack, Android, or AI-focused opportunities.'
-          }
+          id="contact-title"
+          index="05"
+          label={t('İletişim', 'Contact')}
+          title={t('Birlikte çalışalım.', 'Let’s work together.')}
+          lead={t(
+            'Full-stack, Android veya AI odaklı işler için kısa bir mesaj yeterli.',
+            'A short message is enough for full-stack, Android, or AI-focused opportunities.',
+          )}
           aside={
-            <div className="inline-flex items-center gap-2.5 rounded-full border border-emerald-400/40 bg-emerald-500/10 px-4 py-2">
-              <span className="relative flex h-2.5 w-2.5">
-                {!reduce && (
-                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400/70" />
-                )}
-                <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-emerald-500" />
-              </span>
-              <span className="text-xs font-semibold uppercase tracking-[0.16em] text-emerald-700 dark:text-emerald-300">
-                {isTurkish ? 'Remote / hibrit açık' : 'Open to remote / hybrid'}
-              </span>
-            </div>
+            <p className="inline-flex items-center gap-2.5 rounded-full border border-ok/30 bg-ok/10 px-4 py-2 text-sm">
+              <span className="status-dot" aria-hidden="true" />
+              {t('Uzaktan / hibrit işlere açığım', 'Open to remote / hybrid work')}
+            </p>
           }
         />
 
-        <div className="grid gap-4 sm:gap-6 lg:grid-cols-[0.85fr_1.15fr]">
-          <Reveal className="card h-full p-5 sm:p-6 lg:p-8">
-            <h3 className="mb-4 text-h3 text-fg">
-              {isTurkish ? 'Ulaşılabilir kanallar' : 'Available channels'}
-            </h3>
-            <div className="-my-1">
-              {contactInfo.map((item) => (
-                <ChannelRow key={item.label} item={item} />
+        <div className="grid gap-10 lg:grid-cols-12 lg:gap-12">
+          <Reveal className="min-w-0 lg:col-span-5">
+            <h3 className="text-h3">{t('Kanallar', 'Channels')}</h3>
+            <p className="mt-3 max-w-md text-muted">
+              {t(
+                'Aşağıdaki kanallardan birini seç ya da formu doldur; mesajın doğrudan bana ulaşır.',
+                'Pick a channel below or fill in the form; your message comes straight to me.',
+              )}
+            </p>
+            <ul className="mt-6 border-t border-line/10">
+              {channels.map((item) => (
+                <li key={item.label}>
+                  <ChannelRow item={item} />
+                </li>
               ))}
-            </div>
+            </ul>
           </Reveal>
 
           <ContactForm isTurkish={isTurkish} />

@@ -1,170 +1,159 @@
-import { useEffect, useState } from 'react';
-import { motion } from 'framer-motion';
+import { useReducedMotion } from 'framer-motion';
 import { Link } from 'react-router-dom';
-import { HiArrowRight, HiMail } from 'react-icons/hi';
+import { HiArrowRight, HiDownload, HiMail } from 'react-icons/hi';
 import { useLanguage } from '../context/LanguageContext';
-import { fetchGitHubRepos } from '../utils/githubApi';
-import { HERO_ROLES } from '../utils/constants';
-import ASCIIText from './ui/ASCIIText';
+import { AREAS } from '../data/areas';
+import { PROJECTS, caseStudyPath, pick } from '../data/projects';
+import { useGitHubRepos } from '../hooks/useGitHubRepos';
+import { CV_LABEL, CV_PATH, HERO_ROLES, PERSONAL_INFO } from '../utils/constants';
+import { isPlainLeftClick, scrollToSection } from '../utils/scroll';
+import Reveal from './ui/Reveal';
 import RotatingText from './RotatingText';
-import GradientText from './ui/GradientText';
 
-const EASE = [0.22, 1, 0.36, 1];
+// "a React Developer" / "an Android Developer": the English role line is a sentence ("I'm …").
+const withArticle = (role) => `${/^[aeiou]/i.test(role) ? 'an' : 'a'} ${role}`;
 
-const container = {
-  hidden: {},
-  visible: { transition: { staggerChildren: 0.1, delayChildren: 0.05 } },
-};
+const Row = ({ label, children }) => (
+  <div className="grid grid-cols-[6.5rem_minmax(0,1fr)] items-baseline gap-x-4 border-t border-line/10 py-3 first:border-t-0 first:pt-0 last:pb-0 sm:grid-cols-[7.5rem_minmax(0,1fr)]">
+    <dt className="label">{label}</dt>
+    <dd className="min-w-0 text-sm">{children}</dd>
+  </div>
+);
 
-const item = {
-  hidden: { opacity: 0, y: 20 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: EASE } },
-};
+const areaLinkClass =
+  'inline-flex min-h-11 items-center text-fg underline decoration-line/25 underline-offset-4 transition-colors hover:text-accent hover:decoration-accent lg:min-h-8';
 
 const Hero = () => {
   const { isTurkish } = useLanguage();
-  const [repoCount, setRepoCount] = useState(null);
-  const [asciiWaves, setAsciiWaves] = useState(false);
-  const roles = isTurkish ? HERO_ROLES.tr : HERO_ROLES.en;
+  const reduce = useReducedMotion();
+  const { status, repos } = useGitHubRepos();
+  const t = (tr, en) => (isTurkish ? tr : en);
 
-  // Wave the ASCII name only on sm+ (desktop). Keep it static on mobile.
-  useEffect(() => {
-    const mq = window.matchMedia('(min-width: 640px)');
-    const update = () => setAsciiWaves(mq.matches);
-    update();
-    mq.addEventListener('change', update);
-    return () => mq.removeEventListener('change', update);
-  }, []);
+  const roles = isTurkish ? HERO_ROLES.tr : HERO_ROLES.en.map(withArticle);
+  const latest = PROJECTS.find((project) => project.featured) ?? PROJECTS[0];
+  // The count row only exists once GitHub has answered with something.
+  const repoCount = status === 'success' && repos.length > 0 ? repos.length : null;
 
-  useEffect(() => {
-    fetchGitHubRepos()
-      .then((repos) => setRepoCount(repos.length))
-      .catch(() => setRepoCount(null));
-  }, []);
-
-  const handleProjectJump = (event) => {
-    event.preventDefault();
-    const target = document.getElementById('projects');
-    if (!target) return;
-    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    window.history.pushState(null, '', '#projects');
-    target.scrollIntoView({ behavior: prefersReducedMotion ? 'auto' : 'smooth', block: 'start' });
-  };
-
-  const handleContactJump = (event) => {
-    event.preventDefault();
-    const target = document.getElementById('contact');
-    if (!target) return;
-    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    window.history.pushState(null, '', '#contact');
-    target.scrollIntoView({ behavior: prefersReducedMotion ? 'auto' : 'smooth', block: 'start' });
+  const jumpTo = (id) => (event) => {
+    if (!isPlainLeftClick(event)) return;
+    if (scrollToSection(id, reduce)) event.preventDefault();
   };
 
   return (
-    <section className="relative min-h-screen flex items-center justify-center px-5 pt-24 pb-16 sm:pt-28 sm:pb-20">
-      <div className="container-wide">
-        <motion.div
-          variants={container}
-          initial="hidden"
-          animate="visible"
-          className="mx-auto max-w-3xl text-center"
-        >
-          <motion.div variants={item} className="mb-6 flex justify-center sm:mb-8">
-            <Link
-              to="/case-study/noble"
-              className="group inline-flex items-center gap-2 rounded-full border border-line/15 bg-surface/70 py-1 pl-1 pr-3 text-xs font-medium text-muted backdrop-blur-sm transition-colors hover:border-accent/40 hover:text-fg"
-            >
-              <span className="rounded-full bg-accent px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-white">
-                {isTurkish ? 'Yeni' : 'New'}
-              </span>
-              {isTurkish ? 'NOBLE: Rust ile terminal çalışma alanı' : 'NOBLE: a terminal workspace in Rust'}
-              <HiArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
-            </Link>
-          </motion.div>
+    <section aria-labelledby="hero-title" className="relative pb-8 pt-28 md:pb-10 md:pt-36">
+      <div className="container-site grid items-start gap-12 lg:grid-cols-12 lg:gap-12">
+        <div className="min-w-0 lg:col-span-7">
+          <Reveal className="flex flex-wrap items-center gap-x-4 gap-y-3">
+            <p className="inline-flex items-center gap-2.5 rounded-full border border-line/15 bg-surface px-3.5 py-2 text-sm">
+              <span className="status-dot" aria-hidden="true" />
+              {t('Uzaktan / hibrit işlere açığım', 'Open to remote / hybrid work')}
+            </p>
+            <p className="label">{PERSONAL_INFO.locationShort}</p>
+          </Reveal>
 
-          <motion.p variants={item} className="eyebrow mb-4 text-accent sm:mb-6">
-            {isTurkish ? 'Merhaba, ben' : "Hi, I'm"}
-          </motion.p>
+          <Reveal as="h1" id="hero-title" delay={0.06} className="text-display mt-8">
+            {PERSONAL_INFO.name}
+          </Reveal>
 
-          <motion.div variants={item} className="mb-1 w-full sm:mb-2">
-            <h1 className="sr-only">Mert Soylu</h1>
-            {/* ASCII signature on every breakpoint; component auto-shrinks text to fit narrow widths. */}
-            <div aria-hidden="true" className="-mx-5 flex justify-center sm:mx-0">
-              <ASCIIText
-                text="Mert Soylu"
-                asciiFontSize={asciiWaves ? 10 : 6}
-                enableWaves={asciiWaves}
-                className="w-full max-w-2xl h-28 sm:h-40"
-              />
-            </div>
-          </motion.div>
-
-          <motion.p
-            variants={item}
-            className="mt-3 font-display text-xl font-medium sm:mt-4 sm:text-2xl lg:text-3xl"
+          {/* Stable height whatever role is showing: the prefix always sits on its own row below sm, and the
+              type steps down so the longest role ("Junior Full-Stack Geliştirici") still fits on one row. */}
+          <Reveal
+            as="p"
+            delay={0.12}
+            className="mt-6 flex flex-col items-start gap-2 text-[0.9375rem] text-muted min-[360px]:text-base sm:flex-row sm:flex-wrap sm:items-baseline sm:gap-x-3 sm:text-xl"
           >
-            <span aria-hidden="true">
-              <RotatingText
-                texts={roles}
-                rotationInterval={3000}
-                mainClassName="justify-center text-accent"
-                splitLevelClassName="overflow-hidden pb-1"
-                splitBy="characters"
-                staggerDuration={0.02}
-                staggerFrom="last"
-                transition={{ type: 'spring', damping: 25, stiffness: 260 }}
-              />
-            </span>
-            <span className="sr-only">{roles[0]}</span>
-          </motion.p>
+            <span>{t('Ben bir', "I'm")}</span>
+            <RotatingText
+              texts={roles}
+              rotationInterval={3200}
+              mainClassName="mark font-mono"
+              splitLevelClassName="overflow-hidden pb-1"
+              splitBy="characters"
+              staggerDuration={0.012}
+              staggerFrom="last"
+              transition={{ type: 'spring', damping: 25, stiffness: 260 }}
+            />
+          </Reveal>
 
-          <motion.p variants={item} className="mt-4 mx-auto max-w-xl text-body-lg text-muted sm:mt-6">
-            {isTurkish
-              ? 'Web, Android, güvenlik ve yapay zeka alanlarında çalışıyorum; fikirleri hızlı, okunur ve gerçekten çalışan arayüzlere dönüştürüyorum.'
-              : 'I work across web, Android, security, and AI — turning ideas into fast, readable interfaces that actually ship.'}
-          </motion.p>
-
-          <motion.div variants={item} className="mt-8 flex flex-wrap justify-center gap-3 sm:mt-10 sm:gap-4">
-            <a
-              href="#projects"
-              onClick={handleProjectJump}
-              className="group relative inline-flex items-center gap-2 rounded-full border border-accent/30 bg-accent/5 px-6 py-3 text-sm font-semibold text-fg transition-all duration-300 hover:border-accent/60 hover:bg-accent/10 hover:shadow-[0_0_20px_rgba(194,86,47,0.15)]"
-            >
-              <GradientText
-                colors={['#C2562F', '#FF9FFC', '#C2562F']}
-                animationSpeed={6}
-                className="!text-sm !font-semibold"
-              >
-                {isTurkish ? 'Projeleri incele' : 'View projects'}
-              </GradientText>
-              <HiArrowRight className="h-4 w-4 text-accent transition-transform duration-300 group-hover:translate-x-1" />
-            </a>
-            <a
-              href="#contact"
-              onClick={handleContactJump}
-              className="group inline-flex items-center gap-2 rounded-full border border-line/20 bg-surface px-6 py-3 text-sm font-semibold text-muted transition-all duration-300 hover:border-line/40 hover:text-fg hover:shadow-soft"
-            >
-              <HiMail className="h-4 w-4" />
-              {isTurkish ? 'İletişime geç' : 'Get in touch'}
-            </a>
-          </motion.div>
-
-          <motion.div
-            variants={item}
-            className="mt-6 flex flex-wrap justify-center items-center gap-x-6 gap-y-2 text-sm text-muted sm:mt-8"
-          >
-            {repoCount != null && (
-              <span className="inline-flex items-center gap-2">
-                <span className="font-display text-base font-semibold text-fg">{repoCount}</span>
-                {isTurkish ? 'public repo' : repoCount === 1 ? 'public repo' : 'public repos'}
-              </span>
+          <Reveal as="p" delay={0.18} className="text-lead mt-6 max-w-xl">
+            {t(
+              'Web, Android, güvenlik ve yapay zekâ alanlarında çalışıyorum; fikirleri hızlı, okunur ve gerçekten çalışan arayüzlere dönüştürüyorum.',
+              'I work across web, Android, security, and AI — turning ideas into fast, readable interfaces that actually ship.',
             )}
-            <span className="inline-flex items-center gap-2">
-              <span className="h-2 w-2 rounded-full bg-emerald-500" />
-              {isTurkish ? 'Remote / hibrit çalışmaya açık' : 'Open to remote / hybrid'}
-            </span>
-          </motion.div>
-        </motion.div>
+          </Reveal>
+
+          <Reveal delay={0.24} className="mt-10 flex flex-wrap gap-3">
+            <Link
+              to={{ pathname: '/', hash: '#projects' }}
+              onClick={jumpTo('projects')}
+              className="btn-primary btn-lg w-full sm:w-auto"
+            >
+              {t('Projeleri gör', 'View projects')}
+              <HiArrowRight aria-hidden="true" className="h-4 w-4" />
+            </Link>
+            <a href={CV_PATH} download className="btn-secondary btn-lg w-full sm:w-auto">
+              <HiDownload aria-hidden="true" className="h-4 w-4" />
+              {isTurkish ? CV_LABEL.tr : CV_LABEL.en}
+            </a>
+            <Link
+              to={{ pathname: '/', hash: '#contact' }}
+              onClick={jumpTo('contact')}
+              className="btn-ghost btn-lg w-full sm:w-auto"
+            >
+              <HiMail aria-hidden="true" className="h-4 w-4" />
+              {t('İletişim', 'Contact')}
+            </Link>
+          </Reveal>
+        </div>
+
+        <Reveal delay={0.18} className="min-w-0 lg:col-span-5 lg:mt-6">
+          <aside aria-labelledby="hero-now" className="card ticks p-6 sm:p-7">
+            <h2 id="hero-now" className="label mb-5 text-fg">
+              {t('Şu an', 'Now')}
+            </h2>
+            <dl>
+              <Row label={t('Son çıkan', 'Latest release')}>
+                <span className="flex flex-wrap items-center gap-x-3 gap-y-1">
+                  <Link
+                    to={caseStudyPath(latest.id)}
+                    className="inline-flex min-h-11 items-center font-medium text-fg underline decoration-line/25 underline-offset-4 transition-colors hover:text-accent hover:decoration-accent lg:min-h-8"
+                  >
+                    {latest.title}
+                  </Link>
+                  <span className="tag border-transparent bg-signal font-medium text-signal-fg">
+                    {t('YENİ', 'NEW')}
+                  </span>
+                </span>
+                <span className="micro block text-muted">
+                  {latest.tags
+                    .slice(0, 2)
+                    .map((tag) => pick(tag, isTurkish))
+                    .join(' · ')}
+                </span>
+              </Row>
+
+              <Row label={t('Odak', 'Focus')}>
+                <ul>
+                  {AREAS.map((area) => (
+                    <li key={area.id}>
+                      <Link to={area.path} className={areaLinkClass}>
+                        {pick(area.name, isTurkish)}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </Row>
+
+              {repoCount !== null && (
+                <Row label={t('Açık repo', 'Public repos')}>
+                  <span className="font-mono tabular-nums">{repoCount}</span>
+                </Row>
+              )}
+
+              <Row label={t('Konum', 'Based in')}>{pick(PERSONAL_INFO.location, isTurkish)}</Row>
+            </dl>
+          </aside>
+        </Reveal>
       </div>
     </section>
   );

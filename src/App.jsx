@@ -40,7 +40,7 @@ const About = lazyWithRetry(() => import('./components/About'), 'lazy-retry-abou
 const Certificates = lazyWithRetry(() => import('./components/Certificates'), 'lazy-retry-certificates');
 const Projects = lazyWithRetry(() => import('./components/Projects'), 'lazy-retry-projects');
 const Contact = lazyWithRetry(() => import('./components/Contact'), 'lazy-retry-contact');
-const TechLogoLoop = lazyWithRetry(() => import('./components/TechLogoLoop'), 'lazy-retry-tech-loop');
+const Stack = lazyWithRetry(() => import('./components/Stack'), 'lazy-retry-stack');
 const CaseStudyPage = lazyWithRetry(() => import('./pages/CaseStudyPage'), 'lazy-retry-case-study');
 const NotFoundPage = lazyWithRetry(() => import('./pages/NotFoundPage'), 'lazy-retry-404');
 
@@ -54,12 +54,6 @@ const LAZY_ROUTES = [
   { path: '*', Component: NotFoundPage },
 ];
 
-const SectionDivider = ({ className = '' }) => (
-  <div className={`container-wide py-2 ${className}`}>
-    <div className="rule" />
-  </div>
-);
-
 // Reserves roughly the height of the lazy sections so the footer does not jump while they load.
 const HomeFallback = () => <div aria-hidden="true" className="min-h-[120vh]" />;
 
@@ -69,13 +63,9 @@ const HomePage = () => (
     <Hero />
     <Suspense fallback={<HomeFallback />}>
       <About />
-      <SectionDivider />
       <Projects />
-      <SectionDivider className="max-w-screen-2xl" />
-      <TechLogoLoop />
-      <SectionDivider className="max-w-screen-2xl" />
+      <Stack />
       <Certificates />
-      <SectionDivider />
       <Contact />
     </Suspense>
   </>
