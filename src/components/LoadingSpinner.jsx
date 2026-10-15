@@ -1,43 +1,26 @@
-import { motion } from 'framer-motion';
 import { useLanguage } from '../context/LanguageContext';
 
+/**
+ * Route-level loading state: monogram inside a hairline ring with a quarter-arc spinning in CSS
+ * (no JS animation; the global reduced-motion rule stops it).
+ */
 const LoadingSpinner = () => {
   const { isTurkish } = useLanguage();
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-[60vh] gap-6">
-      {/* Spinner ring */}
-      <div className="relative w-16 h-16">
-        {/* Outer ring - rotating */}
-        <motion.div
-          className="absolute inset-0 rounded-full border-2 border-ink-200 dark:border-white/10"
-          style={{ borderTopColor: '#7c5cff', borderRightColor: '#27e0c4' }}
-          animate={{ rotate: 360 }}
-          transition={{ duration: 1.2, repeat: Infinity, ease: 'linear' }}
-        />
-        {/* Inner pulsing glow */}
-        <motion.div
-          className="absolute inset-2 rounded-full bg-cyan-500/10 dark:bg-cyan-300/10"
-          animate={{ scale: [1, 1.15, 1], opacity: [0.5, 0.8, 0.5] }}
-          transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
-        />
-        {/* Center monogram */}
-        <motion.span
-          className="absolute inset-0 flex items-center justify-center text-sm font-bold gradient-text"
-          animate={{ opacity: [0.5, 1, 0.5] }}
-          transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
-        >
+    <div
+      role="status"
+      aria-live="polite"
+      className="flex min-h-[60vh] flex-col items-center justify-center gap-5 pt-16"
+    >
+      <div className="relative h-14 w-14" aria-hidden="true">
+        <div className="absolute inset-0 rounded-full border border-line/15" />
+        <div className="absolute inset-0 animate-spin rounded-full border border-transparent border-t-accent motion-reduce:animate-none" />
+        <span className="absolute inset-0 flex items-center justify-center font-mono text-sm font-semibold text-fg">
           MS
-        </motion.span>
+        </span>
       </div>
-      {/* Loading text */}
-      <motion.p
-        className="text-ink-500 dark:text-ink-300 text-sm"
-        animate={{ opacity: [0.5, 1, 0.5] }}
-        transition={{ duration: 1.5, repeat: Infinity }}
-      >
-        {isTurkish ? 'Yükleniyor...' : 'Loading...'}
-      </motion.p>
+      <p className="label">{isTurkish ? 'Yükleniyor…' : 'Loading…'}</p>
     </div>
   );
 };

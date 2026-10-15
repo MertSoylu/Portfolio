@@ -1,216 +1,257 @@
-import { useCallback, useEffect, useState } from 'react';
-import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 import { HiSun, HiMoon, HiMenu, HiX } from 'react-icons/hi';
 import { FiGithub, FiLinkedin } from 'react-icons/fi';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { useDarkMode } from '../context/DarkModeContext';
 import { useLanguage } from '../context/LanguageContext';
-import Magnet from './ui/Magnet';
+import { PERSONAL_INFO } from '../utils/constants';
+import { isPlainLeftClick, scrollToSection } from '../utils/scroll';
 
 const SOCIALS = [
-  { label: 'GitHub', icon: <FiGithub className="h-5 w-5" />, href: 'https://github.com/MertSoylu' },
-  {
-    label: 'LinkedIn',
-    icon: <FiLinkedin className="h-5 w-5" />,
-    href: 'https://www.linkedin.com/in/mertsoylu/',
-  },
+  { label: 'GitHub', icon: FiGithub, href: PERSONAL_INFO.github },
+  { label: 'LinkedIn', icon: FiLinkedin, href: PERSONAL_INFO.linkedin },
 ];
 
-const IconToggle = ({ onClick, label, children }) => (
-  <button
-    type="button"
-    onClick={onClick}
-    aria-label={label}
-    className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-line/12 bg-surface text-fg transition-colors hover:border-line/25 hover:bg-surface2"
-  >
-    {children}
-  </button>
-);
+const FOCUSABLE = 'a[href], button:not([disabled])';
+const DESKTOP_QUERY = '(min-width: 768px)';
+
+const iconButton =
+  'inline-flex h-11 w-11 items-center justify-center rounded-md text-muted transition-colors duration-150 hover:bg-surface2 hover:text-fg';
 
 const Navbar = () => {
   const { isDark, toggleDarkMode } = useDarkMode();
   const { isTurkish, toggleLanguage } = useLanguage();
   const location = useLocation();
-  const navigate = useNavigate();
   const reduce = useReducedMotion();
   const isHomePage = location.pathname === '/';
   const [open, setOpen] = useState(false);
-  const [scrolled, setScrolled] = useState(false);
-
-  useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 12);
-    onScroll();
-    window.addEventListener('scroll', onScroll, { passive: true });
-    return () => window.removeEventListener('scroll', onScroll);
-  }, []);
-
-  useEffect(() => {
-    if (!open) return undefined;
-    const previous = document.body.style.overflow;
-    document.body.style.overflow = 'hidden';
-    return () => {
-      document.body.style.overflow = previous;
-    };
-  }, [open]);
+  const headerRef = useRef(null);
+  const menuButtonRef = useRef(null);
+  const firstLinkRef = useRef(null);
+  const wasOpen = useRef(false);
 
   const links = [
     { label: isTurkish ? 'Hakkımda' : 'About', id: 'about' },
     { label: isTurkish ? 'Projeler' : 'Projects', id: 'projects' },
+    { label: isTurkish ? 'Sertifikalar' : 'Certificates', id: 'certificates' },
     { label: isTurkish ? 'İletişim' : 'Contact', id: 'contact' },
   ];
 
-  const goToSection = useCallback(
-    (id) => {
-      setOpen(false);
-      const hash = `#${id}`;
-      if (isHomePage) {
-        const el = document.getElementById(id);
-        if (el) {
-          window.history.pushState(null, '', hash);
-          el.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'start' });
-          return;
-        }
-      }
-      navigate(`/${hash}`);
-    },
-    [isHomePage, navigate, reduce],
-  );
+  const closeMenu = useCallback(() => setOpen(false), []);
 
-  const goHome = () => {
-    setOpen(false);
-    navigate('/');
+  // Sheet focus: first link on open, back to the menu button on close.
+  useEffect(() => {
+    if (open) {
+      firstLinkRef.current?.focus();
+    } else if (wasOpen.current) {
+      menuButtonRef.current?.focus();
+    }
+    wasOpen.current = open;
+  }, [open]);
+
+  // Sheet: body scroll lock, Escape to close, Tab kept inside header + sheet, and close when the
+  // viewport grows to the desktop layout.
+  useEffect(() => {
+    if (!open) return undefined;
+
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+
+    const onKeyDown = (event) => {
+      if (event.key === 'Escape') {
+        closeMenu();
+        return;
+      }
+      if (event.key !== 'Tab' || !headerRef.current) return;
+      const items = Array.from(headerRef.current.querySelectorAll(FOCUSABLE)).filter(
+        (el) => el.getClientRects().length > 0,
+      );
+      if (items.length === 0) return;
+      const first = items[0];
+      const last = items[items.length - 1];
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
+      }
+    };
+    const mq = window.matchMedia(DESKTOP_QUERY);
+    const onChange = (event) => {
+      if (event.matches) closeMenu();
+    };
+    document.addEventListener('keydown', onKeyDown);
+    mq.addEventListener('change', onChange);
+
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      document.removeEventListener('keydown', onKeyDown);
+      mq.removeEventListener('change', onChange);
+    };
+  }, [open, closeMenu]);
+
+  // Route changes close the sheet.
+  useEffect(() => {
+    closeMenu();
+  }, [location.pathname, closeMenu]);
+
+  const handleSectionClick = (event, id) => {
+    closeMenu();
+    if (!isHomePage || event.defaultPrevented || !isPlainLeftClick(event)) return;
+    if (scrollToSection(id, reduce)) event.preventDefault();
   };
 
+  const handleBrandClick = () => {
+    closeMenu();
+    if (isHomePage) {
+      window.history.replaceState(null, '', '/');
+      window.scrollTo({ top: 0, behavior: reduce ? 'auto' : 'smooth' });
+    }
+  };
+
+  const themeLabel = isTurkish
+    ? isDark
+      ? 'Açık temaya geç'
+      : 'Koyu temaya geç'
+    : isDark
+      ? 'Switch to light mode'
+      : 'Switch to dark mode';
+
+  // Visible text is "TR / EN"; the accessible name starts with the same string (WCAG 2.5.3).
+  const languageLabel = isTurkish ? 'TR / EN – İngilizceye geç' : 'TR / EN – Switch to Turkish';
+
+  const menuLabel = open
+    ? isTurkish
+      ? 'Menüyü kapat'
+      : 'Close menu'
+    : isTurkish
+      ? 'Menüyü aç'
+      : 'Open menu';
+
   return (
-    <header
-      className={`fixed inset-x-0 top-0 z-50 transition-colors duration-300 ${
-        scrolled || open
-          ? 'border-b border-line/10 bg-canvas/85 backdrop-blur-md'
-          : 'border-b border-transparent'
-      }`}
-    >
-      <nav className="container-wide flex h-16 items-center justify-between gap-4">
-        <button
-          type="button"
-          onClick={goHome}
-          className="group flex items-center gap-2.5 rounded-lg py-1 pr-2 text-left"
-          aria-label={isTurkish ? 'Ana sayfa' : 'Home'}
-        >
-          <img src="/favicon.svg" alt="" width={28} height={28} className="h-7 w-7" draggable={false} />
-          <span className="font-display text-lg font-semibold tracking-tight text-fg">Mert Soylu</span>
-        </button>
-
-        {/* Kapsül arka planı: sayfa tepesinde aurora parlakken linklerin okunur kalması için. */}
-        <div
-          className={`hidden items-center gap-0.5 rounded-full border px-1.5 py-1 transition-colors duration-300 md:flex ${
-            scrolled || open ? 'border-transparent' : 'border-line/10 bg-canvas/55 backdrop-blur-md'
-          }`}
-        >
-          {links.map((link) => (
-            <Magnet key={link.id} padding={30} magnetStrength={4}>
-              <button
-                type="button"
-                onClick={() => goToSection(link.id)}
-                className="rounded-full px-3.5 py-1.5 text-sm font-medium text-fg/70 transition-colors hover:bg-surface2 hover:text-fg"
-              >
-                {link.label}
-              </button>
-            </Magnet>
-          ))}
-        </div>
-
-        <div className="flex items-center gap-1.5">
-          <IconToggle
-            onClick={toggleDarkMode}
-            label={
-              isTurkish
-                ? isDark
-                  ? 'Açık temaya geç'
-                  : 'Koyu temaya geç'
-                : isDark
-                  ? 'Switch to light mode'
-                  : 'Switch to dark mode'
-            }
+    <header ref={headerRef} data-site-nav className="fixed inset-x-0 top-0 z-50">
+      {/* The blurred bar is a child: backdrop-filter would make the header the containing block of the
+          fixed mobile sheet below and collapse it to zero height. */}
+      <div className="h-16 border-b border-line/10 bg-canvas/80 backdrop-blur">
+        <div className="container-site flex h-full items-center justify-between gap-3">
+          <Link
+            to="/"
+            onClick={handleBrandClick}
+            className="-ml-1 flex min-h-11 items-center gap-2.5 rounded-md px-1 text-fg"
           >
-            <AnimatePresence mode="wait" initial={false}>
+            <span
+              aria-hidden="true"
+              className="inline-flex h-8 w-8 items-center justify-center rounded-md bg-signal text-xs font-bold tracking-tight text-signal-fg"
+            >
+              MS
+            </span>
+            <span className="text-base font-semibold tracking-tight">Mert Soylu</span>
+          </Link>
+
+          <nav aria-label={isTurkish ? 'Ana gezinme' : 'Main'} className="hidden md:block">
+            <ul className="flex items-center gap-1">
+              {links.map((link) => (
+                <li key={link.id}>
+                  <Link
+                    to={{ pathname: '/', hash: `#${link.id}` }}
+                    onClick={(event) => handleSectionClick(event, link.id)}
+                    className="inline-flex min-h-11 items-center rounded-md px-3 text-sm font-medium text-muted transition-colors duration-150 hover:bg-surface2 hover:text-fg"
+                  >
+                    {link.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </nav>
+
+          <div className="flex items-center gap-1">
+            <button
+              type="button"
+              onClick={toggleLanguage}
+              aria-label={languageLabel}
+              className="inline-flex min-h-11 items-center rounded-md px-2.5 font-mono text-xs transition-colors duration-150 hover:bg-surface2"
+            >
+              <span>
+                <span className={isTurkish ? 'font-bold text-fg' : 'text-muted'}>TR</span>
+                {' / '}
+                <span className={isTurkish ? 'text-muted' : 'font-bold text-fg'}>EN</span>
+              </span>
+            </button>
+
+            <button type="button" onClick={toggleDarkMode} aria-label={themeLabel} className={iconButton}>
               {isDark ? (
-                <motion.span
-                  key="sun"
-                  initial={{ rotate: -90, opacity: 0 }}
-                  animate={{ rotate: 0, opacity: 1 }}
-                  exit={{ rotate: 90, opacity: 0 }}
-                  transition={{ duration: 0.2 }}
-                >
-                  <HiSun className="h-4 w-4" />
-                </motion.span>
+                <HiSun className="h-5 w-5" aria-hidden="true" />
               ) : (
-                <motion.span
-                  key="moon"
-                  initial={{ rotate: 90, opacity: 0 }}
-                  animate={{ rotate: 0, opacity: 1 }}
-                  exit={{ rotate: -90, opacity: 0 }}
-                  transition={{ duration: 0.2 }}
-                >
-                  <HiMoon className="h-4 w-4" />
-                </motion.span>
+                <HiMoon className="h-5 w-5" aria-hidden="true" />
               )}
-            </AnimatePresence>
-          </IconToggle>
+            </button>
 
-          <IconToggle onClick={toggleLanguage} label={isTurkish ? 'Switch to English' : 'Türkçeye geç'}>
-            <span className="text-[11px] font-bold">{isTurkish ? 'TR' : 'EN'}</span>
-          </IconToggle>
-
-          <button
-            type="button"
-            onClick={() => setOpen((value) => !value)}
-            aria-label={
-              open ? (isTurkish ? 'Menüyü kapat' : 'Close menu') : isTurkish ? 'Menüyü aç' : 'Open menu'
-            }
-            aria-expanded={open}
-            className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-line/12 bg-surface text-fg transition-colors hover:border-line/25 hover:bg-surface2 md:hidden"
-          >
-            {open ? <HiX className="h-5 w-5" /> : <HiMenu className="h-5 w-5" />}
-          </button>
+            <button
+              ref={menuButtonRef}
+              type="button"
+              onClick={() => setOpen((value) => !value)}
+              aria-label={menuLabel}
+              aria-expanded={open}
+              aria-controls="mobile-menu"
+              className={`${iconButton} md:hidden`}
+            >
+              {open ? (
+                <HiX className="h-6 w-6" aria-hidden="true" />
+              ) : (
+                <HiMenu className="h-6 w-6" aria-hidden="true" />
+              )}
+            </button>
+          </div>
         </div>
-      </nav>
+      </div>
 
       <AnimatePresence>
         {open && (
           <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: 'auto' }}
-            exit={{ opacity: 0, height: 0 }}
-            transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
-            className="overflow-hidden border-t border-line/10 bg-canvas/95 backdrop-blur-md md:hidden"
+            id="mobile-menu"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.15 }}
+            className="fixed inset-x-0 bottom-0 top-16 overflow-y-auto border-t border-line/10 bg-canvas md:hidden"
           >
-            <div className="container-wide flex flex-col gap-1 py-4">
-              {links.map((link) => (
-                <button
-                  key={link.id}
-                  type="button"
-                  onClick={() => goToSection(link.id)}
-                  className="rounded-xl px-3 py-3 text-left font-display text-xl font-semibold text-fg transition-colors hover:bg-surface2"
-                >
-                  {link.label}
-                </button>
-              ))}
-
-              <div className="mt-3 flex items-center gap-3 border-t border-line/10 pt-4">
-                {SOCIALS.map((social) => (
-                  <a
-                    key={social.label}
-                    href={social.href}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    aria-label={social.label}
-                    className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-line/12 bg-surface text-fg transition-colors hover:border-line/25 hover:bg-surface2"
-                  >
-                    {social.icon}
-                  </a>
+            <nav aria-label={isTurkish ? 'Mobil menü' : 'Mobile menu'} className="container-site py-4">
+              <ul>
+                {links.map((link, index) => (
+                  <li key={link.id} className="border-b border-line/10">
+                    <Link
+                      ref={index === 0 ? firstLinkRef : undefined}
+                      to={{ pathname: '/', hash: `#${link.id}` }}
+                      onClick={(event) => handleSectionClick(event, link.id)}
+                      className="text-h3 flex min-h-14 items-center py-3 text-fg"
+                    >
+                      {link.label}
+                    </Link>
+                  </li>
                 ))}
-              </div>
-            </div>
+              </ul>
+
+              <ul
+                className="mt-6 flex items-center gap-2"
+                aria-label={isTurkish ? 'Sosyal bağlantılar' : 'Social links'}
+              >
+                {SOCIALS.map(({ label, icon: Icon, href }) => (
+                  <li key={label}>
+                    <a
+                      href={href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      aria-label={label}
+                      className="inline-flex h-11 w-11 items-center justify-center rounded-md border border-line/15 text-fg transition-colors duration-150 hover:border-line/40 hover:bg-surface2"
+                    >
+                      <Icon className="h-5 w-5" aria-hidden="true" />
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </nav>
           </motion.div>
         )}
       </AnimatePresence>

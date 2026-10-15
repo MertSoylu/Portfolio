@@ -1,191 +1,59 @@
 /** @type {import('tailwindcss').Config} */
+// Signal identity tokens. Values live in CSS variables (src/index.css) as RGB triplets so
+// the same utility works in both themes and supports alpha (`bg-canvas/80`).
+const token = (name) => `rgb(var(--${name}) / <alpha-value>)`;
+
 export default {
   content: ['./index.html', './src/**/*.{js,jsx,ts,tsx}'],
   darkMode: 'class',
   theme: {
     extend: {
       fontFamily: {
-        display: ['Fraunces', 'Georgia', 'Times New Roman', 'serif'],
-        heading: ['Fraunces', 'Georgia', 'Times New Roman', 'serif'],
-        body: ['Inter', 'system-ui', '-apple-system', 'Segoe UI', 'sans-serif'],
-        sans: ['Inter', 'system-ui', '-apple-system', 'Segoe UI', 'sans-serif'],
-        mono: ['ui-monospace', 'SFMono-Regular', 'Consolas', 'monospace'],
+        sans: [
+          '"Geist Variable"',
+          'ui-sans-serif',
+          'system-ui',
+          '-apple-system',
+          '"Segoe UI"',
+          'Roboto',
+          'sans-serif',
+        ],
+        mono: ['"Geist Mono Variable"', 'ui-monospace', 'SFMono-Regular', 'Menlo', 'Consolas', 'monospace'],
       },
       colors: {
-        /* Semantic, theme-aware tokens (swap via CSS vars in light/dark). Use these in new markup. */
-        canvas: 'rgb(var(--canvas) / <alpha-value>)',
-        surface: 'rgb(var(--surface) / <alpha-value>)',
-        surface2: 'rgb(var(--surface-2) / <alpha-value>)',
-        fg: 'rgb(var(--fg) / <alpha-value>)',
-        muted: 'rgb(var(--muted) / <alpha-value>)',
-        line: 'rgb(var(--line) / <alpha-value>)',
-        accent: {
-          DEFAULT: 'rgb(var(--accent) / <alpha-value>)',
-          strong: 'rgb(var(--accent-strong) / <alpha-value>)',
-          soft: 'rgb(var(--accent-soft) / <alpha-value>)',
-          50: '#fbf1ec',
-          100: '#f6ddd0',
-          200: '#ecbba3',
-          300: '#e09a77',
-          400: '#d2734a',
-          500: '#c2562f',
-          600: '#a84a26',
-          700: '#89381b',
-          800: '#6e2d15',
-          900: '#5a2715',
+        canvas: token('canvas'),
+        surface: token('surface'),
+        surface2: token('surface-2'),
+        fg: token('fg'),
+        muted: token('muted'),
+        line: token('line'),
+        // Text-safe accent (text, icons, small marks, focus ring). Fills use `signal`.
+        accent: token('accent'),
+        signal: {
+          DEFAULT: token('signal'),
+          fg: token('signal-fg'),
         },
-        /* Legacy ramps remapped to the warm-neutral / clay palette so not-yet-rebuilt
-           markup renders in-palette during the migration. New code should prefer the
-           semantic tokens above. */
+        ok: token('ok'),
+        danger: token('danger'),
+
+        /* LEGACY ALIASES — removed in phase 3 */
+        // Used by: About.jsx, Certificates.jsx (hover:text-accent-strong).
+        'accent-strong': token('accent'),
+        // Used by: ui/DevicePreview.jsx (phone/terminal frames).
         ink: {
-          50: '#f7f4ef',
-          100: '#eee9e1',
-          200: '#ded7cb',
-          300: '#c2b8a9',
-          400: '#9c9183',
-          500: '#6f665c',
-          600: '#564e45',
-          700: '#3d372f',
-          800: '#29241e',
-          900: '#1c1815',
-        },
-        warm: {
-          50: '#fbf1ec',
-          100: '#f6ddd0',
-          200: '#ecbba3',
-          300: '#e09a77',
-          400: '#d2734a',
-          500: '#c2562f',
-          600: '#a84a26',
-          700: '#89381b',
-          800: '#6e2d15',
-          900: '#5a2715',
-        },
-        ember: {
-          50: '#fbf1ec',
-          100: '#f6ddd0',
-          200: '#ecbba3',
-          300: '#e09a77',
-          400: '#d2734a',
-          500: '#c2562f',
-          600: '#a84a26',
-          700: '#89381b',
-          800: '#6e2d15',
-          900: '#5a2715',
-        },
-        violet: {
-          50: '#fbf1ec',
-          100: '#f6ddd0',
-          200: '#ecbba3',
-          300: '#e09a77',
-          400: '#d2734a',
-          500: '#c2562f',
-          600: '#a84a26',
-          700: '#89381b',
-          800: '#6e2d15',
-          900: '#5a2715',
-        },
-        aqua: {
-          50: '#f7f4ef',
-          100: '#eee9e1',
-          200: '#ded7cb',
-          300: '#c2b8a9',
-          400: '#9c9183',
-          500: '#6f665c',
-          600: '#564e45',
-          700: '#3d372f',
-          800: '#29241e',
-          900: '#1c1815',
-        },
-        cyan: {
-          50: '#f7f4ef',
-          100: '#eee9e1',
-          200: '#ded7cb',
-          300: '#c2b8a9',
-          400: '#9c9183',
-          500: '#6f665c',
-          600: '#564e45',
-          700: '#3d372f',
-          800: '#29241e',
-          900: '#1c1815',
-        },
-        dark: {
-          50: '#f7f4ef',
-          100: '#eee9e1',
-          200: '#ded7cb',
-          300: '#c2b8a9',
-          400: '#9c9183',
-          500: '#6f665c',
-          600: '#2a2620',
-          700: '#221e1a',
-          800: '#1b1815',
-          900: '#13110f',
-        },
-        sand: {
-          50: '#faf8f4',
-          100: '#f2efe9',
-          200: '#eae5dc',
-          300: '#ded7cb',
-          400: '#c2b8a9',
-          500: '#9c9183',
-          600: '#6f665c',
-          700: '#564e45',
-          800: '#3d372f',
-          900: '#1c1815',
+          800: '#181B1F',
+          900: '#0A0B0D',
         },
       },
-      borderRadius: {
-        '4xl': '2rem',
-      },
+      /* LEGACY ALIASES — removed in phase 3 */
       boxShadow: {
-        soft: '0 1px 2px rgba(20,16,12,0.04), 0 8px 24px -14px rgba(20,16,12,0.16)',
-        card: '0 1px 2px rgba(20,16,12,0.04), 0 8px 24px -14px rgba(20,16,12,0.16)',
-        lift: '0 18px 48px -22px rgba(20,16,12,0.28)',
-        /* legacy aliases -> calm shadows */
-        elevation: '0 22px 60px -28px rgba(20,16,12,0.30)',
-        glow: '0 8px 24px -14px rgba(20,16,12,0.16)',
-        'glow-sm': '0 4px 14px -8px rgba(20,16,12,0.14)',
-        'glow-lg': '0 22px 60px -28px rgba(20,16,12,0.30)',
-        'warm-soft': '0 12px 32px -18px rgba(194,86,47,0.32)',
-        'warm-prominent': '0 18px 46px -20px rgba(194,86,47,0.38)',
-        duotone: '0 22px 60px -28px rgba(20,16,12,0.30)',
-        'inner-glow': 'inset 0 1px 0 0 rgba(255,255,255,0.35)',
+        // Used by: Hero.jsx, Projects.jsx, ui/DevicePreview.jsx.
+        soft: '0 1px 2px rgb(0 0 0 / 0.18)',
+        lift: '0 24px 48px -24px rgb(0 0 0 / 0.5)',
       },
-      backgroundImage: {
-        'gradient-sand': 'linear-gradient(180deg, #faf8f4 0%, #f2efe9 100%)',
-        'gradient-warm': 'none',
-        'gradient-duotone': 'none',
-        'gradient-trio': 'none',
-        'radial-warm': 'none',
-      },
-      animation: {
-        fadeIn: 'fadeIn 0.6s ease-out both',
-        'fade-up': 'fadeUp 0.7s cubic-bezier(0.22,1,0.36,1) both',
-        floating: 'floating 7s ease-in-out infinite',
-        'star-movement-bottom': 'star-movement-bottom linear infinite alternate',
-        'star-movement-top': 'star-movement-top linear infinite alternate',
-      },
-      keyframes: {
-        fadeIn: {
-          '0%': { opacity: 0 },
-          '100%': { opacity: 1 },
-        },
-        fadeUp: {
-          '0%': { opacity: 0, transform: 'translateY(16px)' },
-          '100%': { opacity: 1, transform: 'translateY(0)' },
-        },
-        floating: {
-          '0%, 100%': { transform: 'translateY(0px)' },
-          '50%': { transform: 'translateY(-14px)' },
-        },
-        'star-movement-bottom': {
-          '0%': { transform: 'translate(0%, 0%)', opacity: '1' },
-          '100%': { transform: 'translate(-100%, 0%)', opacity: '0' },
-        },
-        'star-movement-top': {
-          '0%': { transform: 'translate(0%, 0%)', opacity: '1' },
-          '100%': { transform: 'translate(100%, 0%)', opacity: '0' },
-        },
+      opacity: {
+        // `border-line/12` is used all over the not-yet-rebuilt sections; the spec scale has no 12.
+        12: '0.12',
       },
     },
   },

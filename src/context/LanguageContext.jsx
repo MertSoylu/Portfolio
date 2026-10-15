@@ -20,16 +20,13 @@ export const LanguageProvider = ({ children }) => {
   });
 
   useEffect(() => {
-    localStorage.setItem('language', language);
+    try {
+      localStorage.setItem('language', language);
+    } catch {
+      /* storage unavailable (private mode): the choice just won't persist */
+    }
     document.documentElement.lang = language === 'tr' ? 'tr' : 'en';
     document.documentElement.setAttribute('data-lang', language);
-
-    document.body.classList.add('lang-switching');
-    const timeout = setTimeout(() => {
-      document.body.classList.remove('lang-switching');
-    }, 280);
-
-    return () => clearTimeout(timeout);
   }, [language]);
 
   const toggleLanguage = () => {

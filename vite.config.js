@@ -16,18 +16,16 @@ export default defineConfig(({ mode }) => ({
       workbox: {
         globPatterns: ['**/*.{js,css,html,svg,woff2,png,webp,jpg,jpeg}'],
         // Yalnızca case study'de görünen galeri/video görselleri her ziyaretçiye önbelleğe alınmasın.
-        globIgnores: ['**/previews/noble/**', '**/media/**'],
+        // Kiril/Vietnamca font alt kümeleri bu sitede hiç kullanılmaz; precache dışında tut.
+        globIgnores: [
+          '**/previews/noble/**',
+          '**/media/**',
+          '**/*-cyrillic*.woff2',
+          '**/*-vietnamese*.woff2',
+        ],
         navigateFallback: '/index.html',
         navigateFallbackDenylist: [/^\/api\//, /^\/cv\.pdf$/, /^\/certificates\//, /^\/og-image\.png$/],
         runtimeCaching: [
-          {
-            urlPattern: ({ url }) => url.origin === 'https://res.cloudinary.com',
-            handler: 'StaleWhileRevalidate',
-            options: {
-              cacheName: 'cloudinary-images',
-              expiration: { maxEntries: 60, maxAgeSeconds: 60 * 60 * 24 * 30 },
-            },
-          },
           {
             urlPattern: ({ url }) => url.origin === 'https://api.github.com',
             handler: 'NetworkFirst',
@@ -35,15 +33,6 @@ export default defineConfig(({ mode }) => ({
               cacheName: 'github-api',
               networkTimeoutSeconds: 6,
               expiration: { maxEntries: 30, maxAgeSeconds: 60 * 60 },
-            },
-          },
-          {
-            urlPattern: ({ url }) =>
-              url.origin === 'https://fonts.googleapis.com' || url.origin === 'https://fonts.gstatic.com',
-            handler: 'StaleWhileRevalidate',
-            options: {
-              cacheName: 'google-fonts',
-              expiration: { maxEntries: 20, maxAgeSeconds: 60 * 60 * 24 * 365 },
             },
           },
         ],
@@ -75,8 +64,6 @@ export default defineConfig(({ mode }) => ({
           if (!id.includes('node_modules')) return;
           if (/[\\/]node_modules[\\/]react-icons[\\/]/.test(id)) return 'vendor-icons';
           if (/[\\/]node_modules[\\/]framer-motion[\\/]/.test(id)) return 'vendor-motion';
-          if (/[\\/]node_modules[\\/]ogl[\\/]/.test(id)) return 'vendor-ogl';
-          if (/[\\/]node_modules[\\/](three|@react-three)[\\/]/.test(id)) return 'vendor-three';
           if (/[\\/]node_modules[\\/]@vercel[\\/]/.test(id)) return 'vendor-vercel';
           if (
             /[\\/]node_modules[\\/](react|react-dom|react-router|react-router-dom|scheduler|@remix-run|use-sync-external-store)[\\/]/.test(

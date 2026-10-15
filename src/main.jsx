@@ -2,6 +2,8 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
 import { HelmetProvider } from 'react-helmet-async';
+import '@fontsource-variable/geist';
+import '@fontsource-variable/geist-mono';
 import App from './App.jsx';
 import { initWebVitals } from './utils/vitals';
 import './index.css';
@@ -17,7 +19,7 @@ if (typeof window !== 'undefined' && import.meta.env.PROD) {
   // eslint-disable-next-line no-console
   console.log(
     '%cMert Soylu %cgithub.com/MertSoylu',
-    'font-size: 18px; font-weight: 700; color: #f07d2d;',
+    'font-size: 18px; font-weight: 700; color: #c8f542;',
     'font-size: 13px; color: #888;',
   );
 }

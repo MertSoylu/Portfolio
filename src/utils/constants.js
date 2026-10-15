@@ -1,4 +1,5 @@
 import { PROJECTS, caseStudyPath } from '../data/projects';
+import { areaByPath } from '../data/areas';
 
 // Personal information
 export const PERSONAL_INFO = {
@@ -7,6 +8,7 @@ export const PERSONAL_INFO = {
   university: 'Kütahya Dumlupınar University',
   email: 's6ylumert@gmail.com',
   github: 'https://github.com/MertSoylu',
+  linkedin: 'https://www.linkedin.com/in/mertsoylu/',
   location: 'İzmir, Turkey',
 };
 
@@ -89,12 +91,15 @@ const SITE_URL = 'https://mertsoylu.dev';
 export const FOREST_SITE_URL = 'https://orman.mertsoylu.dev';
 const DEFAULT_OG_IMAGE = `${SITE_URL}/og-image.png`;
 
+// Area route titles come from src/data/areas.js so they never drift from the nav/footer names.
+const areaTitle = (path, lang) => `${areaByPath(path).name[lang]} | Mert Soylu`;
+
 export const SEO_META = {
   '/': {
     tr: {
       title: 'Mert Soylu | Junior Full-Stack Developer',
       description:
-        'Junior Full-Stack Developer. Web ve Android projeleri; siber güvenlik ve yapay zekaya ilgi.',
+        'Junior Full-Stack Developer. Web ve Android projeleri; siber güvenlik ve yapay zekâya ilgi.',
     },
     en: {
       title: 'Mert Soylu | Junior Full-Stack Developer',
@@ -106,11 +111,11 @@ export const SEO_META = {
   },
   '/web': {
     tr: {
-      title: 'Web Geliştirme | Mert Soylu',
+      title: areaTitle('/web', 'tr'),
       description: 'React, Tailwind CSS ve Vite ile yapılan hızlı, erişilebilir web projeleri.',
     },
     en: {
-      title: 'Web Development | Mert Soylu',
+      title: areaTitle('/web', 'en'),
       description: 'Fast, accessible web projects built with React, Tailwind CSS, and Vite.',
     },
     canonical: `${SITE_URL}/web`,
@@ -118,11 +123,11 @@ export const SEO_META = {
   },
   '/android': {
     tr: {
-      title: 'Android Geliştirme | Mert Soylu',
+      title: areaTitle('/android', 'tr'),
       description: 'Kotlin ve temiz mimari ile yapılan Android uygulamaları.',
     },
     en: {
-      title: 'Android Development | Mert Soylu',
+      title: areaTitle('/android', 'en'),
       description: 'Android apps built with Kotlin and clean architecture.',
     },
     canonical: `${SITE_URL}/android`,
@@ -130,11 +135,11 @@ export const SEO_META = {
   },
   '/cybersecurity': {
     tr: {
-      title: 'Siber Güvenlik | Mert Soylu',
+      title: areaTitle('/cybersecurity', 'tr'),
       description: 'Güvenli kod yazma, ağ güvenliği ve savunma odaklı çalışmalar.',
     },
     en: {
-      title: 'Cybersecurity | Mert Soylu',
+      title: areaTitle('/cybersecurity', 'en'),
       description: 'Secure coding, network security, and defense-oriented projects.',
     },
     canonical: `${SITE_URL}/cybersecurity`,
@@ -142,11 +147,11 @@ export const SEO_META = {
   },
   '/data-science': {
     tr: {
-      title: 'AI & Veri Bilimi | Mert Soylu',
-      description: 'Yapay zeka, derin öğrenme ve veri bilimi öğrenme yolculuğu.',
+      title: areaTitle('/data-science', 'tr'),
+      description: 'Yapay zekâ, derin öğrenme ve veri bilimi öğrenme yolculuğum.',
     },
     en: {
-      title: 'AI & Data Science | Mert Soylu',
+      title: areaTitle('/data-science', 'en'),
       description: 'AI, deep learning, and data science learning journey.',
     },
     canonical: `${SITE_URL}/data-science`,
@@ -158,7 +163,7 @@ export const SEO_META = {
       return [
         route,
         {
-          tr: { title: `${project.title} Case Study | Mert Soylu`, description: project.summary.tr },
+          tr: { title: `${project.title} Vaka incelemesi | Mert Soylu`, description: project.summary.tr },
           en: { title: `${project.title} Case Study | Mert Soylu`, description: project.summary.en },
           canonical: `${SITE_URL}${route}`,
           ogImage: DEFAULT_OG_IMAGE,
@@ -169,7 +174,7 @@ export const SEO_META = {
   '/404': {
     tr: {
       title: 'Sayfa Bulunamadı | Mert Soylu',
-      description: 'Aradığınız sayfa mevcut değil.',
+      description: 'Aradığın sayfa mevcut değil.',
     },
     en: {
       title: 'Page Not Found | Mert Soylu',

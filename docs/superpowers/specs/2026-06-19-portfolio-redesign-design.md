@@ -1,3 +1,5 @@
+> **Superseded** by `2026-10-15-signal-identity.md` (Signal identity: Geist + acid-lime on near-black). Kept for history only.
+
 # Portfolio Redesign — Design Spec
 
 **Date:** 2026-06-19

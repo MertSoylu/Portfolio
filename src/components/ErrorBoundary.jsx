@@ -48,26 +48,22 @@ class ErrorBoundary extends React.Component {
     const isTurkish = readLanguage() === 'tr';
 
     return (
-      <div className="min-h-screen flex items-center justify-center px-4 bg-gradient-to-br from-white to-cyan-50 text-ink-900 dark:from-ink-900 dark:to-ink-800 dark:text-white">
-        <div className="card-prominent max-w-md p-8 text-center">
-          <div className="mb-6">
-            <span className="gradient-text inline-block text-7xl font-bold">!</span>
-          </div>
-          <h1 className="text-2xl font-bold mb-3">
-            {isTurkish ? 'Bir Şey Ters Gitti' : 'Something Went Wrong'}
-          </h1>
-          <p className="text-ink-600 dark:text-ink-200 mb-6">
+      <div className="flex min-h-screen items-center justify-center bg-canvas px-4 text-fg">
+        <div className="card w-full max-w-md p-8 text-center">
+          <p className="label mb-5 text-danger">{isTurkish ? 'Hata' : 'Error'}</p>
+          <h1 className="text-h2 mb-3">{isTurkish ? 'Bir Şey Ters Gitti' : 'Something Went Wrong'}</h1>
+          <p className="mb-6 text-muted">
             {isTurkish
               ? 'Beklenmedik bir hata oluştu. Sayfayı yenilemeyi dene veya ana sayfaya dön.'
               : 'An unexpected error occurred. Try refreshing the page or returning home.'}
           </p>
-          <div className="flex flex-col sm:flex-row gap-3 justify-center">
-            <button type="button" onClick={this.handleReload} className="btn-primary">
-              <HiRefresh className="w-5 h-5" />
+          <div className="flex flex-col justify-center gap-3 sm:flex-row">
+            <button type="button" onClick={this.handleReload} className="btn btn-primary">
+              <HiRefresh className="h-5 w-5" aria-hidden="true" />
               {isTurkish ? 'Sayfayı Yenile' : 'Reload Page'}
             </button>
-            <button type="button" onClick={this.handleHome} className="btn-secondary">
-              <HiHome className="w-5 h-5" />
+            <button type="button" onClick={this.handleHome} className="btn btn-secondary">
+              <HiHome className="h-5 w-5" aria-hidden="true" />
               {isTurkish ? 'Ana Sayfa' : 'Go Home'}
             </button>
           </div>

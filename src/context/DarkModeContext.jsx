@@ -2,6 +2,9 @@ import { createContext, useContext, useState, useEffect } from 'react';
 
 const DarkModeContext = createContext();
 
+// Browser-chrome colours; keep in sync with --canvas in src/index.css and public/theme-init.js.
+const THEME_COLOR = { dark: '#0A0B0D', light: '#F7F7F4' };
+
 export const useDarkMode = () => {
   const context = useContext(DarkModeContext);
   if (!context) throw new Error('useDarkMode must be used within DarkModeProvider');
@@ -19,14 +22,23 @@ export const DarkModeProvider = ({ children }) => {
     }
   });
 
+  // `.dark` lives on <html> (set before first paint by public/theme-init.js, then kept in sync here).
   useEffect(() => {
-    const root = document.documentElement;
-    if (isDark) {
-      root.classList.add('dark');
-    } else {
-      root.classList.remove('dark');
+    document.documentElement.classList.toggle('dark', isDark);
+
+    let meta = document.querySelector('meta[name="theme-color"]');
+    if (!meta) {
+      meta = document.createElement('meta');
+      meta.setAttribute('name', 'theme-color');
+      document.head.appendChild(meta);
     }
-    localStorage.setItem('darkMode', JSON.stringify(isDark));
+    meta.setAttribute('content', isDark ? THEME_COLOR.dark : THEME_COLOR.light);
+
+    try {
+      localStorage.setItem('darkMode', JSON.stringify(isDark));
+    } catch {
+      /* storage unavailable (private mode): the choice just won't persist */
+    }
   }, [isDark]);
 
   const toggleDarkMode = () => setIsDark((prev) => !prev);

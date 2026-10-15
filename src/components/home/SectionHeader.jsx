@@ -1,48 +1,64 @@
 import Reveal from '../ui/Reveal';
-import ShinyText from '../ui/ShinyText';
 
 /**
- * SectionHeader — shared, calm section intro: a small uppercase eyebrow, a serif
- * title, an optional lead paragraph, and an optional aside slot (stats). Left
- * aligned and reduced-motion aware via Reveal.
+ * SectionHeader — the only section header pattern. A full-width hairline rule carries a mono
+ * `index / label` marker (`01 / Projeler`), followed by the h2, an optional lead paragraph and an
+ * optional aside (stats, links) that sits to the right of the title from `lg` up.
+ *
+ * Props: `id` (put on the h2 so a section can use aria-labelledby), `index` ('01'), `label`, `title`,
+ * `lead`, `aside`, `align` ('left' | 'center'), `className`.
+ *
+ * Temporary backwards compatibility until phase 2 updates the callers: `kicker` is read as `label`
+ * and `kickerIcon` is ignored.
  */
-const SectionHeader = ({ kicker, kickerIcon, title, lead, aside, className = '' }) => (
-  <div className={`mb-8 sm:mb-12 md:mb-16 ${className}`}>
-    <div className="grid items-end gap-6 sm:gap-8 lg:grid-cols-[minmax(0,1fr)_auto] lg:gap-12">
-      <div className="min-w-0">
-        {kicker && (
-          <Reveal as="div" className="mb-4">
-            <span className="eyebrow">
-              {kickerIcon}
-              <ShinyText
-                text={kicker}
-                speed={4}
-                color="rgb(var(--accent))"
-                shineColor="rgb(var(--accent-strong))"
-                spread={80}
-              />
-            </span>
+const SectionHeader = ({
+  id,
+  index,
+  label,
+  kicker,
+  kickerIcon: _kickerIcon,
+  title,
+  lead,
+  aside,
+  align = 'left',
+  className = '',
+}) => {
+  const marker = [index, label ?? kicker].filter(Boolean).join(' / ');
+  const centered = align === 'center';
+
+  return (
+    <div className={`mb-10 sm:mb-14 ${className}`}>
+      <Reveal className="flex items-center gap-4">
+        {centered && <span aria-hidden="true" className="h-px flex-1 bg-line/15" />}
+        {marker && <span className="label shrink-0 text-muted">{marker}</span>}
+        <span aria-hidden="true" className="h-px flex-1 bg-line/15" />
+      </Reveal>
+
+      <div
+        className={`mt-6 grid items-end gap-6 sm:mt-8 sm:gap-8 lg:gap-12 ${
+          aside ? 'lg:grid-cols-[minmax(0,1fr)_auto]' : ''
+        } ${centered ? 'text-center' : ''}`}
+      >
+        <div className="min-w-0">
+          <Reveal as="h2" id={id} delay={0.05} className={`text-h2 max-w-3xl ${centered ? 'mx-auto' : ''}`}>
+            {title}
           </Reveal>
-        )}
 
-        <Reveal as="h2" delay={0.05} className="section-title max-w-3xl">
-          {title}
-        </Reveal>
+          {lead && (
+            <Reveal as="p" delay={0.1} className={`text-lead mt-5 max-w-2xl ${centered ? 'mx-auto' : ''}`}>
+              {lead}
+            </Reveal>
+          )}
+        </div>
 
-        {lead && (
-          <Reveal as="p" delay={0.1} className="section-subtitle mt-5 max-w-2xl">
-            {lead}
+        {aside && (
+          <Reveal delay={0.15} className="min-w-0 lg:pb-1">
+            {aside}
           </Reveal>
         )}
       </div>
-
-      {aside && (
-        <Reveal delay={0.15} className="min-w-0 lg:pb-2">
-          {aside}
-        </Reveal>
-      )}
     </div>
-  </div>
-);
+  );
+};
 
 export default SectionHeader;

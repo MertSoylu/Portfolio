@@ -1,26 +1,15 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <script>
-      // Apply theme before first paint (default dark) to avoid a flash.
-      (function () {
-        try {
-          var saved = localStorage.getItem('darkMode');
-          var dark = saved !== null ? JSON.parse(saved) : true;
-          if (dark) document.documentElement.classList.add('dark');
-        } catch (e) {
-          document.documentElement.classList.add('dark');
-        }
-      })();
-    </script>
+    <meta name="theme-color" content="#0A0B0D" />
+    <!-- Blocking, same-origin (CSP script-src 'self'): sets the theme class + theme-color before first paint. -->
+    <script src="/theme-init.js"></script>
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="apple-touch-icon" href="/favicon.svg" />
     <link rel="manifest" href="/manifest.webmanifest" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-    <meta data-rh="true" name="description" content="Mert Soylu - Junior Full-Stack Developer Portfolio">
-    <meta name="theme-color" content="#faf8f4" media="(prefers-color-scheme: light)">
-    <meta name="theme-color" content="#13110f" media="(prefers-color-scheme: dark)">
+    <meta data-rh="true" name="description" content="Mert Soylu - Junior Full-Stack Developer Portfolio" />
     <title>Mert Soylu | Junior Full-Stack Developer</title>
 
     <!-- data-rh: Helmet bu etiketleri devralıp sayfaya göre değiştirir (kopya oluşmaz);
@@ -29,7 +18,11 @@
     <meta data-rh="true" property="og:type" content="website" />
     <meta data-rh="true" property="og:url" content="https://mertsoylu.dev/" />
     <meta data-rh="true" property="og:title" content="Mert Soylu | Junior Full-Stack Developer" />
-    <meta data-rh="true" property="og:description" content="Junior Full-Stack Developer — Web Development, Android Development & Cybersecurity" />
+    <meta
+      data-rh="true"
+      property="og:description"
+      content="Junior Full-Stack Developer — Web Development, Android Development & Cybersecurity"
+    />
     <meta data-rh="true" property="og:image" content="https://mertsoylu.dev/og-image.png" />
     <meta data-rh="true" property="og:locale" content="tr_TR" />
     <meta property="og:locale:alternate" content="en_US" />
@@ -37,23 +30,19 @@
     <!-- Twitter Card -->
     <meta data-rh="true" name="twitter:card" content="summary_large_image" />
     <meta data-rh="true" name="twitter:title" content="Mert Soylu | Junior Full-Stack Developer" />
-    <meta data-rh="true" name="twitter:description" content="Junior Full-Stack Developer — Web Development, Android Development & Cybersecurity" />
+    <meta
+      data-rh="true"
+      name="twitter:description"
+      content="Junior Full-Stack Developer — Web Development, Android Development & Cybersecurity"
+    />
     <meta data-rh="true" name="twitter:image" content="https://mertsoylu.dev/og-image.png" />
 
     <!-- Additional SEO -->
     <meta name="author" content="Mert Soylu" />
     <meta name="robots" content="index, follow" />
     <link data-rh="true" rel="canonical" href="https://mertsoylu.dev/" />
-    <link rel="preconnect" href="https://res.cloudinary.com" crossorigin />
-    <link rel="dns-prefetch" href="//res.cloudinary.com" />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link rel="preconnect" href="https://api.github.com" crossorigin />
     <link rel="dns-prefetch" href="//api.github.com" />
-    <link rel="preconnect" href="https://api.emailjs.com" />
-    <link rel="dns-prefetch" href="//api.emailjs.com" />
-    <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400..700;1,9..144,400..600&family=Inter:wght@400..700&display=swap" rel="stylesheet" media="print" onload="this.media='all'" />
-    <noscript><link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400..700;1,9..144,400..600&family=Inter:wght@400..700&display=swap" rel="stylesheet" /></noscript>
 
     <!-- Structured data: Person -->
     <script type="application/ld+json">
@@ -65,18 +54,8 @@
         "image": "https://mertsoylu.dev/og-image.png",
         "jobTitle": "Junior Full-Stack Developer",
         "description": "Junior Full-Stack Developer focused on web, Android, cybersecurity and artificial intelligence.",
-        "sameAs": [
-          "https://github.com/MertSoylu",
-          "https://www.linkedin.com/in/mertsoylu/"
-        ],
-        "knowsAbout": [
-          "Web Development",
-          "Android Development",
-          "React",
-          "JavaScript",
-          "Kotlin",
-          "Python"
-        ],
+        "sameAs": ["https://github.com/MertSoylu", "https://www.linkedin.com/in/mertsoylu/"],
+        "knowsAbout": ["Web Development", "Android Development", "React", "JavaScript", "Kotlin", "Python"],
         "alumniOf": {
           "@type": "CollegeOrUniversity",
           "name": "Kütahya Dumlupınar Üniversitesi"

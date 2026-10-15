@@ -1,20 +1,14 @@
 import React, { useEffect, useState, lazy, Suspense } from 'react';
 import { Routes, Route, useLocation } from 'react-router-dom';
 import { AnimatePresence, motion, MotionConfig, useReducedMotion } from 'framer-motion';
-import { DarkModeProvider, useDarkMode } from './context/DarkModeContext';
-import { LanguageProvider } from './context/LanguageContext';
+import { DarkModeProvider } from './context/DarkModeContext';
+import { LanguageProvider, useLanguage } from './context/LanguageContext';
 import Navbar from './components/Navbar';
 import Hero from './components/Hero';
 import Footer from './components/Footer';
 import LoadingSpinner from './components/LoadingSpinner';
 import ErrorBoundary from './components/ErrorBoundary';
 import PageMeta from './components/PageMeta';
-import { DiReact, DiNodejsSmall, DiPython, DiAndroid, DiGit, DiDocker } from 'react-icons/di';
-import { SiTypescript, SiTailwindcss, SiKotlin, SiPostgresql, SiFigma, SiFirebase } from 'react-icons/si';
-import Aurora from './components/ui/Aurora';
-import ClickSpark from './components/ui/ClickSpark';
-import Noise from './components/ui/Noise';
-import LogoLoop from './components/ui/LogoLoop';
 import { Toaster } from 'react-hot-toast';
 
 const lazyWithRetry = (importer, cacheKey) =>
@@ -46,6 +40,7 @@ const About = lazyWithRetry(() => import('./components/About'), 'lazy-retry-abou
 const Certificates = lazyWithRetry(() => import('./components/Certificates'), 'lazy-retry-certificates');
 const Projects = lazyWithRetry(() => import('./components/Projects'), 'lazy-retry-projects');
 const Contact = lazyWithRetry(() => import('./components/Contact'), 'lazy-retry-contact');
+const TechLogoLoop = lazyWithRetry(() => import('./components/TechLogoLoop'), 'lazy-retry-tech-loop');
 const CaseStudyPage = lazyWithRetry(() => import('./pages/CaseStudyPage'), 'lazy-retry-case-study');
 const NotFoundPage = lazyWithRetry(() => import('./pages/NotFoundPage'), 'lazy-retry-404');
 
@@ -65,42 +60,19 @@ const SectionDivider = ({ className = '' }) => (
   </div>
 );
 
-const techLogos = [
-  <DiReact key="react" className="text-[#61DAFB]" />,
-  <DiNodejsSmall key="node" className="text-[#339933]" />,
-  <SiTypescript key="ts" className="text-[#3178C6]" />,
-  <SiTailwindcss key="tw" className="text-[#06B6D4]" />,
-  <DiPython key="py" className="text-[#3776AB]" />,
-  <DiAndroid key="android" className="text-[#3DDC84]" />,
-  <SiKotlin key="kotlin" className="text-[#7F52FF]" />,
-  <DiGit key="git" className="text-[#F05032]" />,
-  <DiDocker key="docker" className="text-[#2496ED]" />,
-  <SiPostgresql key="pg" className="text-[#4169E1]" />,
-  <SiFigma key="figma" className="text-[#F24E1E]" />,
-  <SiFirebase key="firebase" className="text-[#FFCA28]" />,
-];
+// Reserves roughly the height of the lazy sections so the footer does not jump while they load.
+const HomeFallback = () => <div aria-hidden="true" className="min-h-[120vh]" />;
 
 const HomePage = () => (
   <>
     <PageMeta route="/" />
     <Hero />
-    <Suspense fallback={null}>
+    <Suspense fallback={<HomeFallback />}>
       <About />
       <SectionDivider />
       <Projects />
       <SectionDivider className="max-w-screen-2xl" />
-      <section className="py-9 sm:py-10">
-        <LogoLoop
-          logos={techLogos}
-          speed={70}
-          direction="right"
-          logoHeight={30}
-          gap={36}
-          hoverSpeed={18}
-          fadeOut
-          scaleOnHover
-        />
-      </section>
+      <TechLogoLoop />
       <SectionDivider className="max-w-screen-2xl" />
       <Certificates />
       <SectionDivider />
@@ -109,14 +81,13 @@ const HomePage = () => (
   </>
 );
 
-const EASE = [0.22, 1, 0.36, 1];
-
 const PageTransition = ({ children }) => {
   const prefersReducedMotion = useReducedMotion();
 
   if (prefersReducedMotion) {
     return (
       <motion.div
+        data-page-transition=""
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
@@ -129,9 +100,10 @@ const PageTransition = ({ children }) => {
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 14 }}
-      animate={{ opacity: 1, y: 0, transition: { duration: 0.45, ease: EASE } }}
-      exit={{ opacity: 0, y: -10, transition: { duration: 0.25, ease: EASE } }}
+      data-page-transition=""
+      initial={{ opacity: 0, y: 8 }}
+      animate={{ opacity: 1, y: 0, transition: { duration: 0.3, ease: 'easeOut' } }}
+      exit={{ opacity: 0, y: -8, transition: { duration: 0.15, ease: 'easeIn' } }}
     >
       {children}
     </motion.div>
@@ -200,56 +172,48 @@ const ScrollToTop = () => {
 };
 
 const AppContent = () => {
-  const { isDark } = useDarkMode();
+  const { isTurkish } = useLanguage();
   const location = useLocation();
 
   return (
-    <div className={`relative overflow-x-hidden ${isDark ? 'dark' : ''}`}>
-      <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
-        <div className="absolute inset-0 max-h-[65vh]">
-          <Aurora />
-        </div>
-        <div className="absolute inset-x-0 top-[50vh] h-[40vh] bg-gradient-to-b from-transparent to-canvas pointer-events-none" />
-      </div>
-      <Noise />
-      <ClickSpark>
-        <a
-          href="#main"
-          className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[9999] focus:rounded-lg focus:bg-accent focus:px-4 focus:py-2 focus:text-white focus:shadow-lift"
-        >
-          Skip to main content
-        </a>
-        <Navbar />
-        <ScrollToTop />
-        <main id="main">
-          <AnimatePresence mode="wait">
-            <Routes location={location} key={location.pathname}>
+    <div className="relative flex min-h-screen flex-col">
+      <div className="site-bg" aria-hidden="true" />
+      <a
+        href="#main"
+        className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[9999] focus:rounded-md focus:bg-signal focus:px-4 focus:py-3 focus:text-sm focus:font-medium focus:text-signal-fg"
+      >
+        {isTurkish ? 'Ana içeriğe geç' : 'Skip to main content'}
+      </a>
+      <Navbar />
+      <ScrollToTop />
+      <main id="main" className="flex-1">
+        <AnimatePresence mode="wait">
+          <Routes location={location} key={location.pathname}>
+            <Route
+              path="/"
+              element={
+                <PageTransition>
+                  <HomePage />
+                </PageTransition>
+              }
+            />
+            {LAZY_ROUTES.map(({ path, Component }) => (
               <Route
-                path="/"
+                key={path}
+                path={path}
                 element={
-                  <PageTransition>
-                    <HomePage />
-                  </PageTransition>
+                  <Suspense fallback={<LoadingSpinner />}>
+                    <PageTransition>
+                      <Component />
+                    </PageTransition>
+                  </Suspense>
                 }
               />
-              {LAZY_ROUTES.map(({ path, Component }) => (
-                <Route
-                  key={path}
-                  path={path}
-                  element={
-                    <Suspense fallback={<LoadingSpinner />}>
-                      <PageTransition>
-                        <Component />
-                      </PageTransition>
-                    </Suspense>
-                  }
-                />
-              ))}
-            </Routes>
-          </AnimatePresence>
-        </main>
-        <Footer />
-      </ClickSpark>
+            ))}
+          </Routes>
+        </AnimatePresence>
+      </main>
+      <Footer />
     </div>
   );
 };
@@ -331,11 +295,13 @@ function App() {
                 style: {
                   background: 'rgb(var(--surface))',
                   color: 'rgb(var(--fg))',
-                  border: '1px solid rgb(var(--line) / 0.16)',
-                  borderRadius: '0.85rem',
+                  border: '1px solid rgb(var(--line) / 0.2)',
+                  borderRadius: '0.5rem',
                   fontSize: '0.875rem',
-                  boxShadow: '0 18px 48px -22px rgba(20,16,12,0.28)',
+                  boxShadow: 'none',
                 },
+                success: { iconTheme: { primary: 'rgb(var(--ok))', secondary: 'rgb(var(--surface))' } },
+                error: { iconTheme: { primary: 'rgb(var(--danger))', secondary: 'rgb(var(--surface))' } },
               }}
             />
             <DeferredVercelComponent load={loadAnalytics} label="Vercel Analytics" />
