@@ -7,23 +7,9 @@ import Reveal from '../ui/Reveal';
  *
  * Props: `id` (put on the h2 so a section can use aria-labelledby), `index` ('01'), `label`, `title`,
  * `lead`, `aside`, `align` ('left' | 'center'), `className`.
- *
- * Temporary backwards compatibility until phase 2 updates the callers: `kicker` is read as `label`
- * and `kickerIcon` is ignored.
  */
-const SectionHeader = ({
-  id,
-  index,
-  label,
-  kicker,
-  kickerIcon: _kickerIcon,
-  title,
-  lead,
-  aside,
-  align = 'left',
-  className = '',
-}) => {
-  const marker = [index, label ?? kicker].filter(Boolean).join(' / ');
+const SectionHeader = ({ id, index, label, title, lead, aside, align = 'left', className = '' }) => {
+  const marker = [index, label].filter(Boolean).join(' / ');
   const centered = align === 'center';
 
   return (

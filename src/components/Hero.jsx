@@ -70,7 +70,7 @@ const Hero = () => {
               splitLevelClassName="overflow-hidden pb-1"
               splitBy="characters"
               staggerDuration={0.012}
-              staggerFrom="last"
+              staggerFrom="first"
               transition={{ type: 'spring', damping: 25, stiffness: 260 }}
             />
           </Reveal>

@@ -1,8 +1,28 @@
-import { forwardRef, useCallback, useEffect, useImperativeHandle, useMemo, useState } from 'react';
+import {
+  forwardRef,
+  useCallback,
+  useEffect,
+  useImperativeHandle,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 
 const cx = (...classes) => classes.filter(Boolean).join(' ');
 
+const sameWidths = (a, b) => a === b || (a && b && a.length === b.length && a.every((w, i) => w === b[i]));
+
+/**
+ * Rotating single-line text inside a persistent box.
+ *
+ * `mainClassName` styles that box (the hero puts its `.mark` highlight there), so the box is never
+ * unmounted. The outgoing and incoming texts are stacked in one grid cell and swap at the same time
+ * (no "empty box" gap), and the box width follows the text via a CSS width transition. Widths come
+ * from an invisible measurer that renders every text once; when the longest text cannot fit on one row
+ * the box falls back to its natural width and the text wraps as normal.
+ */
 const RotatingText = forwardRef(function RotatingText(
   {
     texts,
@@ -10,7 +30,7 @@ const RotatingText = forwardRef(function RotatingText(
     initial = { y: '100%', opacity: 0 },
     animate = { y: 0, opacity: 1 },
     exit = { y: '-120%', opacity: 0 },
-    animatePresenceMode = 'wait',
+    animatePresenceMode = 'sync',
     animatePresenceInitial = false,
     rotationInterval = 2800,
     staggerDuration = 0,
@@ -27,7 +47,12 @@ const RotatingText = forwardRef(function RotatingText(
   ref,
 ) {
   const [currentTextIndex, setCurrentTextIndex] = useState(0);
+  // One-row pixel width of each text; null = not measured / does not fit (natural width, text may wrap).
+  const [widths, setWidths] = useState(null);
   const reduceMotion = useReducedMotion();
+  const boxRef = useRef(null);
+  const measureRefs = useRef([]);
+  const textsKey = texts.join('\n');
 
   const splitIntoCharacters = (text) => {
     if (typeof Intl !== 'undefined' && Intl.Segmenter) {
@@ -125,53 +150,114 @@ const RotatingText = forwardRef(function RotatingText(
     return () => clearInterval(intervalId);
   }, [next, rotationInterval, rotates]);
 
+  useLayoutEffect(() => {
+    const box = boxRef.current;
+    const nodes = measureRefs.current.slice(0, texts.length);
+    if (reduceMotion || !box || nodes.length !== texts.length || nodes.some((node) => !node))
+      return undefined;
+
+    const measure = () => {
+      const measured = nodes.map((node) => Math.ceil(node.getBoundingClientRect().width) + 1);
+      const style = window.getComputedStyle(box);
+      const padding = (parseFloat(style.paddingLeft) || 0) + (parseFloat(style.paddingRight) || 0);
+      const available = box.parentElement?.clientWidth ?? Infinity;
+      const usable = measured.every((width) => width > 1) && Math.max(...measured) + padding <= available;
+      const next = usable ? measured : null;
+      setWidths((previous) => (sameWidths(previous, next) ? previous : next));
+    };
+
+    measure();
+    if (typeof ResizeObserver === 'undefined') return undefined;
+    // Re-measure when the type size changes (breakpoints, font swap) or the row gets narrower.
+    const observer = new ResizeObserver(measure);
+    nodes.forEach((node) => observer.observe(node));
+    if (box.parentElement) observer.observe(box.parentElement);
+    return () => observer.disconnect();
+    // `textsKey` stands in for `texts`: callers often pass a fresh array every render.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [textsKey, reduceMotion]);
+
+  const oneRow = widths !== null;
+
   return (
     // Not: `layout` animasyonu bilerek yok. Hero'da y animasyonu yapan bir üst öğe içinde
-    // framer-motion projeksiyonu metni eğip kaydırıyordu; genişlik değişimi artık anında olur.
-    <span className={cx('inline-flex flex-wrap whitespace-pre-wrap relative', mainClassName)} {...rest}>
+    // framer-motion projeksiyonu metni eğip kaydırıyordu; genişlik CSS transition ile değişir.
+    <span ref={boxRef} className={cx('relative inline-flex max-w-full', mainClassName)} {...rest}>
       {/* Screen readers get every text once, whatever the animation is showing. */}
       <span className="sr-only">{texts.join(', ')}</span>
       {reduceMotion ? (
         <span aria-hidden="true">{texts[currentTextIndex]}</span>
       ) : (
-        <AnimatePresence mode={animatePresenceMode} initial={animatePresenceInitial}>
-          <motion.span
-            key={currentTextIndex}
-            className={cx(
-              splitBy === 'lines' ? 'flex flex-col w-full' : 'flex flex-wrap whitespace-pre-wrap relative',
-            )}
+        <>
+          <span
             aria-hidden="true"
+            className={cx(
+              'grid max-w-full overflow-hidden transition-[width] duration-300 ease-out',
+              oneRow ? 'whitespace-nowrap' : 'whitespace-pre-wrap',
+            )}
+            style={oneRow ? { width: widths[currentTextIndex] } : undefined}
           >
-            {elements.map((wordObj, wordIndex, array) => {
-              const previousCharsCount = array
-                .slice(0, wordIndex)
-                .reduce((sum, word) => sum + word.characters.length, 0);
-              return (
-                <span key={wordIndex} className={cx('inline-flex', splitLevelClassName)}>
-                  {wordObj.characters.map((char, charIndex) => (
-                    <motion.span
-                      key={charIndex}
-                      initial={initial}
-                      animate={animate}
-                      exit={exit}
-                      transition={{
-                        ...transition,
-                        delay: getStaggerDelay(
-                          previousCharsCount + charIndex,
-                          array.reduce((sum, word) => sum + word.characters.length, 0),
-                        ),
-                      }}
-                      className={cx('inline-block', elementLevelClassName)}
-                    >
-                      {char}
-                    </motion.span>
-                  ))}
-                  {wordObj.needsSpace && <span className="whitespace-pre"> </span>}
-                </span>
-              );
-            })}
-          </motion.span>
-        </AnimatePresence>
+            <AnimatePresence mode={animatePresenceMode} initial={animatePresenceInitial}>
+              <motion.span
+                key={currentTextIndex}
+                className={cx(
+                  'col-start-1 row-start-1',
+                  splitBy === 'lines'
+                    ? 'flex w-full flex-col'
+                    : oneRow
+                      ? 'flex flex-nowrap'
+                      : 'flex flex-wrap',
+                )}
+              >
+                {elements.map((wordObj, wordIndex, array) => {
+                  const previousCharsCount = array
+                    .slice(0, wordIndex)
+                    .reduce((sum, word) => sum + word.characters.length, 0);
+                  return (
+                    <span key={wordIndex} className={cx('inline-flex', splitLevelClassName)}>
+                      {wordObj.characters.map((char, charIndex) => (
+                        <motion.span
+                          key={charIndex}
+                          initial={initial}
+                          animate={animate}
+                          exit={exit}
+                          transition={{
+                            ...transition,
+                            delay: getStaggerDelay(
+                              previousCharsCount + charIndex,
+                              array.reduce((sum, word) => sum + word.characters.length, 0),
+                            ),
+                          }}
+                          className={cx('inline-block', elementLevelClassName)}
+                        >
+                          {char}
+                        </motion.span>
+                      ))}
+                      {wordObj.needsSpace && <span className="whitespace-pre"> </span>}
+                    </span>
+                  );
+                })}
+              </motion.span>
+            </AnimatePresence>
+          </span>
+          {/* Invisible measurer: every text once, on one row, in the same font as the visible text. */}
+          <span
+            aria-hidden="true"
+            className="pointer-events-none invisible absolute left-0 top-0 h-0 w-max overflow-hidden whitespace-pre"
+          >
+            {texts.map((text, index) => (
+              <span
+                key={text}
+                ref={(node) => {
+                  measureRefs.current[index] = node;
+                }}
+                className="block w-max"
+              >
+                {text}
+              </span>
+            ))}
+          </span>
+        </>
       )}
     </span>
   );

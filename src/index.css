@@ -329,62 +329,6 @@ html.dark {
     @apply absolute inset-0 rounded-full bg-ok;
     animation: status-pulse 2.4s ease-out infinite;
   }
-
-  /* ---- LEGACY ALIASES — removed in phase 3 ------------------------------
-     Old class names still used by not-yet-rebuilt files, restyled to the new tokens.
-     .eyebrow, .text-body-lg: Hero, SpecialtyPageLayout, ProjectShowcase, CaseStudyPage, area pages
-     .text-body / .text-body-sm: Projects, ProjectShowcase, CaseStudyPage, area pages, NotFoundPage
-     .card-prominent / .card-hover: Projects, Certificates, CaseStudyPage, DataSciencePage, CyberSecurityPage
-     .container-wide: Hero, About, Projects, Certificates, Contact, SpecialtyPageLayout, CaseStudyPage, App
-     .rule: App SectionDivider.  .no-scrollbar: ui/CardMarquee */
-  .container-wide {
-    @apply container-site;
-  }
-
-  .eyebrow {
-    @apply inline-flex items-center gap-2 font-mono text-xs uppercase text-muted;
-    letter-spacing: 0.08em;
-  }
-
-  .rule {
-    @apply h-px w-full border-0 bg-line/10;
-  }
-
-  .text-body-lg {
-    @apply text-lg leading-relaxed;
-  }
-
-  .text-body {
-    @apply text-base leading-relaxed;
-  }
-
-  .text-body-sm {
-    @apply text-sm leading-relaxed;
-  }
-
-  .card-prominent {
-    @apply rounded-lg border border-line/10 bg-surface;
-  }
-
-  .card-hover {
-    transition:
-      border-color 150ms ease,
-      background-color 150ms ease;
-  }
-
-  .card-hover:hover {
-    @apply border-line/25;
-    background-color: rgb(var(--surface-2) / 0.6);
-  }
-
-  .no-scrollbar {
-    -ms-overflow-style: none;
-    scrollbar-width: none;
-  }
-
-  .no-scrollbar::-webkit-scrollbar {
-    display: none;
-  }
 }
 
 /* ==========================================================================
@@ -475,11 +419,7 @@ html.dark {
   footer,
   .site-bg,
   button,
-  a[href='#main'],
-  [role='dialog'],
-  canvas,
-  iframe,
-  [data-print-hide] {
+  a[href='#main'] {
     display: none !important;
   }
 

@@ -35,25 +35,6 @@ export default {
         },
         ok: token('ok'),
         danger: token('danger'),
-
-        /* LEGACY ALIASES — removed in phase 3 */
-        // Used by: About.jsx, Certificates.jsx (hover:text-accent-strong).
-        'accent-strong': token('accent'),
-        // Used by: ui/DevicePreview.jsx (phone/terminal frames).
-        ink: {
-          800: '#181B1F',
-          900: '#0A0B0D',
-        },
-      },
-      /* LEGACY ALIASES — removed in phase 3 */
-      boxShadow: {
-        // Used by: Hero.jsx, Projects.jsx, ui/DevicePreview.jsx.
-        soft: '0 1px 2px rgb(0 0 0 / 0.18)',
-        lift: '0 24px 48px -24px rgb(0 0 0 / 0.5)',
-      },
-      opacity: {
-        // `border-line/12` is used all over the not-yet-rebuilt sections; the spec scale has no 12.
-        12: '0.12',
       },
     },
   },

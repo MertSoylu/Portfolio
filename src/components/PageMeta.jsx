@@ -13,7 +13,7 @@ const PageMeta = ({ route, noindex = false }) => {
       <html lang={isTurkish ? 'tr' : 'en'} />
       <title>{lang.title}</title>
       <meta name="description" content={lang.description} />
-      {noindex ? <meta name="robots" content="noindex" /> : null}
+      <meta name="robots" content={noindex ? 'noindex' : 'index, follow'} />
       <link rel="canonical" href={meta.canonical} />
       <meta property="og:type" content="website" />
       <meta property="og:url" content={meta.canonical} />

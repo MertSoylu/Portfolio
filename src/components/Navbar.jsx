@@ -139,7 +139,7 @@ const Navbar = () => {
           <Link
             to="/"
             onClick={handleBrandClick}
-            className="-ml-1 flex min-h-11 items-center gap-2.5 rounded-md px-1 text-fg"
+            className="-ml-1 flex min-h-11 min-w-11 shrink-0 items-center gap-2.5 rounded-md px-1 text-fg"
           >
             <span
               aria-hidden="true"
@@ -147,7 +147,11 @@ const Navbar = () => {
             >
               MS
             </span>
-            <span className="text-base font-semibold tracking-tight">Mert Soylu</span>
+            {/* Below 360px the bar has no room for the name next to TR/EN + theme + menu: keep it for assistive
+                tech (it is the link's accessible name) and let the monogram carry the brand visually. */}
+            <span className="sr-only whitespace-nowrap text-base font-semibold tracking-tight min-[360px]:not-sr-only">
+              Mert Soylu
+            </span>
           </Link>
 
           <nav aria-label={isTurkish ? 'Ana gezinme' : 'Main'} className="hidden md:block">
@@ -166,7 +170,7 @@ const Navbar = () => {
             </ul>
           </nav>
 
-          <div className="flex items-center gap-1">
+          <div className="flex shrink-0 items-center gap-1">
             <button
               type="button"
               onClick={toggleLanguage}
