@@ -2,7 +2,7 @@ import { Helmet } from 'react-helmet-async';
 import { useLanguage } from '../context/LanguageContext';
 import { SEO_META } from '../utils/constants';
 
-const PageMeta = ({ route }) => {
+const PageMeta = ({ route, noindex = false }) => {
   const { isTurkish } = useLanguage();
   const meta = SEO_META[route] || SEO_META['/'];
   const lang = isTurkish ? meta.tr : meta.en;
@@ -13,6 +13,7 @@ const PageMeta = ({ route }) => {
       <html lang={isTurkish ? 'tr' : 'en'} />
       <title>{lang.title}</title>
       <meta name="description" content={lang.description} />
+      {noindex ? <meta name="robots" content="noindex" /> : null}
       <link rel="canonical" href={meta.canonical} />
       <meta property="og:type" content="website" />
       <meta property="og:url" content={meta.canonical} />

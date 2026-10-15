@@ -1,48 +1,85 @@
-import { HiGlobe } from 'react-icons/hi';
 import { useLanguage } from '../context/LanguageContext';
-import SpecialtyPageLayout from '../components/SpecialtyPageLayout';
+import SpecialtyPageLayout, { InfoCard, PageSection } from '../components/SpecialtyPageLayout';
 import Reveal from '../components/ui/Reveal';
 import ProjectShowcase from '../components/project/ProjectShowcase';
-import { projectsByCategory } from '../data/projects';
+import { areaById, fill } from '../data/areas';
+import { getProject, pick, projectsByCategory } from '../data/projects';
+
+const area = areaById('web');
+const { projects: projectsCopy, tech, approach } = area.page;
 
 const WebDevPage = () => {
   const { isTurkish } = useLanguage();
+  const t = (value) => pick(value, isTurkish);
 
   const projects = projectsByCategory('Web');
-  // Yayında olan proje sayısı veriden hesaplanır; metne elle yazılmaz.
-  const liveCount = projects.filter((project) => project.liveUrl).length;
+  // Counts come from the data, never from hand-written text.
+  const counts = { count: projects.length, live: projects.filter((project) => project.liveUrl).length };
 
-  const intro = isTurkish
-    ? `${projects.length} proje, ${liveCount} tanesi yayında. Her birinde önizleme, odak notu ve vaka incelemesi var.`
-    : `${projects.length} projects, ${liveCount} of them live. Each one has a preview, a focus note and a case study.`;
+  // Tag cloud: every project tag once, in order of first appearance.
+  const techTags = [...new Set(projects.flatMap((project) => project.tags ?? []).map(t))];
 
   return (
-    <SpecialtyPageLayout
-      routePath="/web"
-      eyebrow={isTurkish ? 'Web geliştirme' : 'Web development'}
-      eyebrowIcon={<HiGlobe className="h-4 w-4" />}
-      title={isTurkish ? 'Yayında çalışan web projeleri' : 'Web projects running live'}
-      subtitle={
-        isTurkish
-          ? 'JavaScript ve Next.js ile geliştirdiğim projeler. Her birinin kararları ve teknik tercihleri vaka incelemesinde anlatılıyor.'
-          : 'Projects built with JavaScript and Next.js. The decisions and technical trade-offs of each one are laid out in its case study.'
-      }
-    >
-      <Reveal className="card mb-16 flex items-center gap-4 p-5 sm:mb-20 sm:p-6">
-        <span
-          aria-hidden="true"
-          className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-surface2 text-accent"
-        >
-          <HiGlobe className="h-5 w-5" />
-        </span>
-        <p className="text-body-sm text-muted">{intro}</p>
-      </Reveal>
+    <SpecialtyPageLayout areaId={area.id} projects={projects}>
+      <PageSection
+        id="web-projects-heading"
+        index="01"
+        label={t(projectsCopy.label)}
+        title={fill(t(projectsCopy.title), counts)}
+        lead={t(projectsCopy.lead)}
+      >
+        <div className="space-y-16 md:space-y-24">
+          {projects.map((project, index) => (
+            <ProjectShowcase
+              key={project.id}
+              project={project}
+              index={index}
+              flip={index % 2 === 1}
+              headingLevel="h3"
+            />
+          ))}
+        </div>
+      </PageSection>
 
-      <div className="space-y-20 sm:space-y-24">
-        {projects.map((project, index) => (
-          <ProjectShowcase key={project.id} project={project} index={index} flip={index % 2 === 1} />
-        ))}
-      </div>
+      {techTags.length > 0 && (
+        <PageSection
+          id="web-tech-heading"
+          index="02"
+          label={t(tech.label)}
+          title={t(tech.title)}
+          lead={t(tech.lead)}
+        >
+          <Reveal>
+            <ul className="flex flex-wrap gap-2">
+              {techTags.map((tag) => (
+                <li key={tag} className="tag px-3 py-1.5 text-sm text-fg">
+                  {tag}
+                </li>
+              ))}
+            </ul>
+          </Reveal>
+        </PageSection>
+      )}
+
+      <PageSection id="web-approach-heading" index="03" label={t(approach.label)} title={t(approach.title)}>
+        <ul className="grid gap-4 md:grid-cols-3">
+          {approach.items.map((item, index) => (
+            <Reveal as="li" key={item.title.en} delay={index * 0.06} className="h-full">
+              <InfoCard
+                index={String(index + 1).padStart(2, '0')}
+                title={t(item.title)}
+                meta={
+                  getProject(item.project) && (
+                    <span className="micro text-muted">{getProject(item.project).title}</span>
+                  )
+                }
+              >
+                {t(item.desc)}
+              </InfoCard>
+            </Reveal>
+          ))}
+        </ul>
+      </PageSection>
     </SpecialtyPageLayout>
   );
 };

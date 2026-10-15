@@ -1,57 +1,60 @@
 import { Link } from 'react-router-dom';
-import { HiArrowLeft, HiHome } from 'react-icons/hi';
 import { useLanguage } from '../context/LanguageContext';
-import SpecialtyPageLayout from '../components/SpecialtyPageLayout';
+import PageMeta from '../components/PageMeta';
+import { AREAS } from '../data/areas';
 
 const NotFoundPage = () => {
   const { isTurkish } = useLanguage();
-
-  const quickLinks = [
-    { to: '/web', label: isTurkish ? 'Web Geliştirme' : 'Web Development' },
-    { to: '/android', label: 'Android' },
-    { to: '/cybersecurity', label: isTurkish ? 'Siber Güvenlik' : 'Cybersecurity' },
-    { to: '/data-science', label: isTurkish ? 'Veri Bilimi' : 'Data Science' },
-  ];
+  const t = (value) => (isTurkish ? value.tr : value.en);
 
   return (
-    <SpecialtyPageLayout routePath="/404" centered hideBackButton>
-      <p className="font-display text-[7rem] font-semibold leading-none text-accent sm:text-[9rem]">404</p>
+    <div className="container-site flex min-h-[70vh] flex-col items-center justify-center pb-16 pt-28 text-center sm:pt-32">
+      <PageMeta route="/404" noindex />
 
-      <h1 className="mb-4 mt-2 text-h2 text-fg">{isTurkish ? 'Sayfa bulunamadı' : 'Page not found'}</h1>
-      <p className="mb-8 text-body text-muted">
-        {isTurkish
-          ? 'Aradığın sayfa mevcut değil ya da taşınmış olabilir.'
-          : "The page you're looking for doesn't exist or may have been moved."}
+      <p
+        aria-hidden="true"
+        className="font-mono text-[clamp(7rem,28vw,14rem)] font-semibold leading-none tracking-tighter text-fg"
+      >
+        4<span className="text-accent">0</span>4
       </p>
 
-      <div className="flex flex-col justify-center gap-3 sm:flex-row">
-        <Link to="/" className="btn-primary">
-          <HiHome className="h-5 w-5" />
-          {isTurkish ? 'Ana sayfa' : 'Go home'}
+      <h1 className="text-h2 mt-6">
+        <span className="sr-only">404: </span>
+        {isTurkish ? 'Sayfa bulunamadı' : 'Page not found'}
+      </h1>
+      <p className="text-lead mt-4 max-w-md">
+        {isTurkish
+          ? 'Aradığın sayfa mevcut değil ya da taşınmış olabilir.'
+          : 'The page you are looking for does not exist or may have moved.'}
+      </p>
+
+      <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+        <Link to="/" className="btn-primary btn-lg">
+          {isTurkish ? 'Ana sayfa' : 'Home'}
         </Link>
-        <button type="button" onClick={() => window.history.back()} className="btn-secondary">
-          <HiArrowLeft className="h-5 w-5" />
-          {isTurkish ? 'Geri dön' : 'Go back'}
-        </button>
+        <Link to="/#projects" className="btn-secondary btn-lg">
+          {isTurkish ? 'Projelere göz at' : 'Browse projects'}
+        </Link>
       </div>
 
-      <div className="mt-12">
-        <p className="mb-4 text-xs font-semibold uppercase tracking-[0.18em] text-muted">
-          {isTurkish ? 'Belki şunu mu arıyordun?' : 'Maybe you were looking for'}
+      <nav aria-labelledby="not-found-areas" className="mt-14 w-full max-w-3xl sm:mt-16">
+        <p id="not-found-areas" className="label">
+          {isTurkish ? 'Ya da bir alana geç' : 'Or jump to an area'}
         </p>
-        <div className="flex flex-wrap justify-center gap-2">
-          {quickLinks.map((quick) => (
-            <Link
-              key={quick.to}
-              to={quick.to}
-              className="rounded-full border border-line/12 bg-surface px-4 py-2 text-sm font-medium text-muted transition-colors hover:border-line/25 hover:text-fg"
-            >
-              {quick.label}
-            </Link>
+        <ul className="mt-4 grid gap-3 text-left sm:grid-cols-2">
+          {AREAS.map((area) => (
+            <li key={area.id}>
+              <Link to={area.path} className="card-interactive flex min-h-11 items-center gap-3 px-4 py-3">
+                <span aria-hidden="true" className="micro text-accent">
+                  {area.index}
+                </span>
+                <span className="text-sm font-medium">{t(area.name)}</span>
+              </Link>
+            </li>
           ))}
-        </div>
-      </div>
-    </SpecialtyPageLayout>
+        </ul>
+      </nav>
+    </div>
   );
 };
 

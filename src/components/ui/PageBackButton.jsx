@@ -1,19 +1,19 @@
 import { Link } from 'react-router-dom';
 import { HiArrowLeft } from 'react-icons/hi';
 import { useLanguage } from '../../context/LanguageContext';
-import { UI_COPY, pick } from '../../data/projects';
 
-// Sayfa başındaki geri bağlantısı. `label` verilirse varsayılan "Ana sayfaya dön" metni yerine geçer.
-const PageBackButton = ({ to = '/', label, className = '' }) => {
+// Back link at the top of a page. Defaults to the home page's area cards (`/#about`), which is where
+// every area page is reached from; `label` replaces the default "Ana sayfa / Home" text.
+const PageBackButton = ({ to = '/#about', label, className = '' }) => {
   const { isTurkish } = useLanguage();
 
   return (
     <Link
       to={to}
-      className={`group inline-flex min-h-[2.75rem] items-center gap-2 rounded-full border border-line/10 bg-canvas/60 py-1.5 pl-3 pr-4 text-sm font-medium text-fg/75 backdrop-blur-md transition-colors hover:border-line/25 hover:text-fg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent ${className}`}
+      className={`inline-flex min-h-11 items-center gap-2 rounded-md border border-line/15 px-3.5 text-sm font-medium text-muted transition-colors duration-150 hover:border-line/40 hover:bg-surface2 hover:text-fg ${className}`}
     >
-      <HiArrowLeft className="h-4 w-4 transition-transform group-hover:-translate-x-1" aria-hidden="true" />
-      {label ?? pick(UI_COPY.backHome, isTurkish)}
+      <HiArrowLeft className="h-4 w-4 shrink-0" aria-hidden="true" />
+      {label ?? (isTurkish ? 'Ana sayfa' : 'Home')}
     </Link>
   );
 };

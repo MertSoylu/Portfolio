@@ -1,116 +1,118 @@
-import { HiFingerPrint, HiShieldCheck, HiShieldExclamation, HiTerminal } from 'react-icons/hi';
+import { HiExternalLink } from 'react-icons/hi';
 import { useLanguage } from '../context/LanguageContext';
-import SpecialtyPageLayout from '../components/SpecialtyPageLayout';
-import ProjectShowcase from '../components/project/ProjectShowcase';
+import SpecialtyPageLayout, { InfoCard, PageSection } from '../components/SpecialtyPageLayout';
 import Reveal from '../components/ui/Reveal';
+import ProjectShowcase from '../components/project/ProjectShowcase';
+import { areaById } from '../data/areas';
 import { pick, projectsByCategory } from '../data/projects';
+import { CERTIFICATES } from '../utils/constants';
 
-// msscan'in mevcut kontrol listesi. Kısa teknik adlar iki dilde aynı; diğerleri doğal çevirilidir.
-const SCAN_CHECKS = [
-  { tr: 'XSS', en: 'XSS' },
-  { tr: 'SQLi', en: 'SQLi' },
-  { tr: 'CSRF', en: 'CSRF' },
-  { tr: 'SSRF', en: 'SSRF' },
-  { tr: 'Açık yönlendirme', en: 'Open redirect' },
-  { tr: 'Güvenlik başlıkları', en: 'Security headers' },
-  { tr: 'Alt alan adları', en: 'Subdomains' },
-];
-
-const FOCUS_AREAS = [
-  {
-    icon: HiShieldExclamation,
-    title: { tr: 'Web açıklıkları', en: 'Web vulnerabilities' },
-    desc: {
-      tr: 'XSS, SQLi, CSRF, SSRF ve açık yönlendirme gibi sık görülen açıklıkları tanımak ve tespit etmek.',
-      en: 'Recognizing and detecting common flaws such as XSS, SQLi, CSRF, SSRF and open redirects.',
-    },
-  },
-  {
-    icon: HiTerminal,
-    title: { tr: 'CLI otomasyonu', en: 'CLI automation' },
-    desc: {
-      tr: 'Güvenlik kontrollerini terminalden, her seferinde aynı adımlarla çalıştırmak.',
-      en: 'Running security checks from the terminal, the same way every time.',
-    },
-  },
-  {
-    icon: HiFingerPrint,
-    title: { tr: 'Güvenli kodlama', en: 'Secure coding' },
-    desc: {
-      tr: 'Saldırgan bakış açısını günlük ürün ve tasarım kararlarının içine taşımak.',
-      en: "Bringing an attacker's perspective into everyday product and design decisions.",
-    },
-  },
-];
+const area = areaById('cybersecurity');
+const { projects: projectsCopy, checks, focus, certificate: certificateCopy } = area.page;
 
 const CyberSecurityPage = () => {
   const { isTurkish } = useLanguage();
   const t = (value) => pick(value, isTurkish);
+
   const projects = projectsByCategory('Security');
+  const certificate = CERTIFICATES.find((item) => item.id === certificateCopy.id);
+
+  // Sections are numbered in order; without projects the others shift up so there is no gap.
+  const offset = projects.length > 0 ? 0 : 1;
+  const sectionIndex = (position) => String(position - offset).padStart(2, '0');
 
   return (
-    <SpecialtyPageLayout
-      routePath="/cybersecurity"
-      eyebrow={t({ tr: 'Siber güvenlik', en: 'Cybersecurity' })}
-      eyebrowIcon={<HiShieldCheck className="h-4 w-4" aria-hidden="true" />}
-      title={t({ tr: 'Siber Güvenlik', en: 'Cyber Security' })}
-      subtitle={t({
-        tr: 'Öğrendiğim güvenlik kavramlarını küçük, çalışan ve tekrarlanabilir araçlara dönüştürüyorum.',
-        en: 'I turn the security concepts I learn into small, working and repeatable tools.',
-      })}
-    >
+    <SpecialtyPageLayout areaId={area.id} projects={projects}>
       {projects.length > 0 && (
-        <section aria-labelledby="cyber-projects-heading">
-          <Reveal as="h2" id="cyber-projects-heading" className="mb-8 text-h2 text-fg sm:mb-10">
-            {t({ tr: 'Projeler', en: 'Projects' })}
-          </Reveal>
-          <div className="space-y-16 sm:space-y-20">
+        <PageSection
+          id="cyber-projects-heading"
+          index={sectionIndex(1)}
+          label={t(projectsCopy.label)}
+          title={t(projectsCopy.title)}
+        >
+          <div className="space-y-16 md:space-y-24">
             {projects.map((project, index) => (
               <ProjectShowcase key={project.id} project={project} index={index} headingLevel="h3" />
             ))}
           </div>
-        </section>
+        </PageSection>
       )}
 
-      <section aria-labelledby="scan-checks-heading" className="mt-16 sm:mt-24">
-        <Reveal as="h2" id="scan-checks-heading" className="mb-6 text-h2 text-fg">
-          {t({ tr: 'Kontrol ettiği alanlar', en: 'What it checks' })}
-        </Reveal>
-        <Reveal delay={0.05}>
+      <PageSection
+        id="cyber-checks-heading"
+        index={sectionIndex(2)}
+        label={t(checks.label)}
+        title={t(checks.title)}
+        lead={t(checks.lead)}
+      >
+        <Reveal>
           <ul className="flex flex-wrap gap-2">
-            {SCAN_CHECKS.map((check) => (
-              <li
-                key={check.en}
-                className="rounded-full border border-line/12 bg-surface2 px-3.5 py-1.5 text-sm font-medium text-fg"
-              >
-                {t(check)}
+            {checks.items.map((item) => (
+              <li key={item.en} className="tag px-3 py-1.5 text-sm text-fg">
+                {t(item)}
               </li>
             ))}
           </ul>
         </Reveal>
-      </section>
+      </PageSection>
 
-      <section aria-labelledby="focus-areas-heading" className="mt-16 sm:mt-24">
-        <Reveal as="h2" id="focus-areas-heading" className="mb-8 text-h2 text-fg">
-          {t({ tr: 'Odak alanları', en: 'Focus areas' })}
-        </Reveal>
-        <div className="grid gap-4 md:grid-cols-3">
-          {FOCUS_AREAS.map((area, index) => {
-            const Icon = area.icon;
-            return (
-              <Reveal key={area.title.en} delay={index * 0.08} className="h-full">
-                <div className="card card-hover h-full p-6">
-                  <div className="mb-4 inline-flex h-10 w-10 items-center justify-center rounded-xl bg-surface2 text-accent">
-                    <Icon className="h-5 w-5" aria-hidden="true" />
-                  </div>
-                  <h3 className="mb-2 text-h4 text-fg">{t(area.title)}</h3>
-                  <p className="text-body-sm text-muted">{t(area.desc)}</p>
-                </div>
-              </Reveal>
-            );
-          })}
-        </div>
-      </section>
+      <PageSection
+        id="cyber-focus-heading"
+        index={sectionIndex(3)}
+        label={t(focus.label)}
+        title={t(focus.title)}
+      >
+        <ul className="grid gap-4 md:grid-cols-3">
+          {focus.items.map((item, index) => (
+            <Reveal as="li" key={item.title.en} delay={index * 0.06} className="h-full">
+              <InfoCard index={String(index + 1).padStart(2, '0')} title={t(item.title)}>
+                {t(item.desc)}
+              </InfoCard>
+            </Reveal>
+          ))}
+        </ul>
+      </PageSection>
+
+      {certificate && (
+        <PageSection
+          id="cyber-certificate-heading"
+          index={sectionIndex(4)}
+          label={t(certificateCopy.label)}
+          title={t(certificateCopy.title)}
+        >
+          <Reveal>
+            <article className="card flex flex-col gap-6 p-6 md:flex-row md:items-center md:justify-between md:p-8">
+              <div className="min-w-0">
+                <p className="label">
+                  {certificate.issuer} · {certificate.date}
+                </p>
+                <h3 className="text-h3 mt-2">{t(certificate.title)}</h3>
+                {certificate.skills?.length > 0 && (
+                  <ul className="mt-4 flex flex-wrap gap-1.5">
+                    {certificate.skills.map((skill) => (
+                      <li key={skill} className="tag">
+                        {skill}
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+              <a
+                href={certificate.fileUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="btn-secondary shrink-0 self-start md:self-center"
+              >
+                {t(certificateCopy.open)}
+                <HiExternalLink className="h-4 w-4" aria-hidden="true" />
+                <span className="sr-only">
+                  {isTurkish ? '(yeni sekmede açılır)' : '(opens in a new tab)'}
+                </span>
+              </a>
+            </article>
+          </Reveal>
+        </PageSection>
+      )}
     </SpecialtyPageLayout>
   );
 };
