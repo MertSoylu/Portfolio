@@ -1,8 +1,10 @@
 import Reveal from '../ui/Reveal';
+import ScrambleText from '../ui/ScrambleText';
 
 /**
  * SectionHeader — the only section header pattern. A full-width hairline rule carries a mono
- * `index / label` marker (`01 / Projeler`), followed by the h2, an optional lead paragraph and an
+ * `index / label` marker (`01 / Projeler`, which decodes from random glyphs once as it scrolls into view),
+ * followed by the h2, an optional lead paragraph and an
  * optional aside (stats, links) that sits to the right of the title from `lg` up.
  *
  * Props: `id` (put on the h2 so a section can use aria-labelledby), `index` ('01'), `label`, `title`,
@@ -16,7 +18,7 @@ const SectionHeader = ({ id, index, label, title, lead, aside, align = 'left', c
     <div className={`mb-10 sm:mb-14 ${className}`}>
       <Reveal className="flex items-center gap-4">
         {centered && <span aria-hidden="true" className="h-px flex-1 bg-line/15" />}
-        {marker && <span className="label shrink-0 text-muted">{marker}</span>}
+        {marker && <ScrambleText text={marker} className="label shrink-0 text-muted" />}
         <span aria-hidden="true" className="h-px flex-1 bg-line/15" />
       </Reveal>
 

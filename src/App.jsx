@@ -1,5 +1,5 @@
 import React, { useEffect, useState, lazy, Suspense } from 'react';
-import { Routes, Route, useLocation } from 'react-router-dom';
+import { Routes, Route, matchPath, useLocation } from 'react-router-dom';
 import { AnimatePresence, motion, MotionConfig, useReducedMotion } from 'framer-motion';
 import { DarkModeProvider } from './context/DarkModeContext';
 import { LanguageProvider, useLanguage } from './context/LanguageContext';
@@ -9,6 +9,8 @@ import Footer from './components/Footer';
 import LoadingSpinner from './components/LoadingSpinner';
 import ErrorBoundary from './components/ErrorBoundary';
 import PageMeta from './components/PageMeta';
+import { getProject } from './data/projects';
+import { afterLoad } from './components/field/defer';
 import { Toaster } from 'react-hot-toast';
 
 const lazyWithRetry = (importer, cacheKey) =>
@@ -44,15 +46,49 @@ const Stack = lazyWithRetry(() => import('./components/Stack'), 'lazy-retry-stac
 const CaseStudyPage = lazyWithRetry(() => import('./pages/CaseStudyPage'), 'lazy-retry-case-study');
 const NotFoundPage = lazyWithRetry(() => import('./pages/NotFoundPage'), 'lazy-retry-404');
 
+// Signal Field: loaded only after the page has loaded (never on the LCP path). If the chunk or WebGL is
+// unavailable the CSS `.site-bg` fallback simply stays visible.
+const AsciiField = lazy(() => import('./components/field/AsciiField').catch(() => ({ default: () => null })));
+
 // Ana sayfa dışındaki tüm sayfalar aynı Suspense + geçiş sarmalayıcısını kullanır.
+// `mood` drives the Signal Field background per route: home = flowing, area = steadier grid drift,
+// case = calm and sparse, notfound = TV static.
+const HOME_MOOD = 'home';
 const LAZY_ROUTES = [
-  { path: '/web', Component: WebDevPage },
-  { path: '/android', Component: AndroidPage },
-  { path: '/cybersecurity', Component: CyberSecurityPage },
-  { path: '/data-science', Component: DataSciencePage },
-  { path: '/case-study/:id', Component: CaseStudyPage },
-  { path: '*', Component: NotFoundPage },
+  { path: '/web', Component: WebDevPage, mood: 'area' },
+  { path: '/android', Component: AndroidPage, mood: 'area' },
+  { path: '/cybersecurity', Component: CyberSecurityPage, mood: 'area' },
+  { path: '/data-science', Component: DataSciencePage, mood: 'area' },
+  { path: '/case-study/:id', Component: CaseStudyPage, mood: 'case' },
+  { path: '*', Component: NotFoundPage, mood: 'notfound' },
 ];
+
+export const moodForPath = (pathname) => {
+  if (matchPath('/', pathname)) return HOME_MOOD;
+  for (const { path, mood } of LAZY_ROUTES) {
+    if (path === '*') continue;
+    const match = matchPath(path, pathname);
+    if (!match) continue;
+    // An unknown case-study id renders the 404 page, so it gets the 404 mood too.
+    if (mood === 'case' && !getProject(match.params.id)) break;
+    return mood;
+  }
+  return 'notfound';
+};
+
+// Mounts the field once the window has loaded and the browser is idle, then keeps it for the whole session.
+const DeferredField = ({ mood }) => {
+  const [ready, setReady] = useState(false);
+
+  useEffect(() => afterLoad(() => setReady(true)), []);
+
+  if (!ready) return null;
+  return (
+    <Suspense fallback={null}>
+      <AsciiField mood={mood} />
+    </Suspense>
+  );
+};
 
 // Reserves roughly the height of the lazy sections so the footer does not jump while they load.
 const HomeFallback = () => <div aria-hidden="true" className="min-h-[120vh]" />;
@@ -168,6 +204,7 @@ const AppContent = () => {
   return (
     <div className="relative flex min-h-screen flex-col">
       <div className="site-bg" aria-hidden="true" />
+      <DeferredField mood={moodForPath(location.pathname)} />
       <a
         href="#main"
         className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[9999] focus:rounded-md focus:bg-signal focus:px-4 focus:py-3 focus:text-sm focus:font-medium focus:text-signal-fg"
